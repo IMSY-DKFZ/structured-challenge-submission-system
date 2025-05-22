@@ -1,0 +1,53 @@
+# Specific bots
+"~*meta-externalagent"   1;
+
+"~*MJ12bot"              1;
+"~*HTTrack"              1;
+
+# Generic patterns
+""                       1; 
+"~*wget"                 1;
+~*malicious"     1;
+~*backdoor"      1;
+~*netcrawler"    1;
+~*webbandit"     1;
+~*libwww-perl"   1;
+~*BBBike"        1;
+~*Go-http-client"          1;
+~*java"          1;
+
+
+"~*AdsBot-Google" 1;
+"~*AhrefsBot"            1;
+"~*Amazonbot"     1;
+"~*anthropic-ai"  1;
+"~*Applebot"        1;
+"~*AwarioRssBot"  1;
+"~*AwarioSmartBot"        1;
+"~*Bytespider"    1;
+"~*CCBot"       1;
+"~*ccbot"         1;
+~*ChatGPT-User""  1;
+"~*ClaudeBot"     1;
+"~*Claude-Web"    1;
+"~*cohere-ai"     1;
+"~*DataForSeoBot" 1;
+"~*FacebookBot"   1;
+"~*facebookexternalhit"   1;
+"~*facebook"      1;
+"~*facebot"       1;
+"~*GPTBot"        1;
+"~*ImagesiftBot"  1;
+"~*magpie-crawler"        1;
+"~*meta-externalagent"    1;
+"~*omgili"        1;
+"~*omgilibot"     1;
+"~*peer39_crawler"        1;
+"~*peer39_crawler/1.0"    1;
+"~*PerplexityBot" 1;
+"~*SemrushBot" 1;
+"~*YouBot"        1;
+"~*instagram"     1;
+"~*tweet" 1;
+"~*tweeter"       1;
+

@@ -1,0 +1,14 @@
+/opt/BMC/logs/nginx_access.log {
+  daily
+  missingok
+  rotate 31
+  dateext
+  compress
+  delaycompress
+  notifempty
+  sharedscripts
+  postrotate
+    cd /opt/BMC/containers \
+      && /usr//bin/docker compose kill -s USR1 nginx
+  endscript
+}

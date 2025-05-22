@@ -1,0 +1,72 @@
+<!-- 
+    This is a main Jinja2 template for the email communications. You can derive other templates from this template.
+
+    # 1. Create a new file in the folder.
+    # 2. Add the following code to the file.
+    # 3. Make necessary modifications, add/remove variables 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUR_EMAIL_TITLE</title>
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: sans-serif !important;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: .875rem !important;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #555555;
+        }
+
+        /* Button styles */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 0px;
+            background-color: #3498db !important;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Your Email Heading</h1>
+        <p>Dear {{ name }},</p>
+        <p>This is a sample email template using Jinja2. Feel free to customize it to meet your requirements.</p>
+        <a href="https://your-link-here" class="button">Click me</a>
+        <p>Best regards,<br>The structured challenge submission system<br><a
+                href="https://www.biomedical-challenges.org/" target="_blank">https://www.biomedical-challenges.org</a>
+        </p>
+    </div>
+</body>
+
+</html>

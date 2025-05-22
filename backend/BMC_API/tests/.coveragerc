@@ -1,0 +1,4 @@
+[run]
+concurrency = greenlet
+omit = *__init__.py,**/tests/*
+

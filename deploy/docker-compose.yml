@@ -1,0 +1,107 @@
+services:
+  bmc-api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: prod
+    image: bmc-api:2.0.0
+    command: bash -c "alembic upgrade head &&  python -m BMC_API"
+    platform: linux/amd64
+    privileged: true
+    restart: always
+    networks:
+      - bmc-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # For accessing SMTP server on localhost
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      BMC_API_HOST: 0.0.0.0
+      BMC_API_DB_FILE: ./database/db.sqlite3
+      BMC_API_RELOAD: "False"
+      BMC_API_LOG_LEVEL: "INFO"
+      BMC_API_ENVIRONMENT: "prod"
+      BMC_API_MAIL_SERVER: "host.docker.internal"
+      BMC_API_REDIS_HOST: "host.docker.internal"
+    volumes:
+      - database:/app/src/BMC_API/database/:Z 
+      - logs:/app/src/BMC_API/logs/
+      - outputs:/app/src/BMC_API/outputs/:Z
+      - backups:/app/src/BMC_API/backups/:Z
+      - /etc/localtime:/etc/localtime # Important to sync timezone of server
+
+    ports:
+      - "5000:5000"
+ 
+
+  redis:
+    image: redis:latest
+    platform: linux/amd64
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
+    ports:
+      - "6379:6379"
+
+  server:
+    image: nginx_server:stable
+    platform: linux/amd64
+    restart: always
+    build:
+      context: ../nginx
+      dockerfile: Dockerfile
+    privileged: true
+    volumes:
+      - www:/www:Z
+      - logs:/var/log/nginx:Z
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - bmc-api
+    networks:
+      - bmc-network
+
+volumes:
+  database:
+    driver: local
+    driver_opts:
+      type: none
+      device: <PATH_TO_DATABASE_LOCATION_ON_SERVER>
+      o: bind
+  logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: <PATH_TO_LOGS_LOCATION_ON_SERVER>
+      o: bind
+  outputs:
+    driver: local
+    driver_opts:
+      type: none
+      device: <PATH_TO_OUTPUTS_LOCATION_ON_SERVER>
+      o: bind
+  backups:
+    driver: local
+    driver_opts:
+      type: none
+      device: <PATH_TO_BACKUPS_LOCATION_ON_SERVER>
+      o: bind
+  www:
+    driver: local
+    driver_opts:
+      type: none
+      device: <PATH_TO_WWW_LOCATION_ON_SERVER>
+      o: bind
+  
+
+networks:
+  bmc-network:
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YOUR_EMAIL_TITLE</title>
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: sans-serif !important;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-size: .875rem !important;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #555555;
+        }
+
+        /* Button styles */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 0px;
+            background-color: #3498db !important;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+
+        }
+
+        /* Add more styles as needed */
+    </style>
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Confirm your email address</h1>
+        <p>Dear {{first_name}} {{last_name}},</p>
+        <p>Thank you registering to <u>biomedical-challenges.org</u>. Your confirmation code is:
+            <u><b>{{email_confirmation_token}}</b></u>
+        </p>
+        <p>In order to complete your registration, click the button below:</p>
+        <span class="center"><a href="{{email_confirmation_url_with_token}}" class="button" target="_blank">Confirm
+                Email</a></span>
+        <p><i>If the button above does not work, please visit the following link in your browser and write your code
+                manually: <a href="{{email_confirmation_url}}" target="_blank">{{email_confirmation_url}}</a></i></p>
+        <p>Best regards,<br />The structured challenge submission system<br><a
+                href="https://www.biomedical-challenges.org/" target="_blank">https://www.biomedical-challenges.org</a>
+        </p>
+    </div>
+</body>
+
+</html>

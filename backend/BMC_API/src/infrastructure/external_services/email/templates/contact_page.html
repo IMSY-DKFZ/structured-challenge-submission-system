@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUR_EMAIL_TITLE</title>
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: sans-serif !important;
+            background-color: #ffffff !important;
+            margin: 0;
+            padding: 0;
+            font-size: .875rem !important;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff !important;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        h1 {
+            color: #333333 !important;
+        }
+
+        p {
+            color: #555555 !important;
+        }
+
+        /* Button styles */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 0px;
+            background-color: #3498db !important;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>A new message has been sent to {{recipients_group}}</h1>
+        <p>A new message has been sent from the contact page of the structured challenge submission system. Here are the
+            details:</p>
+        <div>
+            <hr><b>Sender name: </b><code>{{sender_name}}</code></span><br />
+            <span><b>Sender email address: </b><code>{{sender_email}}</code></span><br />
+            <span><b>Recipients: </b><code>{{recipients_group}}</code></span><br />
+            <span><b>Subject: </b><code>{{subject}}</code></span><br />
+            <span><b>Message:</b>
+                <pre>{{message}}</pre>
+            </span><br />
+            <hr>
+        </div>
+        <p>Best regards,<br>The structured challenge submission system<br><a
+                href="https://www.biomedical-challenges.org/" target="_blank">https://www.biomedical-challenges.org</a>
+        </p>
+    </div>
+</body>
+
+</html>

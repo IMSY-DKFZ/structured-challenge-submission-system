@@ -11,9 +11,11 @@
                     class="footer-link link-underline link-underline-opacity-10 link-underline-opacity-0-hover">Division
                     of Medical Image
                     Computing
-                    (MIC)</a> and <a href="https://www.helmholtz-imaging.de/" target="_blank"
+                    (MIC)</a>, <a href="https://www.helmholtz-imaging.de/" target="_blank"
                     class="footer-link link-underline link-underline-opacity-10 link-underline-opacity-0-hover">Helmholtz
-                    Imaging (HI)</a>. © <span id="year">2024</span>, Copyright German Cancer Research Center. All rights
+                    Imaging (HI)</a>, and <a href="https://miccai.org/" target="_blank"
+                    class="footer-link link-underline link-underline-opacity-10 link-underline-opacity-0-hover">
+                    the Medical Image Computing and Computer Assisted Intervention (MICCAI) Society</a>. © <span id="year">2024</span>, Copyright German Cancer Research Center. All rights
                 reserved.
             </p>
 

@@ -167,6 +167,9 @@
             src="@/assets/images/DKFZ_Logo_blue.png" alt=""></a><a href="https://helmholtz-imaging.de/" target="_blank"
           class="mx-auto d-block"><img style="width: auto; height: 25px; " src="@/assets/images/HI_Logo_small.png"
             alt="" title=""></a>
+		<a href="https://miccai.org/" target="_blank"
+          class="mx-auto d-block"><img style="width: auto; height: 25px; " src="@/assets/images/MICCAI_logo_bkg_1.png"
+            alt="" title=""></a>
       </div> -->
       <!-- <div class="p-2 text-muted lh-sm"><small>®Copyright German Cancer Research Center. All rights reserved.</small>
 

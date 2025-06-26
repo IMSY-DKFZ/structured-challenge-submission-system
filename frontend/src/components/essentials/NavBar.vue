@@ -15,6 +15,9 @@
                         title=""></a>
                 <a v-else href="https://helmholtz-imaging.de/" target="_blank" class="px-2"><img
                         style="width: auto; height: 23px; " src="@/assets/images/HI_Logo_small.png" alt="" title=""></a>
+				<a href="https://miccai.org/" target="_blank"
+                        class="px-2"><img style="width: auto; height: 45px; " src="@/assets/images/MICCAI_logo_bkg_1.png"
+                        alt="" title=""></a>
             </div>
             <!-- Button for mobile view -->
             <div class="ms-auto mx-auto d-lg-none">

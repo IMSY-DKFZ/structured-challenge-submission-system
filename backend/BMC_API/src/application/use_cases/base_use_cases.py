@@ -2,11 +2,12 @@
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 
 from loguru import logger
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel, TypeAdapter, ValidationError
 from sqlalchemy.exc import NoResultFound
 
 from BMC_API.src.api.dependencies.schemas import BulkOperationResponse
 from BMC_API.src.core.exceptions import NotFoundException, RepositoryException
+from BMC_API.src.core.validation_errors import format_validation_error
 from BMC_API.src.domain.repositories.base_repository import BaseRepositoryProtocol
 from BMC_API.src.infrastructure.persistence.base import Base
 
@@ -128,6 +129,12 @@ class BaseService(Generic[T, ResponseDTO]):
         if not entities:
             raise NotFoundException(message=f"No {self.model_name} found.")
 
+        # Projected queries already return dictionaries containing only the requested
+        # columns. Validating those dicts as full DTOs can reject legacy values or
+        # fail on fields intentionally omitted from the projection.
+        if output_filters:
+            return entities, total_pages, total_records
+
         # Convert entities to DTOs if dto_class is provided
         if self.dto_class:
             return (
@@ -160,6 +167,9 @@ class BaseService(Generic[T, ResponseDTO]):
                 return self.dto_class.model_validate(created)
             return created
 
+        except ValidationError as e:
+            logger.error(f"Validation error creating entity: {e}")
+            raise RepositoryException(message=f"Error creating entity: {format_validation_error(e)}")
         except Exception as e:
             logger.error(f"Error creating entity: {e}")
             raise RepositoryException(message=f"Error creating entity: {str(e)}")
@@ -197,6 +207,11 @@ class BaseService(Generic[T, ResponseDTO]):
                 return self.dto_class.model_validate(updated)
             return updated
 
+        except ValidationError as e:
+            logger.error(f"Validation error updating {self.model_name} with {id}: {e}")
+            raise RepositoryException(
+                message=f"Error updating {self.model_name} with id {id}: {format_validation_error(e)}"
+            )
         except Exception as e:
             logger.error(f"Error updating {self.model_name} with {id}: {e}")
             raise RepositoryException(message=f"Error updating {self.model_name} with id {id}: {str(e)}")
@@ -213,7 +228,6 @@ class BaseService(Generic[T, ResponseDTO]):
         """
         successful_results = []
         failed_results = []
-        # dto_class = update_dto_class or UpdateDTO
 
         for update_data in updates:
             if "id" not in update_data:
@@ -221,25 +235,28 @@ class BaseService(Generic[T, ResponseDTO]):
                 logger.warning(f"Skipping update for {self.model_name} without id")
                 continue
 
-            entity_id = update_data.pop("id")
+            entity_id = update_data["id"]
+            update_fields = {key: value for key, value in update_data.items() if key != "id"}
             original_data = {"id": entity_id, **update_data}
 
             try:
+                if update_dto_class:
+                    update_fields = update_dto_class.model_validate(update_fields).model_dump(exclude_unset=True)
+
                 # Get the existing entity to confirm it exists
                 existing = await self.repository.get(id=entity_id)
                 if not existing:
-                    failed_results.append({
-                        "data": original_data,
-                        "error": f"{self.model_name} with id {entity_id} not found",
-                    })
+                    failed_results.append(
+                        {
+                            "data": original_data,
+                            "error": f"{self.model_name} with id {entity_id} not found",
+                        }
+                    )
                     logger.warning(f"{self.model_name} with id {entity_id} not found for update")
                     continue
 
-                # # Convert dict to the specified UpdateDTO for validation
-                # model_update = dto_class(**update_data)
-
                 # Update the entity
-                updated = await self.repository.update(entity_id, update_data)
+                updated = await self.repository.update(entity_id, update_fields)
 
                 # Convert updated entity to response DTO
                 if self.dto_class:
@@ -247,6 +264,10 @@ class BaseService(Generic[T, ResponseDTO]):
                 else:
                     successful_results.append(updated)
 
+            except ValidationError as e:
+                failed_results.append({"data": original_data, "error": format_validation_error(e)})
+                logger.error(f"Validation error updating {self.model_name} with id {entity_id}: {e}")
+                continue
             except Exception as e:
                 failed_results.append({"data": original_data, "error": str(e)})
                 logger.error(f"Error updating {self.model_name} with id {entity_id}: {e}")
@@ -302,10 +323,12 @@ class BaseService(Generic[T, ResponseDTO]):
                 await self.repository.delete(id=entity_id)
                 successful_results.append(entity_id)
             except NoResultFound:
-                failed_results.append({
-                    "id": entity_id,
-                    "error": f"{self.model_name} with id {entity_id} not found.",
-                })
+                failed_results.append(
+                    {
+                        "id": entity_id,
+                        "error": f"{self.model_name} with id {entity_id} not found.",
+                    }
+                )
                 logger.warning(f"{self.model_name} with id {entity_id} not found for deletion.")
             except Exception as e:
                 failed_results.append({"id": entity_id, "error": str(e)})

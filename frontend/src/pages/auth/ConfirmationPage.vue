@@ -1,14 +1,35 @@
 <template>
-  <ContentCard :headline="headline" :subtitle="subTitle" :show-logo="false" :backlink="backlink" :showLinks="false">
-    <BaseAlert :model-value="alert" @dismiss="dismissAlert" />
-    <VueForm class="mt-4" @submitEvent="confirm" actionBtn="Confirm" name="confirm-form" :actionBtnFullwidth="true">
-      <VueInput label="Confirmation Code" type="text" value="confirmationCode" :required="true"
+  <ContentCard
+    :headline="headline"
+    :subtitle="subTitle"
+    :show-logo="false"
+    :backlink="backlink"
+    :showLinks="false">
+    <BaseAlert
+      :model-value="alert"
+      @dismiss="dismissAlert" />
+    <VueForm
+      class="mt-4"
+      @submitEvent="confirm"
+      actionBtn="Confirm"
+      name="confirm-form"
+      :actionBtnFullwidth="true">
+      <VueInput
+        label="Confirmation Code"
+        type="text"
+        value="confirmationCode"
+        :required="true"
         v-model="confirmationCode"></VueInput>
     </VueForm>
     <div class="text-center d-flex flex-column">
-      <span><router-link class="text-decoration-underline" :to="{ name: 'Registration' }">Create an
-          account</router-link> if
-        you don't have one.</span>
+      <span
+        ><router-link
+          class="text-decoration-underline"
+          :to="{ name: 'Registration' }"
+          >Create an account</router-link
+        >
+        if you don't have one.</span
+      >
     </div>
   </ContentCard>
 </template>
@@ -49,7 +70,7 @@ export default {
   },
   methods: {
     confirm() {
-      apiPost(`/user/confirm_email/?confirmation_token=${this.confirmationCode}`, true)
+      apiPost(`/user/confirm_email?confirmation_token=${this.confirmationCode}`, true)
         .then((response) => {
           //           const loginLink = getStaticUrl({ name: 'Login' })
           //           this.showAlert(
@@ -59,7 +80,11 @@ export default {
           //             0
           //           )
           this.$router.push({ name: 'Login' })
-          useToastAlertStore().showAlert('Your account is now activated. Please log in.', 'success', 6000);
+          useToastAlertStore().showAlert(
+            'Your account is now activated. Please log in.',
+            'success',
+            6000
+          )
         })
         .catch((error) => {
           this.showAlert(error, 'danger', 0)

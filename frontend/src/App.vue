@@ -12,7 +12,6 @@ useColorStore().setPreferredTheme()
   <ToastAlert />
   <Alert-modal />
   <RouterView />
-
 </template>
 
 <style scoped></style>

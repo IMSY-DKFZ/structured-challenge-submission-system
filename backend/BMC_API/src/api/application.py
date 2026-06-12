@@ -17,6 +17,7 @@ from BMC_API.src.core.logging.logging import configure_logging
 
 API_PREFIX = settings.api_prefix
 
+
 def custom_rate_limit_exceeded_handler(
     request: Request,
     exc: RateLimitExceeded,
@@ -37,6 +38,7 @@ def custom_rate_limit_exceeded_handler(
     """
 
     return UJSONResponse({"error": "Rate limit exceeded."}, status_code=status.HTTP_429_TOO_MANY_REQUESTS)
+
 
 def get_app() -> FastAPI:
     """
@@ -61,7 +63,6 @@ def get_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-
     # 3. Register exception handlers
     register_exception_handlers(app)
 
@@ -72,8 +73,8 @@ def get_app() -> FastAPI:
 
     origins = [
         "https://www.biomedical-challenges.org",
-        "http://localhost:5000", # Allow access from local access to /api/docs
-        "http://localhost:5173", # Allow access from local access to frontend
+        "http://localhost:5000",  # Allow access from local access to /api/docs
+        "http://localhost:5173",  # Allow access from local access to frontend
     ]
 
     app.add_middleware(

@@ -4,22 +4,42 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ title }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="_cancel"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            @click="_cancel"></button>
         </div>
         <div class="modal-body lh-sm py-3">
           <p>{{ message }}</p>
           <!-- New password input field -->
-          <div v-if="showPasswordInput" class="form-group">
+          <div
+            v-if="showPasswordInput"
+            class="form-group">
             <p><label for="password">Enter Your Password:</label></p>
-            <input type="password" v-model="password" class="form-control" id="password" required>
+            <input
+              type="password"
+              v-model="password"
+              class="form-control"
+              id="password"
+              required />
           </div>
           <slot></slot>
         </div>
         <div class="modal-footer gap-2">
-          <button type="button" class="btn btn-secondary" @click="_cancel">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="_cancel">
             {{ cancelButton }}
           </button>
-          <button type="button" v-if="okButton" class="btn" :class="okButtonTheme" @click="_confirm">
+          <button
+            type="button"
+            v-if="okButton"
+            class="btn"
+            :class="okButtonTheme"
+            @click="_confirm">
             {{ okButton }}
           </button>
         </div>
@@ -45,7 +65,6 @@ export default {
     showPasswordInput: false, // Flag to show/hide password input
     password: '', // bind this to the password input
 
-
     // Private variables
     resolvePromise: undefined,
     rejectPromise: undefined,
@@ -57,7 +76,7 @@ export default {
       this.message = opts.message
       this.okButton = opts.okButton
       this.okButtonTheme = opts.okButtonTheme || 'btn-primary'
-      this.showPasswordInput = opts.showPasswordInput || false; // Set the flag
+      this.showPasswordInput = opts.showPasswordInput || false // Set the flag
       if (opts.cancelButton) {
         this.cancelButton = opts.cancelButton
       }
@@ -72,7 +91,7 @@ export default {
 
     _confirm() {
       this.$refs.popup.close()
-      this.resolvePromise(this.showPasswordInput ? this.password : true);
+      this.resolvePromise(this.showPasswordInput ? this.password : true)
     },
 
     _cancel() {
@@ -90,6 +109,6 @@ export default {
 }
 
 .popup-modal {
-  z-index: 999
+  z-index: 999;
 }
 </style>

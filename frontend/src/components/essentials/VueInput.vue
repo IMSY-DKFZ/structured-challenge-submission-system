@@ -1,35 +1,95 @@
 <template>
   <div>
     <!--    Text-Inputs  -->
-    <div v-if="!isCheckbox && !isCheckboxPlus && !isSelectPlus && !isSelectWithOther && !isSelectMultipleWithOther"
+    <div
+      v-if="
+        !isCheckbox &&
+        !isCheckboxPlus &&
+        !isSelectPlus &&
+        !isSelectWithOther &&
+        !isSelectMultipleWithOther &&
+        !isConditionalSelect
+      "
       class="mt-3">
       <div class="mb-1">
-        <span v-if="label" v-html="label" class="form-label label"></span>
+        <span
+          v-if="label"
+          v-html="label"
+          class="form-label label"></span>
         <!-- <span v-if="required" class="text-danger"><b>*</b></span> -->
       </div>
       <div>
-        <div class="input-group" v-if="type === 'select'">
-          <span class="input-group-text" v-if="icon !== ''">
-            <i class="bi" :class="`bi-${icon}`"></i>
+        <div
+          class="input-group"
+          v-if="type === 'select'">
+          <span
+            class="input-group-text"
+            v-if="icon !== ''">
+            <i
+              class="bi"
+              :class="`bi-${icon}`"></i>
           </span>
-          <select :errormessage="message" @input="$emit('update:modelValue', $event.target.value)" :value="modelValue"
-            class="form-select" :class="{ 'border-danger': modelValue == null }">
-            <option v-for="(item, idx) in options" :key="idx">
+          <select
+            :errormessage="message"
+            @input="$emit('update:modelValue', $event.target.value)"
+            :value="modelValue"
+            class="form-select"
+            :class="{ 'border-danger': modelValue == null }">
+            <option
+              v-for="(item, idx) in options"
+              :key="idx">
               {{ item }}
             </option>
           </select>
         </div>
-        <div v-else class="input-group">
-          <span class="input-group-text" v-if="icon !== ''">
-            <i class="bi" :class="`bi-${icon}`"></i>
+        <div
+          v-else
+          class="input-group">
+          <span
+            class="input-group-text"
+            v-if="icon !== ''">
+            <i
+              class="bi"
+              :class="`bi-${icon}`"></i>
           </span>
-          <component :is="inputComponentTyp" :errormessage="message" :disabled="disabled" :label="label"
-            :type="textInputType" class="form-control" :minlength="textMinLength" :maxlength="textMaxLength"
-            :class="{ 'border-danger': showError || (required && (!modelValue || !modelValue.length)) }"
-            :value="modelValue" :placeholder="placeholder" @input="$emit('update:modelValue', $event.target.value)"
-            :required="required" :allowSpecialCharacters="allowSpecialCharacters" />
-          <button v-if="passwordInput" @click="toggleShow" class="btn btn-outline-secondary" type="button">
-            <i class="bi" :class="{ 'bi-eye-slash': showPassword, 'bi-eye': !showPassword }"></i>
+          <button
+            v-if="infoText"
+            ref="infoTooltip"
+            class="btn btn-outline-secondary border-secondary-subtle quick-filter-info-button"
+            type="button"
+            data-bs-toggle="tooltip"
+            data-bs-trigger="hover focus click"
+            data-bs-placement="bottom"
+            aria-expanded="false"
+            aria-label="Input information"
+            :title="infoText">
+            <i class="bi bi-info-circle"></i>
+          </button>
+          <component
+            :is="inputComponentTyp"
+            :errormessage="message"
+            :disabled="disabled"
+            :label="label"
+            :type="textInputType"
+            class="form-control"
+            :minlength="textMinLength"
+            :maxlength="textMaxLength"
+            :class="{
+              'border-danger': showError || (required && (!modelValue || !modelValue.length)),
+            }"
+            :value="modelValue"
+            :placeholder="placeholder"
+            @input="$emit('update:modelValue', $event.target.value)"
+            :required="required"
+            :allowSpecialCharacters="allowSpecialCharacters" />
+          <button
+            v-if="passwordInput"
+            @click="toggleShow"
+            class="btn btn-outline-secondary"
+            type="button">
+            <i
+              class="bi"
+              :class="{ 'bi-eye-slash': showPassword, 'bi-eye': !showPassword }"></i>
           </button>
         </div>
       </div>
@@ -37,35 +97,61 @@
       <!-- <div v-if="forgetPassword" class="text-end">
         <router-link :to="{ name: 'Reset password request' }">Reset password</router-link>
       </div> -->
-      <div v-if="showError" class="text-start input-invalid mb-3">
+      <div
+        v-if="showError"
+        class="text-start input-invalid mb-3">
         <div v-if="typeof message === 'string'">
           {{ message }}
         </div>
         <ul v-else-if="Array.isArray(message)">
-          <li v-for="(item, index) in message" :key="index">{{ item }}</li>
+          <li
+            v-for="(item, index) in message"
+            :key="index">
+            {{ item }}
+          </li>
         </ul>
       </div>
     </div>
-    <div v-if="isPasswordRepeat" class="mb-3">
-      <div id="passwordHelpBlock" class="form-text pb-2">
-        <small>Your password must be 8-20 characters long. It must include upper and lower case letters, numbers, and
-          special
-          characters such as !,#.</small>
+    <div
+      v-if="isPasswordRepeat"
+      class="mb-3">
+      <div
+        id="passwordHelpBlock"
+        class="form-text pb-2">
+        <small
+          >Your password must be 8-20 characters long. It must include upper and lower case letters,
+          numbers, and special characters such as !,#.</small
+        >
       </div>
       <label class="form-label">Confirm password</label>
       <div class="input-group">
-        <span class="input-group-text" v-if="icon !== ''">
-          <i class="bi" :class="`bi-${icon}`"></i>
+        <span
+          class="input-group-text"
+          v-if="icon !== ''">
+          <i
+            class="bi"
+            :class="`bi-${icon}`"></i>
         </span>
         <!-- <input :errormessage="passwordDontMatch" :label="'Confirm password'" onpaste="return false;"
           ondrop="return false;" autocomplete="off" :type="textInputType" class="form-control"
           :class="{ 'border-danger': passwordDontMatch }" v-model="passwordRepeat" :required="modelValue !== ''" /> -->
 
-        <input :errormessage="passwordDontMatch" :label="'Confirm password'" autocomplete="off" :type="textInputType"
-          class="form-control" :class="{ 'border-danger': passwordsDontMatch || hasValidationErrors }"
-          v-model="passwordRepeat" :required="modelValue !== ''" /><button v-if="passwordInput" @click="toggleShow"
-          class="btn btn-outline-secondary" type="button">
-          <i class="bi" :class="{ 'bi-eye-slash': showPassword, 'bi-eye': !showPassword }"></i>
+        <input
+          :errormessage="passwordDontMatch"
+          :label="'Confirm password'"
+          autocomplete="off"
+          :type="textInputType"
+          class="form-control"
+          :class="{ 'border-danger': passwordsDontMatch || hasValidationErrors }"
+          v-model="passwordRepeat"
+          :required="modelValue !== ''" /><button
+          v-if="passwordInput"
+          @click="toggleShow"
+          class="btn btn-outline-secondary"
+          type="button">
+          <i
+            class="bi"
+            :class="{ 'bi-eye-slash': showPassword, 'bi-eye': !showPassword }"></i>
         </button>
       </div>
       <!-- <div v-if="hasValidationErrors" class="text-danger mt-2">
@@ -76,75 +162,217 @@
           <li v-for="(error, index) in message" :key="index">{{ error }}</li>
         </ul>
       </div> -->
-      <div v-if="passwordsDontMatch" class="text-danger mt-2">
+      <div
+        v-if="passwordsDontMatch"
+        class="text-danger mt-2">
         <small>{{ passwordDontMatch }}</small>
       </div>
     </div>
-    <div class="form-check d-flex align-items-center gap-2 mt-4" style="flex-grow: 1; flex-shrink: 1" v-if="isCheckbox">
-      <input :checked="modelValue" :errormessage="message" type="checkbox" class="form-check-input"
-        :class="{ 'border-danger': showError || (required && (required && (!modelValue))) }"
-        @input="$emit('update:modelValue', $event.target.checked)" :required="required" :id="label + 'id'" />
-      <label style="flex-shrink: 100" class="form-check-label"
-        :class="{ 'text-danger': showError || (required && (required && (!modelValue))) }" v-html="label"
+    <div
+      class="form-check d-flex align-items-center gap-2 mt-4"
+      style="flex-grow: 1; flex-shrink: 1"
+      v-if="isCheckbox">
+      <input
+        :checked="modelValue"
+        :errormessage="message"
+        type="checkbox"
+        class="form-check-input"
+        :class="{ 'border-danger': showError || (required && required && !modelValue) }"
+        @input="$emit('update:modelValue', $event.target.checked)"
+        :required="required"
+        :id="label + 'id'" />
+      <label
+        style="flex-shrink: 100"
+        class="form-check-label"
+        :class="{ 'text-danger': showError || (required && required && !modelValue) }"
+        v-html="label"
         :for="label + 'id'">
-
       </label>
       <!-- <span v-if="required" class="text-danger"><b>*</b></span> -->
     </div>
     <!-- Add radio group here -->
-    <div class="gap-2" v-if="isCheckboxPlus">
-      <div v-for="(item, idx) in options" :key="idx" class="p-1 gap-2 pe-3 align-items-center"
+    <div
+      class="gap-2"
+      v-if="isCheckboxPlus">
+      <div
+        v-for="(item, idx) in options"
+        :key="idx"
+        class="p-1 gap-2 pe-3 align-items-center"
         style="display: inline-flex">
-        <input :checked="setCheckboxPlusVModal(item)" :errormessage="message" type="checkbox" class="form-check-input"
-          :class="{ 'border-danger': showError }" @input="buildCheckboxPlusVModal({ key: 'checkbox', value: item })"
-          :required="required" :id="item + uniqueId + 'option'" />
-        <label class="form-check-label" :for="item + uniqueId + 'option'">
+        <input
+          :checked="setCheckboxPlusVModal(item)"
+          :errormessage="message"
+          type="checkbox"
+          class="form-check-input"
+          :class="{ 'border-danger': showError }"
+          @input="buildCheckboxPlusVModal({ key: 'checkbox', value: item })"
+          :required="required"
+          :id="item + uniqueId + 'option'" />
+        <label
+          class="form-check-label"
+          :for="item + uniqueId + 'option'">
           {{ item }}
         </label>
       </div>
-      <input v-model="inputPlus" :errormessage="message" :disabled="disabled" :label="label" type="text"
-        class="form-control" :minlength="textMinLength" :maxlength="textMaxLength" placeholder="Please specify"
+      <input
+        v-model="inputPlus"
+        :errormessage="message"
+        :disabled="disabled"
+        :label="label"
+        type="text"
+        class="form-control"
+        :minlength="textMinLength"
+        :maxlength="textMaxLength"
+        placeholder="Please specify"
         :class="{ 'border-danger': showError || (required && (!modelValue || !modelValue.length)) }"
-        :required="required" :allowSpecialCharacters="allowSpecialCharacters" />
-      <div v-if="showError" class="text-start input-invalid mb-3">
+        :required="required"
+        :allowSpecialCharacters="allowSpecialCharacters" />
+      <div
+        v-if="showError"
+        class="text-start input-invalid mb-3">
         {{ message }}
       </div>
     </div>
 
-    <div class="gap-2" v-if="isSelectWithOther">
-
-      <span class="input-group-text" v-if="icon !== ''">
-        <i class="bi" :class="`bi-${icon}`"></i>
+    <div
+      class="gap-2"
+      v-if="isSelectWithOther">
+      <div class="pt-3 pb-1">
+        <span
+          v-if="label"
+          v-html="label"
+          class="form-label label"></span>
+      </div>
+      <span
+        class="input-group-text"
+        v-if="icon !== ''">
+        <i
+          class="bi"
+          :class="`bi-${icon}`"></i>
       </span>
-      <select v-model="selectedOption" class="form-select mb-2" :class="{ 'border-danger': selectedOption == null }">
-        <option v-for="(item, idx) in options" :key="idx">
+      <select
+        v-model="selectedOption"
+        class="form-select mb-2"
+        :class="{ 'border-danger': selectedOption == null }">
+        <option
+          v-for="(item, idx) in options"
+          :key="idx">
           {{ item }}
         </option>
         <option value="Other">Other</option>
       </select>
 
       <!-- Conditionally show input field when "Other" is selected -->
-      <input v-if="selectedOption === 'Other'" type="text" class="form-control" v-model="customInput"
+      <input
+        v-if="selectedOption === 'Other'"
+        type="text"
+        class="form-control"
+        v-model="customInput"
         placeholder="Enter custom value" />
     </div>
-    <div class="gap-2" v-if="isSelectMultipleWithOther">
-      <span class="input-group-text" v-if="icon !== ''">
-        <i class="bi" :class="`bi-${icon}`"></i>
+    <div
+      class="gap-2"
+      v-if="isSelectMultipleWithOther">
+      <div class="pt-3 pb-1">
+        <span
+          v-if="label"
+          v-html="label"
+          class="form-label label"></span>
+      </div>
+      <span
+        class="input-group-text"
+        v-if="icon !== ''">
+        <i
+          class="bi"
+          :class="`bi-${icon}`"></i>
       </span>
       <i class="ms-1 small">(You can select multiple values and/or add a custom input)</i>
-      <multiselect v-model="selectedOptions" :multiple="true" :taggable="true" :close-on-select="true"
-        :spellcheck="true" :allow-empty="true" :options="options"
+      <multiselect
+        v-model="selectedOptions"
+        :multiple="true"
+        :taggable="true"
+        :close-on-select="true"
+        :spellcheck="true"
+        :allow-empty="true"
+        :options="options"
         tag-placeholder="Press ENTER to add this as custom input"
         placeholder="Select option(s) or start typing to add a custom input..."
-        :class="{ 'border-danger': hasSelectedOptionsError }" @tag="addCustomInput">
-
+        :class="{ 'border-danger': hasSelectedOptionsError }"
+        @tag="addCustomInput">
       </multiselect>
-      <div class="text-danger mt-1 ms-1 small" v-if="hasSelectedOptionsError">
+      <div
+        class="text-danger mt-1 ms-1 small"
+        v-if="hasSelectedOptionsError">
         Please select at least one option.
       </div>
 
       <!-- <input v-if="showCustomInput" type="text" class="form-control mt-2" v-model="customInput"
         placeholder="Enter custom value" /> -->
+    </div>
+    <div
+      v-if="isConditionalSelect"
+      class="mt-3">
+      <div class="mb-3">
+        <label class="form-label d-block fw-bold mb-2">{{ label }}</label>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            :name="uniqueId + 'cond'"
+            :id="uniqueId + 'condYes'"
+            value="Yes"
+            :checked="conditionalOption === 'Yes'"
+            @change="updateConditionalOption('Yes')" />
+          <label
+            class="form-check-label"
+            :for="uniqueId + 'condYes'"
+            >Yes</label
+          >
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            :name="uniqueId + 'cond'"
+            :id="uniqueId + 'condNo'"
+            value="No"
+            :checked="conditionalOption === 'No'"
+            @change="updateConditionalOption('No')" />
+          <label
+            class="form-check-label"
+            :for="uniqueId + 'condNo'"
+            >No</label
+          >
+        </div>
+      </div>
+
+      <div
+        v-if="conditionalOption === 'Yes'"
+        class="alert alert-light border">
+        <label class="form-label fw-bold">{{ placeholder || 'Please convert select' }}</label>
+        <select
+          class="form-select"
+          :class="{ 'border-danger': showError && !conditionalTopic }"
+          :value="conditionalTopic"
+          @change="updateConditionalTopic($event.target.value)">
+          <option
+            disabled
+            value="">
+            Please select...
+          </option>
+          <option
+            v-for="(item, idx) in options"
+            :key="idx"
+            :value="item">
+            {{ item }}
+          </option>
+        </select>
+        <div
+          v-if="showError && !conditionalTopic"
+          class="text-danger mt-1 small">
+          Please select an option from the list.
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -191,6 +419,10 @@ export default {
       typ: String,
       default: '',
     },
+    infoText: {
+      typ: String,
+      default: '',
+    },
     placeholder: {
       typ: String,
       default: '',
@@ -214,6 +446,7 @@ export default {
           'text-field',
           'checkbox',
           'checkboxPlus',
+          'conditionalSelect',
         ].includes(value)
       },
     },
@@ -234,6 +467,10 @@ export default {
       typ: Boolean,
       default: true,
     },
+    pattern: {
+      typ: String,
+      default: null,
+    },
   },
   emits: ['update:modelValue', 'errorState'],
   data() {
@@ -245,6 +482,7 @@ export default {
       selectedOption: this.modelValue || null,
       selectedOptions: [],
       customInput: '',
+      infoTooltipInstance: null,
     }
   },
   computed: {
@@ -252,7 +490,7 @@ export default {
       return this.type === 'textarea' ? 'textarea' : 'input'
     },
     hasValidationErrors() {
-      return Array.isArray(this.message) ? this.message.length > 0 : Boolean(this.message);
+      return Array.isArray(this.message) ? this.message.length > 0 : Boolean(this.message)
     },
     showError() {
       return this.hasValidationErrors || this.hasError || this.passwordsDontMatch
@@ -275,18 +513,23 @@ export default {
     isSelectMultipleWithOther() {
       return this.type === 'selectMultipleWithOther'
     },
+    isConditionalSelect() {
+      return this.type === 'conditionalSelect'
+    },
     isPasswordRepeat() {
       return this.type === 'password-repeat'
     },
     passwordsDontMatch() {
-      return this.isPasswordRepeat &&
+      return (
+        this.isPasswordRepeat &&
         this.modelValue &&
         this.passwordRepeat &&
-        this.modelValue !== this.passwordRepeat;
+        this.modelValue !== this.passwordRepeat
+      )
     },
 
     passwordDontMatch() {
-      return this.passwordsDontMatch ? 'Passwords do not match.' : '';
+      return this.passwordsDontMatch ? 'Passwords do not match.' : ''
     },
     passwordInput() {
       return ['password', 'password-repeat'].includes(this.type)
@@ -304,14 +547,36 @@ export default {
     },
 
     hasSelectedOptionsError() {
-      return !this.selectedOptions || this.selectedOptions.length === 0;
+      return !this.selectedOptions || this.selectedOptions.length === 0
     },
     showCustomInput() {
-      return this.selectedOptions && this.selectedOptions.some(option => option.label === 'Other');
+      return this.selectedOptions && this.selectedOptions.some((option) => option.label === 'Other')
     },
     formattedOptions() {
-      return [...this.options, 'Other'];
-    }
+      return [...this.options, 'Other']
+    },
+    conditionalOption() {
+      if (
+        this.modelValue &&
+        typeof this.modelValue === 'string' &&
+        this.modelValue.startsWith('Yes:')
+      ) {
+        return 'Yes'
+      } else if (this.modelValue === 'No') {
+        return 'No'
+      }
+      return ''
+    },
+    conditionalTopic() {
+      if (
+        this.modelValue &&
+        typeof this.modelValue === 'string' &&
+        this.modelValue.startsWith('Yes: ')
+      ) {
+        return this.modelValue.substring(5)
+      }
+      return ''
+    },
   },
   watch: {
     hasError(n) {
@@ -319,11 +584,13 @@ export default {
         this.resetInputState()
       }
     },
+    infoText() {
+      this.$nextTick(this.initializeInfoTooltip)
+    },
     passwordRepeat(newValue) {
       if (this.isPasswordRepeat && this.modelValue) {
-        this.validatePassword(this.modelValue);
+        this.validatePassword(this.modelValue)
       }
-
     },
     modelValue: {
       handler: function (value) {
@@ -333,7 +600,7 @@ export default {
           this.resetInputState()
         }
         if (this.type === 'password-repeat') {
-          this.validatePassword(value);
+          this.validatePassword(value)
         }
         this.$emit('errorState', {
           questionKey: this.questionKey,
@@ -348,26 +615,23 @@ export default {
     },
     selectedOption(newValue) {
       if (newValue !== 'Other') {
-        this.customInput = '';
-        this.$emit('update:modelValue', newValue);
+        this.customInput = ''
+        this.$emit('update:modelValue', newValue)
       } else {
-        this.$emit('update:modelValue', this.customInput);
+        this.$emit('update:modelValue', this.customInput)
       }
     },
     customInput(newValue) {
       if (this.selectedOption === 'Other') {
-        this.$emit('update:modelValue', newValue);
+        this.$emit('update:modelValue', newValue)
       }
     },
     selectedOptions: {
-
       handler(newValue) {
-        this.$emit('update:modelValue', this.convertSelectedOptionsToString(newValue));
-
+        this.$emit('update:modelValue', this.convertSelectedOptionsToString(newValue))
       },
-      deep: true
+      deep: true,
     },
-
   },
   async mounted() {
     if (this.hasError) {
@@ -378,22 +642,46 @@ export default {
     }
     // Check if the modelValue exists in options, or set it as 'Other'
     if (this.modelValue && this.options.includes(this.modelValue)) {
-      this.selectedOption = this.modelValue; // Preselect the saved option
+      this.selectedOption = this.modelValue // Preselect the saved option
     } else if (this.modelValue) {
-      this.selectedOption = 'Other'; // Preselect "Other" if value not in options
-      this.customInput = this.modelValue; // Set the custom input to saved value
+      this.selectedOption = 'Other' // Preselect "Other" if value not in options
+      this.customInput = this.modelValue // Set the custom input to saved value
     }
     if (this.isSelectMultipleWithOther && typeof this.modelValue === 'string') {
-      this.selectedOptions = this.convertStringToSelectedOptions(this.modelValue);
+      this.selectedOptions = this.convertStringToSelectedOptions(this.modelValue)
     }
+    this.initializeInfoTooltip()
+  },
+  beforeUnmount() {
+    this.disposeInfoTooltip()
   },
   methods: {
+    disposeInfoTooltip() {
+      if (this.infoTooltipInstance) {
+        this.infoTooltipInstance.dispose()
+        this.infoTooltipInstance = null
+      }
+    },
+    initializeInfoTooltip() {
+      this.disposeInfoTooltip()
+      if (!this.infoText || !this.$refs.infoTooltip || !window.bootstrap?.Tooltip) return
+      this.infoTooltipInstance = new window.bootstrap.Tooltip(this.$refs.infoTooltip, {
+        trigger: 'hover focus click',
+        placement: 'bottom',
+      })
+    },
     resetInputState() {
       this.message = ''
       this.passwordRepeat = ''
       this.showPassword = false
     },
     checkForFormValidation(value) {
+      // Pattern validation takes precedence for text inputs
+      if (this.pattern && this.type === 'text') {
+        this.validatePattern(value)
+        return
+      }
+
       if (this.type === 'select' && this.required) {
         this.validateSelect(value)
       } else if (this.type === 'email') {
@@ -404,20 +692,29 @@ export default {
         this.validateCheckbox(value)
       } else if (this.type === 'checkboxPlus' && this.required) {
         this.validateCheckboxPlus(value)
+      } else if (this.type === 'conditionalSelect' && this.required) {
+        this.validateConditionalSelect(value)
       } else if (this.textMinLength || this.textMaxLength) {
         this.validateLength(value)
       } else if (this.required) {
         this.validateInput(value)
       }
-      const regex = /[^A-z0-9\\_\-\\.\\<\\>\\?\\@\\*\\%\\$€\\&\\/\\§\\!\\:\\;\\,\\+\\=\\(\\)\\}\\{\\"\\'\#\'\\Ä-ü\s\–]/;
-      if ((this.type !== 'email' && this.type !== 'password-repeat' && this.type !== 'password') && !this.allowSpecialCharacters && regex.test(JSON.stringify(value))
 
-      ) {
-        const matches = value.match(regex);
-        const foundCharacters = matches.map(match => match.trim());
-        this.message = `The following characters are not alowed: ${foundCharacters.join(', ')}`
-      } else {
-        this.message = ''
+      // Only check special characters if pattern validation didn't already set an error
+      if (this.message === '') {
+        const regex =
+          /[^A-z0-9\\_\-\\.\\<\\>\\?\\@\\*\\%\\$€\\&\\/\\§\\!\\:\\;\\,\\+\\=\\(\\)\\}\\{\\"\\'\#\'\\Ä-ü\s\–]/
+        if (
+          this.type !== 'email' &&
+          this.type !== 'password-repeat' &&
+          this.type !== 'password' &&
+          !this.allowSpecialCharacters &&
+          regex.test(JSON.stringify(value))
+        ) {
+          const matches = value.match(regex)
+          const foundCharacters = matches.map((match) => match.trim())
+          this.message = `The following characters are not alowed: ${foundCharacters.join(', ')}`
+        }
       }
     },
     toggleShow() {
@@ -453,6 +750,22 @@ export default {
         this.message = 'Input is required'
       }
     },
+    validatePattern(value) {
+      if (!value || value === '') {
+        if (this.required) {
+          this.message = 'Input is required'
+        } else {
+          this.message = ''
+        }
+        return
+      }
+      const regex = new RegExp(this.pattern)
+      if (regex.test(value)) {
+        this.message = ''
+      } else {
+        this.message = 'Please enter a valid four-digit year (e.g., 2024)'
+      }
+    },
     // validatePassword(value) {
     //   let regex = /^(?=.*[0-9])(?=.*[!@.#$%^&*])(?=.*[A-Z])[a-zA-Z0-9!@#,$%.^&*]{8,}$/
     //   if (regex.test(value)) {
@@ -468,53 +781,52 @@ export default {
     // },
     validatePasswordMatch(value) {
       if (this.modelValue && value && this.modelValue !== value) {
-        this.message = 'Passwords do not match.';
+        this.message = 'Passwords do not match.'
       } else {
         // Only clear the message if it was a password match error
         if (this.message === 'Passwords do not match.') {
-          this.message = '';
+          this.message = ''
         }
       }
     },
     validatePassword(value) {
-      let hasUpperCase = /[A-Z]/.test(value);
-      let hasLowerCase = /[a-z]/.test(value);
-      let hasDigit = /\d/.test(value);
+      let hasUpperCase = /[A-Z]/.test(value)
+      let hasLowerCase = /[a-z]/.test(value)
+      let hasDigit = /\d/.test(value)
       // let hasSpecialChar = /[!@.#$%^&*]/.test(value);
-      let hasSpecialChar = /[!@.#$%^&*(),\[\]=§{}?><\/\\~+;:_-]/.test(value);
+      let hasSpecialChar = /[!@.#$%^&*(),\[\]=§{}?><\/\\~+;:_-]/.test(value)
 
-
-      let errorMessages = [];
+      let errorMessages = []
 
       if (!hasUpperCase) {
-        errorMessages.push('Password must contain at least one upper case letter.');
+        errorMessages.push('Password must contain at least one upper case letter.')
       }
 
       if (!hasLowerCase) {
-        errorMessages.push('Password must contain at least one lower case letter.');
+        errorMessages.push('Password must contain at least one lower case letter.')
       }
 
       if (!hasDigit) {
-        errorMessages.push('Password must contain at least one digit.');
+        errorMessages.push('Password must contain at least one digit.')
       }
 
       if (!hasSpecialChar) {
-        errorMessages.push('Password must contain at least one special character.');
+        errorMessages.push('Password must contain at least one special character.')
       }
 
       if (value.length < this.textMinLength) {
-        errorMessages.push(`Password must be at least ${this.textMinLength} characters long.`);
+        errorMessages.push(`Password must be at least ${this.textMinLength} characters long.`)
       }
 
       if (value.length > this.textMaxLength) {
-        errorMessages.push(`Input can't be longer than ${this.textMaxLength} characters.`);
+        errorMessages.push(`Input can't be longer than ${this.textMaxLength} characters.`)
       }
 
       if (errorMessages.length > 0) {
         // this.message = `<ul><li>${errorMessages.join('</li><li>')}</li></ul>`;
         this.message = errorMessages
       } else {
-        this.message = '';
+        this.message = ''
       }
     },
 
@@ -569,9 +881,9 @@ export default {
     },
     convertSelectedOptionsToString(options) {
       if (Array.isArray(options)) {
-        return options.join(',');
+        return options.join(',')
       }
-      return options;
+      return options
     },
 
     convertStringToSelectedOptions(string) {
@@ -579,16 +891,36 @@ export default {
         if (string === '') {
           return []
         } else {
-          return string.split(',').map(option => (option));
+          return string.split(',').map((option) => option)
         }
       }
-      return string;
+      return string
     },
     addCustomInput(input) {
       this.options.push(input)
       this.selectedOptions.push(input)
       // this.selectedOptions = this.selectedOptions.concat(',', input)
-    }
+    },
+    updateConditionalOption(val) {
+      if (val === 'No') {
+        this.$emit('update:modelValue', 'No')
+      } else {
+        // Switching to yes, but no topic yet
+        this.$emit('update:modelValue', 'Yes:')
+      }
+    },
+    updateConditionalTopic(val) {
+      this.$emit('update:modelValue', 'Yes: ' + val)
+    },
+    validateConditionalSelect(value) {
+      if (value === 'No') {
+        this.message = ''
+      } else if (value && value.startsWith('Yes:') && value.length > 5) {
+        this.message = ''
+      } else {
+        this.message = 'Please select an option'
+      }
+    },
   },
 }
 </script>
@@ -602,7 +934,7 @@ export default {
 }
 
 .multiselect__tag-icon::after {
-  content: "x";
+  content: 'x';
   color: #266d4d;
   font-size: 17px;
 }

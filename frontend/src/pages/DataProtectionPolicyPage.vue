@@ -6,28 +6,27 @@
         <div>
           <h4>1. Purpose of collecting and storing personal data</h4>
           <p>
-            For your registration on challenge submission system, we need the following
-            data: a username, a password and an email address. The latter is necessary to create a
-            way to contact you. All other information (full name, institution) is optional. We refer
-            to these data as personal data. Challenge proposal data, as defined in the privacy
-            policy, includes all challenge design parameters, inserted in challenge proposals. This
-            data may contain personal data, depending on what you insert. The parameter (4) Organizs
-            will ask you for names, affiliations and email addresses of the organizing committee.
-            The names will be published in case of acceptence. By registering to the submission
-            system, you agree that you are in charge of the challenge proposal data, making sure,
-            that you are allowed to insert potential personal data and that all organizers agree
-            that their names will be published.
+            For your registration on challenge submission system, we need the following data: a
+            username, a password and an email address. The latter is necessary to create a way to
+            contact you. All other information (full name, institution) is optional. We refer to
+            these data as personal data. Challenge proposal data, as defined in the privacy policy,
+            includes all challenge design parameters, inserted in challenge proposals. This data may
+            contain personal data, depending on what you insert. The parameter (4) Organizs will ask
+            you for names, affiliations and email addresses of the organizing committee. The names
+            will be published in case of acceptence. By registering to the submission system, you
+            agree that you are in charge of the challenge proposal data, making sure, that you are
+            allowed to insert potential personal data and that all organizers agree that their names
+            will be published.
           </p>
           <h4>2. Deletion of the data</h4>
           <p>
             A withdrawal of the consent is possible at any time and implicates the immediate
             termination of the process, including the deletion of all personal data (please contact
-            kontakt@dkfz.de). Your personal data will be deleted at the
-            latest after 50 years. Challenge proposals related to your user account, will be
-            assigned to the administrators in order to keep challenge data. If you wish to delete
-            the challenge data as well, please inform the contact person. I have been advised to
-            inform the contact person (part of the challenge proposal data) in case my challenge
-            proposals should also be deleted.
+            kontakt@dkfz.de). Your personal data will be deleted at the latest after 50 years.
+            Challenge proposals related to your user account, will be assigned to the administrators
+            in order to keep challenge data. If you wish to delete the challenge data as well,
+            please inform the contact person. I have been advised to inform the contact person (part
+            of the challenge proposal data) in case my challenge proposals should also be deleted.
           </p>
           <h4>3. Transmission of data to third parties</h4>
           <p>

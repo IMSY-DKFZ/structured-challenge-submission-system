@@ -125,11 +125,10 @@ def convert_challenge_to_pdf(challenge, tasks):
         topMargin=top_margin,
         bottomMargin=bottom_margin,
         title=challenge_name,
-        author='Challenge submission system v2',
-        subject='',
-        creator='',
-        producer='',
-    
+        author="Challenge submission system v2",
+        subject="",
+        creator="",
+        producer="",
     )
     story = []
 

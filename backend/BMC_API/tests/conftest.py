@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import (
 
 from BMC_API.src.api.application import get_app
 from BMC_API.src.application.interfaces.password_hasher_impl import BcryptPasswordHasher
-from BMC_API.src.core.config.settings import settings
 from BMC_API.src.domain.entities.user_model import UserModel
 from BMC_API.src.infrastructure.external_services.email.email_service import (
     conf,
@@ -36,8 +35,8 @@ def database_url() -> str:
 
     :return: database url.
     """
-    # DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-    DATABASE_URL = str(settings.db_url)
+    DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+    # DATABASE_URL = str(settings.db_url)
     return DATABASE_URL
 
 

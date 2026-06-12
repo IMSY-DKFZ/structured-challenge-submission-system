@@ -66,9 +66,7 @@ async def backup_database(file_name: str | None = None):
             backup_file_name = file_name + ".sqlite3"
 
         else:
-            backup_file_name = (
-                "database_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".sqlite3"
-            )
+            backup_file_name = "database_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".sqlite3"
         backup_file_location = os.path.join(backup_folder, backup_file_name)
 
         try:
@@ -109,6 +107,7 @@ async def delete_db_backups(delete_all_backups: bool = False) -> list:
         raise
     return sqlite_files
 
+
 async def clean_database_backups(age_limit: int) -> list:
     # Get the backup folder path
     backup_folder = str(settings.backup_folder)
@@ -126,9 +125,9 @@ async def clean_database_backups(age_limit: int) -> list:
     # Delete all backups older than age_limit in days
 
     # target_time = time.time() - age_limit*60*60*24
-    target_time = time.time() - age_limit*60*60*1
+    target_time = time.time() - age_limit * 60 * 60 * 1
     older_backups = [file for file in sqlite_files if os.path.getctime(file) < target_time]
-    if len(older_backups)>=2:
+    if len(older_backups) >= 2:
         try:
             # Remove each backup file
             for file in older_backups:

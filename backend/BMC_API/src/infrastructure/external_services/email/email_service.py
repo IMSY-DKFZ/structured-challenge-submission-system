@@ -1,11 +1,40 @@
+import builtins
 from pathlib import Path
 
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from jinja2 import TemplateNotFound
 from loguru import logger
 
 from BMC_API.src.core.config.settings import settings
 from BMC_API.src.infrastructure.external_services.email.schema import EmailSchema
+
+
+def _import_fastapi_mail():
+    """
+    Import fastapi_mail lazily and patch missing SecretStr if required.
+    FastAPI-Mail<=1.4.2 expects SecretStr to be available globally which is not
+    the case when running with some Pydantic 2 builds on Python 3.13.
+    """
+
+    try:
+        from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+    except NameError as exc:
+        if getattr(exc, "name", "") != "SecretStr":
+            raise
+
+        from pydantic import SecretStr
+
+        setattr(builtins, "SecretStr", SecretStr)
+        from fastapi_mail import (
+            ConnectionConfig,
+            FastMail,
+            MessageSchema,
+            MessageType,
+        )
+
+    return ConnectionConfig, FastMail, MessageSchema, MessageType
+
+
+ConnectionConfig, FastMail, MessageSchema, MessageType = _import_fastapi_mail()
 
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,

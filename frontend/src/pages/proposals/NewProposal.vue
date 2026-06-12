@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="pb-5">
-      <router-link type="button" class="btn btn-outline-secondary me-2" :to="{ name: 'Proposals' }">
+      <router-link
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        :to="{ name: 'Proposals' }">
         <i class="be bi-arrow-left pe-1" />
         Go Back
       </router-link>
@@ -11,31 +14,48 @@
             <p>
               This view provides all challenge parameters for this proposal. Please fill in as many
               parameters as you can. You have to fill in a challenge name to save a challenge. The
-              progress bar only updates after saving the proposal! Thank you for using the structured
-              challenge submission system for MICCAI challenges!
+              progress bar only updates after saving the proposal! Thank you for using the
+              structured challenge submission system for MICCAI challenges!
             </p>
             <p>
-              This form is the key to create a new challenge proposal. Please enter as many parameters
-              as you can. You are able to submit a proposal after filling in at least 90% of the
-              parameters. Please read the parameter descriptions carefully to avoid entering wrong
-              information!
+              This form is the key to create a new challenge proposal. Please enter as many
+              parameters as you can. You are able to submit a proposal after filling in at least 90%
+              of the parameters. Please read the parameter descriptions carefully to avoid entering
+              wrong information!
             </p>
           </template>
         </VueTextSection>
       </collapse-section>
     </div>
-    <VueForm @submitEvent="createChallenge" actionBtn="Create Challenge Proposal" name="beforeProposalData"
-      :showActionBtn="!noConferences" :error-message="noConferences" :actionBtnFullwidth="true">
+    <VueForm
+      @submitEvent="createChallenge"
+      actionBtn="Create Challenge Proposal"
+      name="beforeProposalData"
+      :showActionBtn="!noConferences"
+      :error-message="noConferences"
+      :actionBtnFullwidth="true">
       <br />
       <vue-text-section>
-        <h2>Challenge name<small class="text-danger"><b>*</b></small></h2>
-        <VueInput label="Use the title to convey the essential information on the challenge mission." type="text"
-          :required="true" text-min-length="5" v-model="title">
+        <h2>
+          Challenge name<small class="text-danger"><b>*</b></small>
+        </h2>
+        <VueInput
+          label="Use the title to convey the essential information on the challenge mission."
+          type="text"
+          :required="true"
+          text-min-length="5"
+          v-model="title">
         </VueInput>
       </vue-text-section>
       <vue-text-section>
-        <h2>Conference<small class="text-danger"><b>*</b></small></h2>
-        <VueInput label="Assign your proposal to a Conference" type="select" :options="options" :required="true"
+        <h2>
+          Conference<small class="text-danger"><b>*</b></small>
+        </h2>
+        <VueInput
+          label="Assign your proposal to a Conference"
+          type="select"
+          :options="options"
+          :required="true"
           v-model="selectedConference">
         </VueInput>
       </vue-text-section>
@@ -71,7 +91,7 @@ export default {
       noConferencesMessage: 'There are currently no available conferences to create a proposal!',
     }
   },
-  async created() { },
+  async created() {},
   async mounted() {
     this.options = await proposalStore.getConferences
     this.options = this.options.map((x) => x.name)
@@ -79,7 +99,6 @@ export default {
     if (!this.noConferences) {
       this.selectedConference = null
     }
-
   },
   computed: {
     noConferences() {
@@ -87,9 +106,9 @@ export default {
     },
 
     async selectedConferenceId() {
-      const conference_list = await proposalStore.getConferences;  // Make sure to await the asynchronous function
-      const selectedConf = conference_list.find((x) => x.name === this.selectedConference);
-      return selectedConf ? selectedConf.id : null;
+      const conference_list = await proposalStore.getConferences // Make sure to await the asynchronous function
+      const selectedConf = conference_list.find((x) => x.name === this.selectedConference)
+      return selectedConf ? selectedConf.id : null
     },
   },
   methods: {

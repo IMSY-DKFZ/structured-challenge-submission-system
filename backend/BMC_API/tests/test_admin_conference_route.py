@@ -121,6 +121,27 @@ class TestAdminConferenceRoutes:
         assert response.json()["successful"][1]["name"] == data["name"]
         assert len(response.json()["failed"]) == 0
 
+    async def test_admin_bulk_update_conference_rejects_invalid_email(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token
+    ):
+        create_url = fastapi_app.url_path_for("create_conference_route_admin")
+        create_resp = await client.post(
+            create_url,
+            json=conference_data,
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        conf_id = create_resp.json()["id"]
+
+        bulk_update_url = fastapi_app.url_path_for("bulk_update_conferences_route_admin")
+        updates = [{"id": conf_id, "chairperson_emails": ["not-an-email"]}]
+
+        response = await client.put(bulk_update_url, json=updates, headers={"Authorization": f"Bearer {admin_token}"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["successful"]) == 0
+        assert len(response.json()["failed"]) == 1
+        assert "value is not a valid email address" in response.json()["failed"][0]["error"]
+
     async def test_admin_can_delete_conference(
         self, client: AsyncClient, fastapi_app: FastAPI, admin_token, test_admin
     ):

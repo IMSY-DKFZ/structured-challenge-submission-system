@@ -6,9 +6,9 @@ function StringToPrettyDate(string) {
     const zonedDate = utcToZonedTime(date, 'Europe/Berlin')
     const pattern = "dd.MM.yyyy HH:mm z '(Europe/Berlin)'"
     // return format(zonedDate, pattern, { timeZone: 'Europe/Berlin' })
-    return format(date, "dd.MM.yyyy, HH:mm (z)")
+    return format(date, 'dd.MM.yyyy, HH:mm (z)')
   } else {
-    return "-"
+    return '-'
   }
 }
 
@@ -23,7 +23,6 @@ function StringToPrettyDate(string) {
 
 //   // Detect user's time zone
 //   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
 
 //   // Set the options for formatting the date
 //   const options = {

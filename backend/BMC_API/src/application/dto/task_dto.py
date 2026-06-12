@@ -45,15 +45,18 @@ class TaskInputAdminDTO(TaskModelCreateDTO):
     task_locked: bool | None = None
     task_owner_id: int | None = None
 
-    model_config = ConfigDict(from_attributes=True, extra='allow')
+    model_config = ConfigDict(from_attributes=True, extra="allow")
+
 
 TaskUpdateAdminDTO: BaseModel = create_all_optional_model(model_name="TaskUpdateAdminDTO", base_model=TaskInputAdminDTO)
+
 
 class TaskResponseAdminDTO(TaskModelBaseOutputDTO):
     """
     DTO for detailed conference model responses for admin operations.
     Returned when accessing conference models via the API.
     """
+
     task_challenge_id: int | None = None
     # task_challenge: Any | None = None
     task_locked: bool | None = None

@@ -8,6 +8,7 @@ import zipfile
 from collections import ChainMap
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Type
+from urllib.parse import quote
 
 from fastapi import BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
@@ -21,6 +22,7 @@ from BMC_API.src.application.dto.challenge_dto import (
     ChallengeHistoryModelDTO,
     ChallengeModelBaseOutputDTO,
     ChallengeModelUpdateDTO,
+    ChallengeUpdateAdminDTO,
 )
 from BMC_API.src.application.dto.task_dto import (
     TaskModelBaseOutputDTO,
@@ -36,7 +38,7 @@ from BMC_API.src.application.use_cases.task_history_use_cases import TaskHistory
 from BMC_API.src.application.use_cases.task_use_cases import TaskService
 from BMC_API.src.application.use_cases.user_use_cases import UserService
 from BMC_API.src.core.config.settings import settings
-from BMC_API.src.core.exceptions import RepositoryException
+from BMC_API.src.core.exceptions import RepositoryException, NotFoundException
 from BMC_API.src.domain.entities.challenge_model import ChallengeModel
 from BMC_API.src.domain.interfaces.token_cache import TokenCache
 from BMC_API.src.domain.repositories.challenge_repository import (
@@ -68,9 +70,12 @@ class ChallengeSubmissionOps:
         differences_in_tasks = []
 
         # 1. Get challenge histories
-        challenge_histories_obj, *_ = await self.challenge_history_service.list(
-            search_filters={"challenge_id": challenge_obj.id}, sort_by="timestamp", sort_desc=True
-        )
+        try:
+            challenge_histories_obj, *_ = await self.challenge_history_service.list(
+                search_filters={"challenge_id": challenge_obj.id}, sort_by="timestamp", sort_desc=True
+            )
+        except NotFoundException:
+            challenge_histories_obj = []
 
         if challenge_histories_obj and isinstance(challenge_histories_obj, list):
             if Assignments.RETAKE_SNAPSHOT in status_assignments:
@@ -79,36 +84,43 @@ class ChallengeSubmissionOps:
                     for challenge_history in challenge_histories_obj
                     if challenge_history.new_status != new_status
                 ]
-                challenge_history_last = challenge_histories_obj_filtered[0]
+                challenge_history_last = (
+                    challenge_histories_obj_filtered[0] if challenge_histories_obj_filtered else None
+                )
             else:
                 challenge_history_last = challenge_histories_obj[0]
         else:
-            challenge_history_last = challenge_histories_obj
+            challenge_history_last = None
 
         # Get column names of challenge model
-        column_names = ChallengeModelUpdateDTO.model_fields.keys()
-        for column_name in column_names:
-            old_value = challenge_history_last.snapshot.get(column_name)
-            new_value = getattr(challenge_obj, column_name)
-            if old_value != new_value:
-                differences_in_challenge.append({"field": column_name, "content": new_value})
+        if challenge_history_last:
+            column_names = ChallengeModelUpdateDTO.model_fields.keys()
+            for column_name in column_names:
+                old_value = challenge_history_last.snapshot.get(column_name)
+                new_value = getattr(challenge_obj, column_name)
+                if old_value != new_value:
+                    differences_in_challenge.append({"field": column_name, "content": new_value})
 
         # Get task histories
         for task_obj in task_list:
             differences_in_task = []
-            task_histories_in_db, *_ = await self.task_history_service.list(
-                search_filters={"task_id": task_obj.id}, sort_by="timestamp", sort_desc=True
-            )
+            try:
+                task_histories_in_db, *_ = await self.task_history_service.list(
+                    search_filters={"task_id": task_obj.id}, sort_by="timestamp", sort_desc=True
+                )
+            except NotFoundException:
+                task_histories_in_db = []
+
             if task_histories_in_db and isinstance(task_histories_in_db, list):
                 if Assignments.RETAKE_SNAPSHOT in status_assignments:
                     task_history_in_db_filtered = [
                         task_history for task_history in task_histories_in_db if task_history.new_status != new_status
                     ]
-                    task_history_last = task_history_in_db_filtered[0]
+                    task_history_last = task_history_in_db_filtered[0] if task_history_in_db_filtered else None
                 else:
                     task_history_last = task_histories_in_db[0]
             else:
-                task_history_last = task_histories_in_db
+                task_history_last = None
 
             if task_history_last:
                 # Get column names of challenge model
@@ -190,12 +202,18 @@ class ChallengeSubmissionOps:
                 snapshot[key] = value.isoformat()
 
         if Assignments.RETAKE_SNAPSHOT in status_assignments:
-            challenge_histories, *_ = await self.challenge_history_service.list(
-                search_filters={"challenge_id": challenge_obj.id}, sort_by="timestamp", sort_desc=True
-            )
-            challenge_history_latest = (
-                challenge_histories[0] if isinstance(challenge_histories, list) else challenge_histories
-            )
+            try:
+                challenge_histories, *_ = await self.challenge_history_service.list(
+                    search_filters={"challenge_id": challenge_obj.id}, sort_by="timestamp", sort_desc=True
+                )
+                challenge_history_latest = (
+                    challenge_histories[0]
+                    if isinstance(challenge_histories, list) and challenge_histories
+                    else challenge_histories
+                )
+            except NotFoundException:
+                challenge_history_latest = None
+
             if challenge_history_latest:
                 updates = {
                     "changes": differences_in_challenge,
@@ -231,10 +249,16 @@ class ChallengeSubmissionOps:
                     snapshot[key] = value.isoformat()
 
             if Assignments.RETAKE_SNAPSHOT in status_assignments:
-                task_histories, *_ = await self.task_history_service.list(
-                    search_filters={"task_id": task_obj.id}, sort_by="timestamp", sort_desc=True
-                )
-                task_history_latest = task_histories[0] if isinstance(task_histories, list) else task_histories
+                try:
+                    task_histories, *_ = await self.task_history_service.list(
+                        search_filters={"task_id": task_obj.id}, sort_by="timestamp", sort_desc=True
+                    )
+                    task_history_latest = (
+                        task_histories[0] if isinstance(task_histories, list) and task_histories else task_histories
+                    )
+                except NotFoundException:
+                    task_history_latest = None
+
                 if task_history_latest:
                     updates = {
                         "changes": differences_in_tasks[idx]
@@ -285,6 +309,81 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
             task_history_service,
         )
 
+    def _prepare_pdf_export_objects(self, challenge_obj: ChallengeModel):
+        challenge_to_pdf = copy.deepcopy(challenge_obj)
+        setattr(challenge_to_pdf, "histories", [])
+        setattr(challenge_to_pdf, "challenge_tasks", [])
+        setattr(challenge_to_pdf, "challenge_conference", None)
+        setattr(challenge_to_pdf, "challenge_owner", None)
+
+        task_list_to_pdf = copy.deepcopy(list(challenge_obj.challenge_tasks))
+        for task_obj in task_list_to_pdf:
+            setattr(task_obj, "histories", [])
+            setattr(task_obj, "task_challenge", None)
+            setattr(task_obj, "task_owner", None)
+
+        return challenge_to_pdf, task_list_to_pdf
+
+    async def _generate_proposal_pdf(
+        self,
+        challenge_obj: ChallengeModel,
+        workflow_status: ChallengeStatus,
+        rendered_status: Optional[ChallengeStatus] = None,
+        status_assignments: Optional[List[Assignments]] = None,
+        include_snapshot: bool = True,
+    ) -> str:
+        task_list = challenge_obj.challenge_tasks
+        current_status = challenge_obj.challenge_status
+        rendered_status = rendered_status or workflow_status
+        status_assignments = status_assignments or StatusBusiness.status_assignments(workflow_status)
+
+        challenge_to_pdf, task_list_to_pdf = self._prepare_pdf_export_objects(challenge_obj)
+        setattr(challenge_to_pdf, "challenge_status", rendered_status)
+
+        for task_obj in task_list_to_pdf:
+            setattr(task_obj, "task_status", rendered_status)
+
+        if Assignments.GET_DIFF in status_assignments:
+            differences_in_challenge, differences_in_tasks = await self.submission_ops.detect_differences(
+                rendered_status, status_assignments, challenge_obj, task_list
+            )
+        else:
+            differences_in_challenge = []
+            differences_in_tasks = []
+
+        if (differences_in_challenge or differences_in_tasks) and Assignments.MARK_DIFFS_BLUE in status_assignments:
+            challenge_to_pdf, task_list_to_pdf = self.submission_ops.mark_differences(
+                differences_in_challenge,
+                differences_in_tasks,
+                challenge_to_pdf,
+                task_list_to_pdf,
+                "blue",
+            )
+        elif (differences_in_challenge or differences_in_tasks) and Assignments.MARK_DIFFS_RED in status_assignments:
+            challenge_to_pdf, task_list_to_pdf = self.submission_ops.mark_differences(
+                differences_in_challenge,
+                differences_in_tasks,
+                challenge_to_pdf,
+                task_list_to_pdf,
+                "red",
+            )
+
+        if include_snapshot and Assignments.TAKE_SNAPSHOT in status_assignments:
+            await self.submission_ops.take_snapshot(
+                rendered_status,
+                current_status,
+                status_assignments,
+                differences_in_challenge,
+                differences_in_tasks,
+                challenge_obj,
+                task_list,
+            )
+
+        proposal_file_name = convert_challenge_to_pdf(challenge_to_pdf, task_list_to_pdf)
+        file_full_path = os.path.join(settings.submissions_folder, proposal_file_name)
+        os.stat(file_full_path)
+        return proposal_file_name
+
     async def challenge_histories(self, id: int) -> List:
         obj = await super().get_raw(id)
         if obj.histories:
@@ -307,14 +406,28 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
     async def update_challenge_bulk(
         self, updates: List[Dict[str, Any]]
     ) -> BulkOperationResponse[ChallengeModelBaseOutputDTO]:
+        prepared_updates = []
         for entity_data in updates:
-            challenge_obj = await self.get_raw(entity_data["id"])
+            if "id" not in entity_data:
+                prepared_updates.append(entity_data)
+                continue
+
+            challenge_obj = await self.repository.get(id=entity_data["id"])
+            if not challenge_obj:
+                prepared_updates.append(entity_data)
+                continue
+
             current_status = challenge_obj.challenge_status
             new_status = StatusActions.next_status_for_update(current_status)
-            entity_data["challenge_modified_time"] = datetime.now()
-            entity_data["challenge_status"] = new_status
+            prepared_updates.append(
+                {
+                    **entity_data,
+                    "challenge_modified_time": datetime.now(),
+                    "challenge_status": new_status,
+                }
+            )
 
-        return await super().update_bulk(updates=updates)
+        return await super().update_bulk(updates=prepared_updates, update_dto_class=ChallengeUpdateAdminDTO)
 
     async def prune_challenge(self, id: int) -> BulkOperationResponse:
         """Delete a challenge, challenge histories, its related tasks and task histories."""
@@ -367,6 +480,7 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
             successful=successful,
             failed=failed,
         )
+
     async def prune_challenges_bulk(self, ids: List[int]) -> BulkOperationResponse[Any]:
         """
         Prune multiple entities by their IDs.
@@ -385,10 +499,12 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
                 await self.prune_challenge(id=entity_id)
                 successful_results.append(entity_id)
             except NoResultFound:
-                failed_results.append({
-                    "id": entity_id,
-                    "error": f"{self.model_name} with id {entity_id} not found.",
-                })
+                failed_results.append(
+                    {
+                        "id": entity_id,
+                        "error": f"{self.model_name} with id {entity_id} not found.",
+                    }
+                )
                 logger.warning(f"{self.model_name} with id {entity_id} not found for deletion.")
             except Exception as e:
                 failed_results.append({"id": entity_id, "error": str(e)})
@@ -400,7 +516,6 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
             successful=successful_results,
             failed=failed_results,
         )
-
 
     async def status(self, id: int, new_status: ChallengeStatus) -> ChallengeModelBaseOutputDTO:
         """Transactional update the status of a challenge and its related tasks."""
@@ -419,6 +534,15 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
         try:
             challenge_obj = await self.get_raw(id)
             challenge_tasks = challenge_obj.challenge_tasks
+            challenge_update_data = {"challenge_modified_time": timestamp, "challenge_status": new_status}
+
+            if StatusBusiness.should_export_clean_pdf(new_status):
+                challenge_update_data["challenge_file"] = await self._generate_proposal_pdf(
+                    challenge_obj,
+                    workflow_status=ChallengeStatus.CLEAN_PROPOSAL,
+                    rendered_status=new_status,
+                    include_snapshot=False,
+                )
 
             if challenge_tasks:
                 updates = [
@@ -427,7 +551,6 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
                 ]
                 await self.task_service.update_bulk(updates=updates)
 
-            challenge_update_data = {"challenge_modified_time": timestamp, "challenge_status": new_status}
             updated_challenge = await self.update(id=id, model_update=challenge_update_data)
 
             await db_session.commit()
@@ -456,6 +579,15 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
                 # Get the challenge and related tasks
                 challenge_obj = await self.get_raw(challenge_id)
                 challenge_tasks = challenge_obj.challenge_tasks
+                challenge_update_data = {"challenge_modified_time": timestamp, "challenge_status": new_status}
+
+                if StatusBusiness.should_export_clean_pdf(new_status):
+                    challenge_update_data["challenge_file"] = await self._generate_proposal_pdf(
+                        challenge_obj,
+                        workflow_status=ChallengeStatus.CLEAN_PROPOSAL,
+                        rendered_status=new_status,
+                        include_snapshot=False,
+                    )
 
                 if challenge_tasks:
                     task_updates = [
@@ -464,18 +596,15 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
                     ]
                     await self.task_service.update_bulk(updates=task_updates)
 
-                # Update the challenge
-                challenge_update_data = {"challenge_modified_time": timestamp, "challenge_status": new_status}
                 updated_challenge = await self.update(id=challenge_id, model_update=challenge_update_data)
 
+                await db_session.commit()
                 successful_results.append(updated_challenge)
 
             except Exception as e:
                 await db_session.rollback()
                 failed_results.append({"id": challenge_id, "error": str(e)})
                 continue
-
-        await db_session.commit()
 
         return BulkOperationResponse[Any](
             detail=f"Bulk status update completed: {len(successful_results)} successful, {len(failed_results)} failed.",
@@ -486,7 +615,7 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
     async def download_challenge(self, id: int) -> FileResponse:
         obj = await super().get_raw(id)
         if not obj.challenge_file:
-            HTTPException(
+            raise HTTPException(
                 status_code=403,
                 detail="The challenge has not been submitted yet. Please submit it first.",
             )
@@ -496,7 +625,9 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
 
             os.stat(file_full_path)
             headers = {
-                "X-Content-Filename": proposal_file_name,  # Emre: Do NOT forget to add this to server/nginx configuration!
+                "X-Content-Filename": quote(
+                    proposal_file_name
+                ),  # Emre: Do NOT forget to add this to server/nginx configuration!
             }
             return FileResponse(
                 path=file_full_path,
@@ -609,24 +740,11 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
         challenge_obj = await self.get_raw(id)
         task_list = challenge_obj.challenge_tasks
 
-        ## 2. Create clean copies of challenge and task objects for PDF export. Remove irrelevant fields.
-        challenge_to_pdf = copy.deepcopy(challenge_obj)
-        setattr(challenge_to_pdf, "histories", [])
-        setattr(challenge_to_pdf, "challenge_tasks", [])
-        setattr(challenge_to_pdf, "challenge_conference", None)
-        setattr(challenge_to_pdf, "challenge_owner", None)
-
-        task_list_to_pdf = copy.deepcopy(list(task_list))
-        for task_obj in task_list_to_pdf:
-            setattr(task_obj, "histories", [])
-            setattr(task_obj, "task_challenge", None)
-            setattr(task_obj, "task_owner", None)
-
-        ## 3. Detect new status
+        ## 2. Detect new status
         current_status = challenge_obj.challenge_status
         new_status = StatusActions.next_status_for_submit(current_status)
 
-        ## 4. Get task/business list for new status
+        ## 3. Get task/business list for new status
         status_assignments = StatusBusiness.status_assignments(new_status)
         if new_status == current_status and new_status not in [
             ChallengeStatus.ACCEPT,
@@ -636,48 +754,14 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
         ]:
             status_assignments.append(Assignments.RETAKE_SNAPSHOT)
 
-        # OPERATIONS
-        ## 1. Find and mark the modified sections between two statuses
-        if Assignments.GET_DIFF in status_assignments:
-            differences_in_challenge, differences_in_tasks = await self.submission_ops.detect_differences(
-                new_status, status_assignments, challenge_obj, task_list
-            )
-        else:
-            differences_in_challenge = []
-            differences_in_tasks = []
-
-        ## 2. Mark updated sections in challenge_to_pdf and task_list_to_pdf
-        if (differences_in_challenge or differences_in_tasks) and Assignments.MARK_DIFFS_BLUE in status_assignments:
-            mark_color = "blue"
-            challenge_to_pdf, task_list_to_pdf = self.submission_ops.mark_differences(
-                differences_in_challenge, differences_in_tasks, challenge_to_pdf, task_list_to_pdf, mark_color
-            )
-
-        elif (differences_in_challenge or differences_in_tasks) and Assignments.MARK_DIFFS_RED in status_assignments:
-            mark_color = "red"
-            challenge_to_pdf, task_list_to_pdf = self.submission_ops.mark_differences(
-                differences_in_challenge, differences_in_tasks, challenge_to_pdf, task_list_to_pdf, mark_color
-            )
-
-        ## 3. Snapshot for challenges
-
-        if Assignments.TAKE_SNAPSHOT in status_assignments:
-            await self.submission_ops.take_snapshot(
-                new_status,
-                current_status,
-                status_assignments,
-                differences_in_challenge,
-                differences_in_tasks,
-                challenge_obj,
-                task_list,
-            )
-
         ## 4. Export PDF file for the proposal
         if Assignments.EXPORT_PROPOSAL in status_assignments:
             try:
-                proposal_file_name = convert_challenge_to_pdf(challenge_to_pdf, task_list_to_pdf)
-                file_full_path = os.path.join(settings.submissions_folder, proposal_file_name)
-                os.stat(file_full_path)
+                proposal_file_name = await self._generate_proposal_pdf(
+                    challenge_obj,
+                    workflow_status=new_status,
+                    status_assignments=status_assignments,
+                )
             except HTTPException as e:
                 raise e
             except Exception as e:
@@ -724,12 +808,12 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
 
                     recipients = list(set(admin_emails))
                     logger.info(f"E-mail will be requested for {recipients}")
-                    
+
                     if recipients:
                         email_scheduler.schedule_draft_submitted(
                             recipients, submission_time, challenge_name, challenge_file_location
                         )
-                        
+
                 except Exception as e:
                     logger.exception(f"E-mail requested for {recipients} failed.")
                     logger.exception(e)
@@ -758,7 +842,7 @@ class ChallengeService(BaseService[ChallengeModel, ChallengeModelBaseOutputDTO])
                         recipients = [recipients]
                     first_name = user.first_name
                     last_name = user.last_name
-                    
+
                     logger.info(f"E-mail will be requested for {recipients}")
                     if recipients:
                         email_scheduler.schedule_own_draft_submitted(

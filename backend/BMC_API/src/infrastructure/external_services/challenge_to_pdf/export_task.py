@@ -62,6 +62,14 @@ def add_task_to_document(story, task, challenge, idx, styles):
     )
     story.append(Paragraph(task.task_contact_person or "N/A", styles["Normal"]))
 
+    story.append(
+        Paragraph(
+            "c) Indicate whether clinicians are part of the organizing team. If yes, describe their role.",
+            styles["Definition"],
+        )
+    )
+    story.append(Paragraph(task.task_organizing_team_clinicians or "N/A", styles["Normal"]))
+
     # Life cycle type
     story.append(Paragraph("Life cycle type", styles["Heading3"]))
 
@@ -110,7 +118,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "b) Report the platform (e.g. grand-challenge.org) used to run the challenge.",
+            "b) Report the platform used to run the challenge.",
             styles["Definition"],
         )
     )
@@ -119,7 +127,16 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "c) Provide the URL for the challenge website (if any).",
+            "c) Do you agree that the your submission is shared with the platform (e.g., grand-challenge, synapse...) that you indicated?<br/><br/>Please note: 1) this purpose of such sharing is that the challenge chairs and the platform can communicate smoothly, your answer won't impact the review of your proposal; 2) regardless of your response to this question, it is your responsibility to perform all actions required by the platform (e.g. filling their submission request).",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_platform_sharing_information or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "d) Provide the URL for the challenge website (if any).",
             styles["Definition"],
         )
     )
@@ -131,7 +148,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "a) Define the allowed user interaction of the algorithms assessed (e.g. only (semi-) automatic methods allowed).",
+            "a) Define the allowed user interaction of the algorithms assessed. This includes the policy regarding any curation, (pre-)processing and (pre-)training steps.",
             styles["Definition"],
         )
     )
@@ -140,7 +157,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "b) Define the policy on the usage of training data. The data used to train algorithms may, for example, be restricted to the data provided by the challenge or to publicly available data including (open) pre-trained nets.",
+            "b) Define the policy on the usage of training data. The data used to train algorithms may, for example, be restricted to the data provided by the challenge or may also include publicly available data including (open) pre-trained nets. Clarify whether such additional data needs to be publicly  available at the time of the challenge launch. Clarify whether adding (private) annotations of the public data is allowed.",
             styles["Definition"],
         )
     )
@@ -366,6 +383,12 @@ def add_task_to_document(story, task, challenge, idx, styles):
             bulletFontName="OpenSans-Light",
             bulletFontSize=10,
             bulletDedent=6,
+        )
+    )
+    story.append(
+        Paragraph(
+            "Please note that the data license should not differ among sources. In case a license has to be changed, it has to be reported to the MICCAI challenges team and changed in the proposal.",
+            styles["Definition"],
         )
     )
 
@@ -747,7 +770,16 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "c) Explain why a total number of cases and the specific proportion of training, validation and test cases was chosen.",
+            "c) How much of the data are already annotated (stratified by train test in percentage)?",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_quantity_of_data or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "d) Explain why a total number of cases and the specific proportion of training, validation and test cases was chosen.",
             styles["Definition"],
         )
     )
@@ -756,7 +788,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "d) Mention further important characteristics of the training, validation and test cases (e.g. class distribution in classification tasks chosen according to real-world distribution vs. equal class distribution) and justify the choice.",
+            "e) Mention further important characteristics of the training, validation and test cases (e.g. class distribution in classification tasks chosen according to real-world distribution vs. equal class distribution) and justify the choice.",
             styles["Definition"],
         )
     )
@@ -764,7 +796,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "e) Challenge organizers are encouraged to (partly) use unseen, unpublished data for their challenges. Describe if new data will be used for the challenge and state the number of cases along with the proportion of new data.",
+            "f) Challenge organizers are encouraged to (partly) use unseen, unpublished data for their challenges. Describe if new data will be used for the challenge and state the number of cases along with the proportion of new data.",
             styles["Definition"],
         )
     )
@@ -897,7 +929,7 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "a) Describe the method used to compute a performance rank for all submitted algorithms based on the generated metric results on the test cases. Typically the text will describe how results obtained per case and metric are aggregated to arrive at a final score/ranking.",
+            "a) Describe the method used to compute a performance rank for all submitted algorithms based on the generated metric results on the test cases. Typically the text will describe how results obtained per case and metric are aggregated to arrive at a final score/ranking. Ideally, provide the ranking scheme as a concrete pseudo code.",
             styles["Definition"],
         )
     )
@@ -932,47 +964,110 @@ def add_task_to_document(story, task, challenge, idx, styles):
 
     story.append(
         Paragraph(
-            "a) Provide details for the statistical methods used in the scope of the challenge analysis. This may include",
+            "Provide an overview of the statistical approaches used in the scope of the challenge analysis. Details can be provided in the parameters below. For each parameter, justify why the described statistical method(s) was/were used and, if necessary, add a description of any method used to assess whether the data met the assumptions required for the particular statistical approach.",
             styles["Definition"],
         )
     )
-    story.append(
-        ListFlowable(
-            [
-                Paragraph(
-                    "description of the missing data handling,",
-                    styles["Definition"],
-                ),
-                Paragraph(
-                    "details about the assessment of variability of rankings,",
-                    styles["Definition"],
-                ),
-                Paragraph(
-                    "description of any method used to assess whether the data met the assumptions, required for the particular statistical approach, or",
-                    styles["Definition"],
-                ),
-                Paragraph(
-                    "indication of any software product that was used for all data analysis methods.",
-                    styles["Definition"],
-                ),
-            ],
-            bulletType="bullet",
-            bulletFontName="OpenSans-Light",
-            bulletFontSize=10,
-            bulletDedent=6,
-        )
-    )
 
-    story.append(Paragraph(task.task_statistical_analyses or "N/A", styles["Normal"]))
+    story.append(Paragraph(task.task_statistical_analyses_overview or "N/A", styles["Normal"]))
 
     story.append(
         Paragraph(
-            "b) Justify why the described statistical method(s) was/were used.",
+            "Provide a description of how the precision of the performance estimates of individual algorithms is assessed (e.g. confidence interval of the mean on the test set computed using percentile bootstrap, confidence interval of the accuracy on the test set computed using percentile bootstrap).",
             styles["Definition"],
         )
     )
 
-    story.append(Paragraph(task.task_justification_of_statistical_analyses or "N/A", styles["Normal"]))
+    story.append(Paragraph(task.task_statistical_analyses_precision_performance_estimates or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "Provide a description of how variability of the performance of individual algorithms across tests cases is assessed (e.g. SD across test cases, IQR, graphs, reporting outliers…).",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_statistical_analyses_performance_variability or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "Provide a description of how variability of rankings is assessed.",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_statistical_analyses_rankings_variability or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "Provide a description of statistical tests that are used to assess whether the differences in performance between algorithms are statistically significant.",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_statistical_analyses_test_for_significance or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "Provide a description of the missing data handling.",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_statistical_analyses_missing_data_handling or "N/A", styles["Normal"]))
+
+    story.append(
+        Paragraph(
+            "Indicate any software product that is used for all data analysis methods.",
+            styles["Definition"],
+        )
+    )
+
+    story.append(Paragraph(task.task_statistical_analyses_software or "N/A", styles["Normal"]))
+
+    # story.append(
+    #     Paragraph(
+    #         "Provide details for the statistical methods used in the scope of the challenge analysis. This may include",
+    #         styles["Definition"],
+    #     )
+    # )
+    # story.append(
+    #     ListFlowable(
+    #         [
+    #             Paragraph(
+    #                 "description of the missing data handling,",
+    #                 styles["Definition"],
+    #             ),
+    #             Paragraph(
+    #                 "details about the assessment of variability of rankings,",
+    #                 styles["Definition"],
+    #             ),
+    #             Paragraph(
+    #                 "description of any method used to assess whether the data met the assumptions, required for the particular statistical approach, or",
+    #                 styles["Definition"],
+    #             ),
+    #             Paragraph(
+    #                 "indication of any software product that was used for all data analysis methods.",
+    #                 styles["Definition"],
+    #             ),
+    #         ],
+    #         bulletType="bullet",
+    #         bulletFontName="OpenSans-Light",
+    #         bulletFontSize=10,
+    #         bulletDedent=6,
+    #     )
+    # )
+
+    # story.append(Paragraph(task.task_statistical_analyses or "N/A", styles["Normal"]))
+
+    # story.append(
+    #     Paragraph(
+    #         "b) Justify why the described statistical method(s) was/were used.",
+    #         styles["Definition"],
+    #     )
+    # )
+
+    # story.append(Paragraph(task.task_justification_of_statistical_analyses or "N/A", styles["Normal"]))
 
     # Further analyses
     story.append(Paragraph("Further analyses", styles["Heading3"]))

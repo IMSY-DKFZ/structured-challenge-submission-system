@@ -13,9 +13,7 @@ class ChallengeModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     version = Column(Integer, default=1)
-    histories = relationship(
-        "ChallengeHistoryModel", back_populates="challenge", lazy="selectin"
-    )
+    histories = relationship("ChallengeHistoryModel", back_populates="challenge", lazy="selectin")
     is_allowed_for_further_editing = Column(Boolean, default=False)
     challenge_created_time = Column(DateTime, nullable=False)
     challenge_modified_time = Column(DateTime)
@@ -24,9 +22,7 @@ class ChallengeModel(Base):
     challenge_application_scenarios = Column(String)
     challenge_author_emails = Column(JSON)
     challenge_author_names = Column(JSON)
-    challenge_conference = relationship(
-        "ConferenceModel", back_populates="challenges", lazy="selectin"
-    )
+    challenge_conference = relationship("ConferenceModel", back_populates="challenges", lazy="selectin")
     challenge_conference_id = Column(Integer, ForeignKey("conferences.id"))
     challenge_doi = Column(String(length=255))
     challenge_duration = Column(String)
@@ -42,9 +38,7 @@ class ChallengeModel(Base):
     challenge_locked = Column(Boolean, default=False)
     challenge_name = Column(String)
     challenge_novelty = Column(String)
-    challenge_owner = relationship(
-        "UserModel", back_populates="challenges", lazy="selectin"
-    )
+    challenge_owner = relationship("UserModel", back_populates="challenges", lazy="selectin")
     challenge_owner_id = Column(Integer, ForeignKey("users.id"))
     challenge_progress = Column(String)
     challenge_publication_and_future = Column(String)
@@ -55,9 +49,7 @@ class ChallengeModel(Base):
     challenge_status = Column(String, default=ChallengeStatus.DRAFT)
     challenge_submission_time = Column(DateTime)
     challenge_super_reviewer_status = Column(String)
-    challenge_tasks = relationship(
-        "TaskModel", back_populates="task_challenge", lazy="selectin"
-    )
+    challenge_tasks = relationship("TaskModel", back_populates="task_challenge", lazy="selectin")
     challenge_workshop = Column(String)
     challenge_year = Column(String)
     challenge_is_lighthouse_challenge = Column(Boolean, default=False)
@@ -70,3 +62,5 @@ class ChallengeModel(Base):
     challenge_lighthouse_deadline_for_data = Column(String)
     challenge_lighthouse_prize_money = Column(String)
     challenge_lighthouse_compute_per_participant = Column(String)
+    challenge_lncs_proceedings = Column(String)
+    challenge_esr_collaboration = Column(String)

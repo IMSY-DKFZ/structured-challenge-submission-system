@@ -1,10 +1,11 @@
 """empty message
 
 Revision ID: 2600256f9595
-Revises: 
+Revises:
 Create Date: 2023-12-06 13:14:15.653454
 
 """
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -86,17 +87,13 @@ def upgrade() -> None:
         sa.Column("challenge_conference_id", sa.Integer(), nullable=True),
         sa.Column("challenge_doi", sa.String(length=255), nullable=True),
         sa.Column("challenge_duration", sa.String(), nullable=True),
-        sa.Column(
-            "challenge_expected_number_of_participants", sa.String(), nullable=True
-        ),
+        sa.Column("challenge_expected_number_of_participants", sa.String(), nullable=True),
         sa.Column("challenge_feedback", sa.String(), nullable=True),
         sa.Column("challenge_file", sa.String(), nullable=True),
         sa.Column("challenge_first_feedback_status", sa.String(), nullable=True),
         sa.Column("challenge_first_feedback_time", sa.DateTime(), nullable=True),
         sa.Column("challenge_further_comments", sa.String(), nullable=True),
-        sa.Column(
-            "challenge_interested_in_nvidia_resources", sa.Boolean(), nullable=True
-        ),
+        sa.Column("challenge_interested_in_nvidia_resources", sa.Boolean(), nullable=True),
         sa.Column("challenge_keywords", sa.JSON(), nullable=True),
         sa.Column("challenge_locked", sa.Boolean(), nullable=True),
         sa.Column("challenge_name", sa.String(), nullable=True),
@@ -105,9 +102,7 @@ def upgrade() -> None:
         sa.Column("challenge_publication_and_future", sa.String(), nullable=True),
         sa.Column("challenge_references", sa.String(), nullable=True),
         sa.Column("challenge_reviewer_status", sa.String(), nullable=True),
-        sa.Column(
-            "challenge_space_and_hardware_requirements", sa.String(), nullable=True
-        ),
+        sa.Column("challenge_space_and_hardware_requirements", sa.String(), nullable=True),
         sa.Column("challenge_status", sa.String(), nullable=True),
         sa.Column("challenge_submission_time", sa.DateTime(), nullable=True),
         sa.Column("challenge_super_reviewer_status", sa.String(), nullable=True),
@@ -156,23 +151,15 @@ def upgrade() -> None:
         sa.Column("task_data_origin", sa.String(), nullable=True),
         sa.Column("task_ethics_approval", sa.String(), nullable=True),
         sa.Column("task_evaluation_metrics", sa.String(), nullable=True),
-        sa.Column(
-            "task_explanation_number_proportion_data", sa.String(), nullable=True
-        ),
+        sa.Column("task_explanation_number_proportion_data", sa.String(), nullable=True),
         sa.Column("task_field_of_application", sa.String(), nullable=True),
         sa.Column("task_further_analyses", sa.String(), nullable=True),
         sa.Column("task_imaging_modalities", sa.String(), nullable=True),
         sa.Column("task_interaction_level_policy", sa.String(), nullable=True),
-        sa.Column(
-            "task_justification_of_data_characteristics", sa.String(), nullable=True
-        ),
+        sa.Column("task_justification_of_data_characteristics", sa.String(), nullable=True),
         sa.Column("task_justification_of_metrics", sa.String(), nullable=True),
-        sa.Column(
-            "task_justification_of_rank_computation_method", sa.String(), nullable=True
-        ),
-        sa.Column(
-            "task_justification_of_statistical_analyses", sa.String(), nullable=True
-        ),
+        sa.Column("task_justification_of_rank_computation_method", sa.String(), nullable=True),
+        sa.Column("task_justification_of_statistical_analyses", sa.String(), nullable=True),
         sa.Column("task_keywords", sa.JSON(), nullable=True),
         sa.Column("task_licence", sa.String(), nullable=True),
         sa.Column("task_lifecycle", sa.String(), nullable=True),

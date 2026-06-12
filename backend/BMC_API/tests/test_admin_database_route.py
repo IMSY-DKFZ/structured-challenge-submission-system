@@ -34,6 +34,7 @@ async def test_database_backup_and_download_default_name(tmp_path, monkeypatch):
     assert response.media_type == "application/octet-stream"
     assert response.path == str(backup_file)
 
+
 @pytest.mark.anyio
 async def test_database_backup_and_download_custom_name_added_ext(tmp_path, monkeypatch):
     backup_file = tmp_path / "dump.sqlite3"
@@ -46,6 +47,7 @@ async def test_database_backup_and_download_custom_name_added_ext(tmp_path, monk
 
     response = await admin_database.database_backup_and_download("backup")
     assert response.filename == "backup.sqlite3"
+
 
 @pytest.mark.anyio
 async def test_database_backup_and_download_custom_name_with_ext(tmp_path, monkeypatch):
@@ -60,6 +62,7 @@ async def test_database_backup_and_download_custom_name_with_ext(tmp_path, monke
     response = await admin_database.database_backup_and_download("custom.sqlite3")
     assert response.filename == "custom.sqlite3"
 
+
 @pytest.mark.anyio
 async def test_database_backup_and_download_runtime_error(monkeypatch):
     async def stub_backup_database(file_name):
@@ -72,6 +75,7 @@ async def test_database_backup_and_download_runtime_error(monkeypatch):
     assert exc_info.value.status_code == HTTP_503_SERVICE_UNAVAILABLE
     assert "Something went wrong" in exc_info.value.detail
 
+
 @pytest.mark.anyio
 async def test_database_backup_and_download_file_not_found(monkeypatch):
     async def stub_backup_database(file_name):
@@ -82,6 +86,7 @@ async def test_database_backup_and_download_file_not_found(monkeypatch):
     with pytest.raises(HTTPException) as exc_info:
         await admin_database.database_backup_and_download()
     assert exc_info.value.status_code == HTTP_404_NOT_FOUND
+
 
 @pytest.mark.anyio
 async def test_database_backup_and_download_generic_exception(monkeypatch):
@@ -110,6 +115,7 @@ async def test_delete_database_backups_default(monkeypatch):
     assert data["message"] == "All database backups except the latest one successfully deleted."
     assert data["deleted_files"] == ["a", "b"]
 
+
 @pytest.mark.anyio
 async def test_delete_database_backups_delete_all(monkeypatch):
     async def stub_delete_db_backups(delete_all: bool):
@@ -121,6 +127,7 @@ async def test_delete_database_backups_delete_all(monkeypatch):
     data = json.loads(response.body)
     assert data["message"] == "All database backups successfully deleted."
     assert data["deleted_files"] == ["x", "y", "z"]
+
 
 @pytest.mark.anyio
 async def test_delete_database_backups_exception(monkeypatch):
@@ -160,6 +167,7 @@ async def test_backup_endpoint_via_client(tmp_path, monkeypatch, client, fastapi
     assert response.headers["content-disposition"] == 'attachment; filename="endpoint.sqlite3"'
     assert response.content == b"hello world"
 
+
 @pytest.mark.anyio
 async def test_delete_backups_endpoint_via_client(monkeypatch, client, fastapi_app):
     """
@@ -179,7 +187,7 @@ async def test_delete_backups_endpoint_via_client(monkeypatch, client, fastapi_a
     response = await client.delete(url)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    
+
     assert data == {
         "message": "All database backups except the latest one successfully deleted.",
         "deleted_files": ["old1", "old2"],

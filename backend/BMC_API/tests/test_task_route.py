@@ -50,15 +50,20 @@ class TestTaskRoutes:
     async def test_create_task_authenticated_with_extra_fields(
         self, client: AsyncClient, fastapi_app: FastAPI, user_token, patch_challenge_and_conference_open
     ):
-        task_data = {"task_name": "Test Task", "extra_field": "This is a task for testing."}
+        task_data = {
+            "task_name": "Test Task",
+            "task_abstract": "This is a task for testing.",
+            "extra_field": "ignored",
+        }
 
         url = fastapi_app.url_path_for("create_task_route")
         response = await client.post(
             f"{url}?challenge_id={CHALLENGE_ID}", json=task_data, headers={"Authorization": f"Bearer {user_token}"}
         )
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["detail"][0]["msg"] == "Extra inputs are not permitted"
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["task_name"] == task_data["task_name"]
+        assert "extra_field" not in response.json()
 
     async def test_create_task_unauthenticated(self, client: AsyncClient, fastapi_app: FastAPI):
         # Act: No token provided
@@ -74,19 +79,21 @@ class TestTaskRoutes:
         # Assert
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    async def test_create_task_missing_fields(
+    async def test_create_task_without_abstract(
         self, client: AsyncClient, fastapi_app: FastAPI, user_token, patch_challenge_and_conference_open
     ):
-        incomplete_data = {"task_name": "Missing Description", "task_deadline": str(datetime.now())}
+        task_data = {"task_name": "Missing Description", "task_deadline": str(datetime.now())}
 
         url = fastapi_app.url_path_for("create_task_route")
         response = await client.post(
             f"{url}?challenge_id={CHALLENGE_ID}",
-            json=incomplete_data,
+            json=task_data,
             headers={"Authorization": f"Bearer {user_token}"},
         )
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["task_name"] == task_data["task_name"]
+        assert response.json()["task_abstract"] is None
 
     async def test_create_and_access_task_as_different_user(
         self,

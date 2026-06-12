@@ -4,8 +4,11 @@ from unittest.mock import patch
 import pytest
 from fastapi import FastAPI, status
 from httpx import AsyncClient
+from sqlalchemy import select
 
+from BMC_API.src.application.interfaces.password_hasher_impl import BcryptPasswordHasher
 from BMC_API.src.application.dto.user_dto import UserCreateAdminDTO, UserUpdateAdminDTO
+from BMC_API.src.domain.entities.user_model import UserModel
 
 pytest_plugins = [
     "BMC_API.tests.fixtures.admin_user_fixtures",
@@ -378,6 +381,72 @@ class TestAdminUserRoutes:
         assert "failed" in response.json()
         assert len(response.json()["successful"]) == 1
         assert len(response.json()["failed"]) == 1
+
+    @pytest.mark.anyio
+    async def test_bulk_update_users_admin_rejects_invalid_password(
+        self,
+        client: AsyncClient,
+        fastapi_app: FastAPI,
+        admin_token,
+        test_user: UserCreateAdminDTO,
+        confirmed_user,
+    ):
+        user_data = test_user.model_dump()
+        create_url = fastapi_app.url_path_for("create_user_route_admin")
+        create_response = await client.post(
+            create_url,
+            json=user_data,
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        user_id = create_response.json()["id"]
+
+        url = fastapi_app.url_path_for("bulk_update_users_route_admin")
+        response = await client.put(
+            url,
+            json=[{"id": user_id, "password": "weak"}],
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["successful"]) == 0
+        assert len(response.json()["failed"]) == 1
+        assert "Password must be at least 8 characters long" in response.json()["failed"][0]["error"]
+
+    @pytest.mark.anyio
+    async def test_bulk_update_users_admin_hashes_password(
+        self,
+        client: AsyncClient,
+        fastapi_app: FastAPI,
+        admin_token,
+        test_user: UserCreateAdminDTO,
+        confirmed_user,
+        dbsession,
+    ):
+        user_data = test_user.model_dump()
+        create_url = fastapi_app.url_path_for("create_user_route_admin")
+        create_response = await client.post(
+            create_url,
+            json=user_data,
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        user_id = create_response.json()["id"]
+        new_password = "NewPassword94215!"
+
+        url = fastapi_app.url_path_for("bulk_update_users_route_admin")
+        response = await client.put(
+            url,
+            json=[{"id": user_id, "password": new_password}],
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["successful"]) == 1
+        assert len(response.json()["failed"]) == 0
+
+        result = await dbsession.execute(select(UserModel).where(UserModel.id == user_id))
+        user = result.scalars().first()
+        assert user.password != new_password
+        assert BcryptPasswordHasher().verify(new_password, user.password)
 
     @pytest.mark.anyio
     async def test_delete_user_admin_success(

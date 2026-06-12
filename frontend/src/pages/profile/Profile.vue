@@ -13,10 +13,14 @@
         <div class="col-12 col-md-4 mb-3">
           <h6 class="mb-0">Roles</h6>
           <div class="mb-3 opacity-75">
-            <span v-for="role in userData?.roles" :key="role" class="badge text-bg-primary me-1">{{ role }}</span>
+            <span
+              v-for="role in userData?.roles"
+              :key="role"
+              class="badge text-bg-primary me-1"
+              >{{ role }}</span
+            >
           </div>
         </div>
-
 
         <div class="col-12 col-md-4 mb-3">
           <h6 class="mb-0">Crated time</h6>
@@ -28,7 +32,9 @@
         </div>
         <div class="col-12 col-md-4 mb-3">
           <h6 class="mb-0">Last login</h6>
-          <div class="mb-3 opacity-75 small">{{ StringToPrettyDate(userData?.last_login_time) }}</div>
+          <div class="mb-3 opacity-75 small">
+            {{ StringToPrettyDate(userData?.last_login_time) }}
+          </div>
         </div>
         <div class="col-12 col-md-4 mb-3">
           <h6 class="mb-0">Institution</h6>

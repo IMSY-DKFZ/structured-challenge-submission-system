@@ -10,6 +10,7 @@ from BMC_API.src.api.dependencies.schemas import BulkOperationResponse
 from BMC_API.src.application.dto.task_dto import (
     TaskHistoryModelDTO,
     TaskModelBaseOutputDTO,
+    TaskUpdateAdminDTO,
 )
 from BMC_API.src.application.use_cases.base_use_cases import BaseService
 from BMC_API.src.core.exceptions import RepositoryException
@@ -50,11 +51,25 @@ class TaskService(BaseService[TaskModel, TaskModelBaseOutputDTO]):
         return await super().update(id=id, model_update=model_update)
 
     async def update_task_bulk(self, updates: List[Dict[str, Any]]) -> BulkOperationResponse[TaskModelBaseOutputDTO]:
+        prepared_updates = []
         for entity_data in updates:
-            task_obj = await self.get_raw(entity_data["id"])
+            if "id" not in entity_data:
+                prepared_updates.append(entity_data)
+                continue
+
+            task_obj = await self.repository.get(id=entity_data["id"])
+            if not task_obj:
+                prepared_updates.append(entity_data)
+                continue
+
             current_status = task_obj.task_status
             new_status = StatusActions.next_status_for_update(current_status)
-            entity_data["task_modified_time"] = datetime.now()
-            entity_data["task_status"] = new_status
+            prepared_updates.append(
+                {
+                    **entity_data,
+                    "task_modified_time": datetime.now(),
+                    "task_status": new_status,
+                }
+            )
 
-        return await super().update_bulk(updates=updates)
+        return await super().update_bulk(updates=prepared_updates, update_dto_class=TaskUpdateAdminDTO)

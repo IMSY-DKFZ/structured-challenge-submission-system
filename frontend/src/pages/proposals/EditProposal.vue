@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="pb-2">
-      <router-link type="button" class="btn btn-outline-secondary me-2" :to="{ name: 'Proposals' }">
+      <router-link
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        :to="{ name: 'Proposals' }">
         <i class="be bi-arrow-left pe-1" />
         Go Back
       </router-link>
@@ -12,14 +15,14 @@
             <p>
               This view provides all challenge parameters for this proposal. Please fill in as many
               parameters as you can. You have to fill in a challenge name to save a challenge. The
-              progress bar only updates after saving the proposal! Thank you for using the structured
-              challenge submission system for MICCAI challenges!
+              progress bar only updates after saving the proposal! Thank you for using the
+              structured challenge submission system for MICCAI challenges!
             </p>
             <p>
-              This form is the key to create a new challenge proposal. Please enter as many parameters
-              as you can. You are able to submit a proposal after filling in at least 90% of the
-              parameters. Please read the parameter descriptions carefully to avoid entering wrong
-              information!
+              This form is the key to create a new challenge proposal. Please enter as many
+              parameters as you can. You are able to submit a proposal after filling in at least 90%
+              of the parameters. Please read the parameter descriptions carefully to avoid entering
+              wrong information!
             </p>
           </template>
         </VueTextSection>

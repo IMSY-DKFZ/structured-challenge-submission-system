@@ -144,7 +144,6 @@ class UserService(BaseService[UserModel, UserResponseDTO]):
         return bearer_tokens
 
     async def refresh_token(self, user_service_admin, token_data: Token, token_cache: TokenCache = None) -> Token:
-
         # 1. Check if there is a refresh_token
         refresh_token = token_data.refresh_token
         if not refresh_token:
@@ -154,7 +153,7 @@ class UserService(BaseService[UserModel, UserResponseDTO]):
         refresh_token_payload = auth.decode_token(token_data.refresh_token)
         refresh_token_type = refresh_token_payload.get("type")
         email = refresh_token_payload.get("sub")
-        
+
         if refresh_token_type is not None and refresh_token_type != "refresh":
             raise InvalidTokenException(message="Invalid refresh token")
 
@@ -166,21 +165,19 @@ class UserService(BaseService[UserModel, UserResponseDTO]):
             If someone is trying to use blacklisted token, this can mean that the token is stolen. In this case user is disabled. Admin is notified about the situation
             """
             if email is not None:
-                user, *_ = await user_service_admin.list(search_filters={"email":email})
+                user, *_ = await user_service_admin.list(search_filters={"email": email})
                 user_id = user[0].id
                 await user_service_admin.update(id=user_id, user_update={"disabled": True})
-                
-                #TODO: Send admin an e-mail about this
-                logger.warning(
-                    f"User [{email}] disabled because of usage of blacklisted token [{refresh_token}]!"
-                )
 
-            raise InvalidTokenException(message="Invalid refresh token") # Just send general error, don't give detail.
-        
+                # TODO: Send admin an e-mail about this
+                logger.warning(f"User [{email}] disabled because of usage of blacklisted token [{refresh_token}]!")
+
+            raise InvalidTokenException(message="Invalid refresh token")  # Just send general error, don't give detail.
+
         # 4. If to issue found, continue token refreshing procedure
         bearer_tokens: Token = auth.generate_bearer_tokens(TokenData(email=email))
         return bearer_tokens
-        
+
     async def logout_user(self, token_data: Token, token_cache: TokenCache = None) -> None:
         access_token_payload = auth.decode_token(token_data.access_token)
         access_token_type = access_token_payload.get("type", None)

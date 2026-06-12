@@ -15,26 +15,36 @@
       </VueTextSection>
     </collapse-section>
 
-    <div class="accordion" id="proposalList
+    <div
+      class="accordion"
+      id="proposalList
 ">
       <LoadingCircle :activated="LoadingCircleState"></LoadingCircle>
 
       <div v-if="!LoadingCircleState">
-        <div v-for="(item, idx) in proposalsList" :key="'item' + idx" class="py-2">
-
+        <div
+          v-for="(item, idx) in proposalsList"
+          :key="'item' + idx"
+          class="py-2">
           <div class="card">
-            <div class="card-header d-flex" :class="{
-              'bg-success text-white': isProposalAccepted(item?.challenge_status),
-              'bg-primary text-white': isProposalSubmitted(item?.challenge_status),
-              'bg-danger text-bg-danger': isProposalRejected(item?.challenge_status),
-              'text-bg-warning': isRevisionRequired(item?.challenge_status),
-              'bg-body-secondary': !isProposalAccepted(item?.challenge_status) &&
-                !isProposalSubmitted(item?.challenge_status) &&
-                !isProposalRejected(item?.challenge_status) &&
-                !isRevisionRequired(item?.challenge_status)
-            }">
-              <div class="flex-grow-1"><small class="fw-semibold">Challenge proposal ID #{{ item?.id
-                  }}</small> (<small>{{ setStatusText(item?.challenge_status) }})</small></div>
+            <div
+              class="card-header d-flex"
+              :class="{
+                'bg-success text-white': isProposalAccepted(item?.challenge_status),
+                'bg-primary text-white': isProposalSubmitted(item?.challenge_status),
+                'bg-danger text-bg-danger': isProposalRejected(item?.challenge_status),
+                'text-bg-warning': isRevisionRequired(item?.challenge_status),
+                'bg-body-secondary':
+                  !isProposalAccepted(item?.challenge_status) &&
+                  !isProposalSubmitted(item?.challenge_status) &&
+                  !isProposalRejected(item?.challenge_status) &&
+                  !isRevisionRequired(item?.challenge_status),
+              }">
+              <div class="flex-grow-1">
+                <small class="fw-semibold">Challenge proposal ID #{{ item?.id }}</small> (<small
+                  >{{ setStatusText(item?.challenge_status) }})</small
+                >
+              </div>
               <div class="">
                 <h5 :hidden="!isRevisionRequired(item?.challenge_status)">⚠️</h5>
                 <h5 :hidden="!isProposalAccepted(item?.challenge_status)">✅</h5>
@@ -43,20 +53,31 @@
               </div>
             </div>
 
-            <div class="card-body"
-              :class="{ 'bg-warning-subtle': isRevisionRequired(item?.challenge_status), 'bg-danger-subtle': isProposalRejected(item?.challenge_status), 'bg-success-subtle': isProposalAccepted(item?.challenge_status), 'bg-primary-subtle': isProposalSubmitted(item?.challenge_status), }">
+            <div
+              class="card-body"
+              :class="{
+                'bg-warning-subtle': isRevisionRequired(item?.challenge_status),
+                'bg-danger-subtle': isProposalRejected(item?.challenge_status),
+                'bg-success-subtle': isProposalAccepted(item?.challenge_status),
+                'bg-primary-subtle': isProposalSubmitted(item?.challenge_status),
+              }">
               <!-- <h4 class="card-title">{{ item?.challenge_abstract }}</h4> -->
               <div class="row py-3">
                 <div class="col-12 col-md-8 col-lg-9">
                   <h4 class="pe-5">{{ item?.challenge_name }}</h4>
                   <VueTextSection>
-
-                    <template #text class="w-75 pb-3">{{ item?.challenge_abstract }}</template>
+                    <template
+                      #text
+                      class="w-75 pb-3"
+                      >{{ item?.challenge_abstract }}</template
+                    >
                     <div class="d-flex flex-column gap-3">
                       <div>
                         <h6 class="mb-0">Status</h6>
-                        <small class="mb-0 opacity-75"><span :hidden="!isRevisionRequired(item?.challenge_status)">⚠️
-                          </span>{{ setStatusText(item?.challenge_status) }}</small>
+                        <small class="mb-0 opacity-75"
+                          ><span :hidden="!isRevisionRequired(item?.challenge_status)">⚠️ </span
+                          >{{ setStatusText(item?.challenge_status) }}</small
+                        >
                       </div>
                       <div>
                         <h6 class="mb-0">Created</h6>
@@ -75,9 +96,12 @@
                 </div>
                 <div class="col-12 col-md-4 col-lg-3">
                   <div class="d-grid gap-3 pt-3">
-                    <button :disabled="!checkModifyProposal(item?.challenge_status)"
+                    <button
+                      :disabled="!checkModifyProposal(item?.challenge_status)"
                       class="btn btn-primary text-nowrap shadow-sm"
-                      :class="{ 'btn-outline-secondary': !checkModifyProposal(item?.challenge_status) }"
+                      :class="{
+                        'btn-outline-secondary': !checkModifyProposal(item?.challenge_status),
+                      }"
                       @click="$router.push({ name: 'Edit Proposal', params: { id: item?.id } })">
                       <i class="bi bi-folder2-open"></i>
                       <span class="ps-2">Edit proposal</span>
@@ -103,21 +127,40 @@
                       <i class="bi bi-files"></i>
                       <span class="ps-2">Modify proposal</span>
                     </button> -->
-                    <button :disabled="!checkDownloadProposal(item?.challenge_status)"
-                      :class="{ 'btn': true, 'btn-success': checkDownloadProposal(item?.challenge_status), 'btn-outline-secondary': !checkDownloadProposal(item?.challenge_status) }"
-                      class="text-nowrap shadow-sm" type="button" @click="downloadProposal(item?.id)">
+                    <button
+                      :disabled="!checkDownloadProposal(item?.challenge_status)"
+                      :class="{
+                        btn: true,
+                        'btn-success': checkDownloadProposal(item?.challenge_status),
+                        'btn-outline-secondary': !checkDownloadProposal(item?.challenge_status),
+                      }"
+                      class="text-nowrap shadow-sm"
+                      type="button"
+                      @click="downloadProposal(item?.id)">
                       <i class="bi bi-download"></i>
                       <span class="ps-2">Download proposal</span>
                     </button>
-                    <button :disabled="!checkSubmitProposal(item?.challenge_status)"
-                      :class="{ 'btn': true, 'btn-dark': checkSubmitProposal(item?.challenge_status), 'btn-outline-secondary': !checkSubmitProposal(item?.challenge_status) }"
-                      class="text-nowrap shadow-sm" type="button" @click="submitProposal(item?.id)">
+                    <button
+                      :disabled="!checkSubmitProposal(item?.challenge_status)"
+                      :class="{
+                        btn: true,
+                        'btn-dark': checkSubmitProposal(item?.challenge_status),
+                        'btn-outline-secondary': !checkSubmitProposal(item?.challenge_status),
+                      }"
+                      class="text-nowrap shadow-sm"
+                      type="button"
+                      @click="submitProposal(item?.id)">
                       <i class="bi bi-send"></i>
                       <span class="ps-2">Re-generate proposal</span>
                     </button>
-                    <button :disabled="checkDeleteProposal(item?.challenge_status)"
-                      :class="{ 'btn-outline-secondary': checkDeleteProposal(item?.challenge_status) }"
-                      class="btn btn-danger text-nowrap shadow-sm" type="button" @click="deleteProposal(item?.id)">
+                    <button
+                      :disabled="checkDeleteProposal(item?.challenge_status)"
+                      :class="{
+                        'btn-outline-secondary': checkDeleteProposal(item?.challenge_status),
+                      }"
+                      class="btn btn-danger text-nowrap shadow-sm"
+                      type="button"
+                      @click="deleteProposal(item?.id)">
                       <i class="bi bi-trash3"></i>
                       <span class="ps-2">Delete proposal</span>
                     </button>
@@ -128,7 +171,6 @@
                   </div>
                 </div>
               </div>
-
             </div>
             <!-- <div class="card-footer">
               <span class="mb-0">Last modified: </span>
@@ -136,10 +178,7 @@
         StringToPrettyDate(item?.challenge_modified_time)
                 }}</small>
             </div> -->
-
           </div>
-
-
         </div>
       </div>
     </div>
@@ -176,43 +215,42 @@ export default {
     async getAndSetProposals() {
       this.proposalsList = []
       this.LoadingCircleState = false
-      await apiGet('/user/my_challenges/?limit=1000&offset=0').then((resp) => {
-        this.proposalsList = resp["content"]
+      await apiGet('/user/my_challenges?limit=1000&offset=0').then((resp) => {
+        this.proposalsList = resp['content']
         this.LoadingCircleState = false
       })
     },
-    showHistory() { },
-    createCopy() { },
-    modifyProposal() { },
+    showHistory() {},
+    createCopy() {},
+    modifyProposal() {},
     async downloadProposal(id) {
       if (Number.isInteger(id)) {
         await apiGetDownload(`/challenge/${id}/download`, {
           responseType: 'blob',
         })
           .then((response) => {
+            const contentType = response.headers['content-type']
+            const blob = new Blob([response.data], { type: 'application/pdf' })
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
 
-            const contentType = response.headers['content-type'];
-            const blob = new Blob([response.data], { type: "application/pdf" });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-
-            link.href = url;
-            const contentDisposition = response.headers['content-disposition'];
-            const filenameSection = response.headers['x-content-filename'] || "Challenge_proposal.pdf";
-            let decodedFilename = decodeURIComponent(filenameSection);
-            link.setAttribute('download', decodedFilename);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-
+            link.href = url
+            const contentDisposition = response.headers['content-disposition']
+            const filenameSection =
+              response.headers['x-content-filename'] || 'Challenge_proposal.pdf'
+            let decodedFilename = decodeURIComponent(filenameSection)
+            link.setAttribute('download', decodedFilename)
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+            window.URL.revokeObjectURL(url)
           })
           .catch((e) => {
-            useToastAlertStore().showAlert(e, 'danger', 6000);
-
-          });
-
-      } else { useToastAlertStore().showAlert('Challenge not found!', 'danger', 6000); }
+            useToastAlertStore().showAlert(e, 'danger', 6000)
+          })
+      } else {
+        useToastAlertStore().showAlert('Challenge not found!', 'danger', 6000)
+      }
     },
     async submitProposal(id) {
       if (Number.isInteger(id)) {
@@ -221,16 +259,16 @@ export default {
         })
           .then(() => {
             this.$router.push({ name: 'Proposals' })
-            useToastAlertStore().showAlert('Challenge proposal submitted successfully. You can download your submission file.', 'success', 6000);
-
-
+            useToastAlertStore().showAlert(
+              'Challenge proposal submitted successfully. You can download your submission file.',
+              'success',
+              6000
+            )
           })
           .catch((e) => {
             // this.$router.push({ name: 'Proposals' })
-            useToastAlertStore().showAlert(e, 'danger', 6000);
-
-          });
-
+            useToastAlertStore().showAlert(e, 'danger', 6000)
+          })
       }
     },
 
@@ -241,7 +279,6 @@ export default {
         okButton: 'Delete proposal permanently',
         okButtonTheme: 'btn-danger',
         showPasswordInput: true,
-
       })
       if (ok) {
         await apiDelete(
@@ -250,16 +287,14 @@ export default {
           )}`
         )
           .then(() => {
-            setTimeout(1000);
+            setTimeout(1000)
             useToastAlertStore().showAlert('The proposal was permanently deleted', 'success')
-            setTimeout(3000);
-            location.reload();
+            setTimeout(3000)
+            location.reload()
           })
           .catch((e) => {
-            useToastAlertStore().showAlert(e, 'danger', 6000);
-
-          });
-
+            useToastAlertStore().showAlert(e, 'danger', 6000)
+          })
       } else {
       }
     },
@@ -289,20 +324,20 @@ export default {
     },
     checkModifyProposal(role) {
       return [
-        "Draft",
-        "DraftUpdated",
-        "DraftSubmitted",
-        "MinorRevisionRequired",
-        "MajorRevisionRequired",
-        "RevisionUpdated",
-        "RevisionSubmitted",
-        "PrelimAcceptAsStandardChallenge",
-        "PrelimAcceptAsLighthouseChallenge",
-        "RevisionUpdatedPrelimAccept",
-        "RevisionSubmittedPrelimAccept",
-        "AcceptedModifiedDraft",
-        "AcceptedModifiedUpdated",
-        "AcceptedModifiedSubmitted",
+        'Draft',
+        'DraftUpdated',
+        'DraftSubmitted',
+        'MinorRevisionRequired',
+        'MajorRevisionRequired',
+        'RevisionUpdated',
+        'RevisionSubmitted',
+        'PrelimAcceptAsStandardChallenge',
+        'PrelimAcceptAsLighthouseChallenge',
+        'RevisionUpdatedPrelimAccept',
+        'RevisionSubmittedPrelimAccept',
+        'AcceptedModifiedDraft',
+        'AcceptedModifiedUpdated',
+        'AcceptedModifiedSubmitted',
         'Accept',
         'AcceptAsLighthouseChallenge',
         'AcceptAsStandardChallenge',
@@ -318,9 +353,9 @@ export default {
         'AcceptAsStandardChallenge',
         'AcceptedModified',
         'Reject',
-        "AcceptedModifiedSubmitted",
-        "RevisionSubmittedPrelimAccept",
-        'CleanProposal'
+        'AcceptedModifiedSubmitted',
+        'RevisionSubmittedPrelimAccept',
+        'CleanProposal',
       ].includes(role)
     },
     checkSubmitProposal(role) {
@@ -332,8 +367,8 @@ export default {
         'AcceptAsStandardChallenge',
         'AcceptedModified',
         'Reject',
-        "AcceptedModifiedSubmitted",
-        "RevisionSubmittedPrelimAccept",
+        'AcceptedModifiedSubmitted',
+        'RevisionSubmittedPrelimAccept',
         'CleanProposal',
       ].includes(role)
     },
@@ -341,9 +376,8 @@ export default {
       return [
         'DraftSubmitted',
         'RevisionSubmitted',
-        "AcceptedModifiedSubmitted",
-        "RevisionSubmittedPrelimAccept",
-
+        'AcceptedModifiedSubmitted',
+        'RevisionSubmittedPrelimAccept',
       ].includes(role)
     },
     isRevisionRequired(role) {
@@ -352,14 +386,10 @@ export default {
         'MinorRevisionRequired',
         'PrelimAcceptAsLighthouseChallenge',
         'PrelimAcceptAsStandardChallenge',
-
       ].includes(role)
     },
     isProposalRejected(role) {
-      return [
-        'Reject',
-        'Deleted',
-      ].includes(role)
+      return ['Reject', 'Deleted'].includes(role)
     },
     isProposalAccepted(role) {
       return [
@@ -376,7 +406,7 @@ export default {
         'AcceptAsLighthouseChallenge',
         'AcceptAsStandardChallenge',
         'Reject',
-        'CleanProposal'
+        'CleanProposal',
       ].includes(role)
     },
     setStatusText(status) {
@@ -417,8 +447,8 @@ export default {
           return 'Accepted modified updated'
         case 'AcceptedModifiedSubmitted':
           return 'Accepted modified submitted'
-        case "CleanProposal":
-          return "Clean/Unmark proposal"
+        case 'CleanProposal':
+          return 'Clean/Unmark proposal'
         default:
           return status
       }

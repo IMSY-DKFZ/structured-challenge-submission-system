@@ -14,14 +14,17 @@
       <template #title>About</template>
       <template #text>
         <p>
-          A recent MICCAI paper [<a href="https://link.springer.com/chapter/10.1007/978-3-030-00937-3_45"
-            target="_blank">Reinke, A. et al. (2018)</a>] showed that common practice in biomedical challenge
-          organization can be exploited
-          to tune challenge rankings. To prevent such incidences and to improve the quality of
+          A recent MICCAI paper [<a
+            href="https://link.springer.com/chapter/10.1007/978-3-030-00937-3_45"
+            target="_blank"
+            >Reinke, A. et al. (2018)</a
+          >] showed that common practice in biomedical challenge organization can be exploited to
+          tune challenge rankings. To prevent such incidences and to improve the quality of
           challenges, the
-          <a href="https://miccai.org/index.php/special-interest-groups/challenges/" target="_blank">MICCAI Board
-            Challenge Working Group (now:
-            Special Interest Group (SIG) for Challenges)
+          <a
+            href="https://miccai.org/index.php/special-interest-groups/challenges/"
+            target="_blank"
+            >MICCAI Board Challenge Working Group (now: Special Interest Group (SIG) for Challenges)
           </a>
           and the MICCAI 2020 satellite event team decided to introduce the concept of challenge
           registration. Similar to how clinical trials have to be registered before starting, the
@@ -31,8 +34,8 @@
           design).
         </p>
         <p>
-          To facilitate this process for the challenge organizers, this system has been updated in
-          a way that allows for straightforward PDF export of the challenge design. The satellite
+          To facilitate this process for the challenge organizers, this system has been updated in a
+          way that allows for straightforward PDF export of the challenge design. The satellite
           event team will export the document and have it signed by the contact person of the
           challenge before uploading it on the submission system.
         </p>
@@ -44,7 +47,6 @@
         </p>
       </template>
     </VueTextSection>
-
 
     <VueTextSection>
       <template #title>Selection criteria</template>
@@ -62,20 +64,22 @@
         <p>
           Proposals will be reviewed by at least two reviewers chosen based on their expertise in
           the area of a proposal. Reviewers will provide feedback and assist the challenge
-          organizing committee in making a final decision. To ensure a rich and diverse program,
-          we reserve the right to ask the applicants of proposals with substantial overlaps to
-          merge or alter their scopes. We also reserve the right to ask applicants to provide
-          supplementary materials and to revise their proposals in order to ensure the quality and
-          standard of the MICCAI challenges.
+          organizing committee in making a final decision. To ensure a rich and diverse program, we
+          reserve the right to ask the applicants of proposals with substantial overlaps to merge or
+          alter their scopes. We also reserve the right to ask applicants to provide supplementary
+          materials and to revise their proposals in order to ensure the quality and standard of the
+          MICCAI challenges.
         </p>
       </template>
     </VueTextSection>
     <VueTextSection>
       <template #title>Copyright</template>
-      <template #text>Authors will assign to the MICCAI Society the right to distribute challenge materials
-        (such as the agenda or the challenge design document) to MICCAI members and to challenge
-        and conference attendees, independently of the copyright ownership planned by the
-        challenge organizers.</template>
+      <template #text
+        >Authors will assign to the MICCAI Society the right to distribute challenge materials (such
+        as the agenda or the challenge design document) to MICCAI members and to challenge and
+        conference attendees, independently of the copyright ownership planned by the challenge
+        organizers.</template
+      >
     </VueTextSection>
     <!-- <VueTextSection>
         <template #title>Budget</template>
@@ -87,8 +91,6 @@
           register for the event unless registration fee waivers have been requested and
           granted.</template>
       </VueTextSection> -->
-
-
   </div>
 </template>
 
@@ -104,9 +106,7 @@ export default {
     },
   },
   data() {
-
     return {
-
       news: [
         {
           titel: 'News 1',

@@ -25,9 +25,8 @@ router = APIRouter(
     dependencies=[Depends(RoleChecker([Roles.ADMIN]))]
 )  # IMPORTANT: dependency injection among all endpoints here for role checking
 
-@router.post(
-    "/database_backup_and_download"
-)
+
+@router.post("/database_backup_and_download")
 async def database_backup_and_download(file_name: str | None = None) -> FileResponse:
     try:
         backup_file_location = await backup_database(file_name)
@@ -64,15 +63,11 @@ async def database_backup_and_download(file_name: str | None = None) -> FileResp
         )
 
 
-@router.delete(
-    "/delete_database_backups"
-)
+@router.delete("/delete_database_backups")
 async def delete_database_backups(
-
     current_active_user: Annotated[UserInDB, Depends(validate_active_user_password_dependency)],
     delete_all_backups: bool = False,
 ) -> JSONResponse:
-
     try:
         deleted_files = await delete_db_backups(delete_all_backups)
     except Exception as e:

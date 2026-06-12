@@ -1,9 +1,15 @@
 <!-- src/components/BaseAlert.vue -->
 <template>
-  <div v-if="modelValue.show" :class="`alert alert-${modelValue.type} alert-dismissible fade show my-3`" role="alert">
+  <div
+    v-if="modelValue.show"
+    :class="`alert alert-${modelValue.type} alert-dismissible fade show my-3`"
+    role="alert">
     <span v-html="modelValue.message"></span>
-    <button type="button" class="btn-close" @click="$emit('dismiss')" aria-label="Close">
-    </button>
+    <button
+      type="button"
+      class="btn-close"
+      @click="$emit('dismiss')"
+      aria-label="Close"></button>
   </div>
 </template>
 
@@ -13,10 +19,10 @@ export default {
   props: {
     modelValue: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
-  emits: ['dismiss']
+  emits: ['dismiss'],
 }
 </script>
 

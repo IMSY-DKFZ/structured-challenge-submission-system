@@ -19,6 +19,7 @@ router = APIRouter(
     dependencies=[Depends(RoleChecker([Roles.ADMIN]))]
 )  # IMPORTANT: dependency injection among all endpoints here for role checking
 
+
 @router.get("/health")
 async def redis_health(
     redis_pool: Annotated[ConnectionPool, Depends(get_redis_pool)],
@@ -31,9 +32,9 @@ async def redis_health(
             await redis.ping()
         except Exception as e:
             logger.error(e)
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
     return {"message": "Redis server works"}
+
 
 @router.get(
     "/",
@@ -58,13 +59,10 @@ async def get_redis_value(
                     value=redis_value,
                 )
         except Exception as e:
-            if 'No active exception' in str(e):
-                raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Key not found.")
-            else: 
-                raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE )
+            if "No active exception" in str(e):
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found.")
+            else:
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 @router.get(
@@ -92,11 +90,7 @@ async def get_all_redis_values(
                 # convert keys and values to strings
                 for key, value in zip(keys, values):
                     key_str = key.decode("utf-8", errors="ignore")
-                    value_str = (
-                        value.decode("utf-8", errors="ignore")
-                        if value is not None
-                        else None
-                    )
+                    value_str = value.decode("utf-8", errors="ignore") if value is not None else None
                     results.append(
                         RedisValueDTO(
                             key=key_str,
@@ -104,16 +98,14 @@ async def get_all_redis_values(
                         )
                     )
                 return results
-          
+
         except Exception as e:
-            if 'No active exception' in str(e):
+            if "No active exception" in str(e):
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No data found.")
+            else:
                 raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No data found.")
-            else: 
-                raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                  )
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
 
 
 @router.post(
@@ -133,8 +125,7 @@ async def set_redis_value(
                 await redis.set(name=redis_value.key, value=redis_value.value)
             except Exception as e:
                 logger.error(e)
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
         return {"message": "key-value pair successfully stored in Redis database."}
 
 
@@ -147,7 +138,7 @@ async def delete_redis_key(
     redis_pool: Annotated[ConnectionPool, Depends(get_redis_pool)],
 ) -> None:
     """
-    Delete key&value pair from redis. 
+    Delete key&value pair from redis.
     """
 
     async with Redis(connection_pool=redis_pool) as redis:
@@ -156,21 +147,15 @@ async def delete_redis_key(
             if not redis_value:
                 raise
         except Exception as e:
-            if 'No active exception' in str(e):
-                raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Key not found.")
-            else: 
-                HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE
-            )
+            if "No active exception" in str(e):
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found.")
+            else:
+                HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
         try:
             await redis.delete(key)
         except Exception as e:
             logger.error(e)
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE
-            )
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
         return {"message": "key-value pair successfully deleted from Redis database."}
 
 
@@ -191,11 +176,8 @@ async def delete_all_redis_keys(
             await redis.delete(*keys)
     except Exception as e:
         logger.error(e)
-        if 'No active exception' in str(e):
-                raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Key not found.")
-        else: 
-            raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE )
+        if "No active exception" in str(e):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found.")
+        else:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
     return {"message": "All key-value pairs successfully deleted from Redis database."}

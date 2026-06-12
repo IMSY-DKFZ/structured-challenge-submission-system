@@ -54,7 +54,11 @@ class TestChallengeRoutes:
     async def test_create_challenge_authenticated_with_extra_fields(
         self, client: AsyncClient, fastapi_app: FastAPI, user_token, patch_challenge_and_conference_open
     ):
-        challenge_data = {"challenge_name": "Test Challenge", "extra_field": "This is a challenge for testing."}
+        challenge_data = {
+            "challenge_name": "Test Challenge",
+            "challenge_abstract": "This is a challenge for testing.",
+            "extra_field": "ignored",
+        }
 
         url = fastapi_app.url_path_for("create_challenge_route")
         response = await client.post(
@@ -63,8 +67,9 @@ class TestChallengeRoutes:
             headers={"Authorization": f"Bearer {user_token}"},
         )
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["detail"][0]["msg"] == "Extra inputs are not permitted"
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["challenge_name"] == challenge_data["challenge_name"]
+        assert "extra_field" not in response.json()
 
     async def test_create_challenge_unauthenticated(self, client: AsyncClient, fastapi_app: FastAPI):
         # Act: No token provided
@@ -80,19 +85,21 @@ class TestChallengeRoutes:
         # Assert
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    async def test_create_challenge_extra_fields(
+    async def test_create_challenge_without_abstract(
         self, client: AsyncClient, fastapi_app: FastAPI, user_token, patch_challenge_and_conference_open
     ):
-        incomplete_data = {"challenge_name": "Missing Description", "challenge_deadline": str(datetime.now())}
+        challenge_data = {"challenge_name": "Missing Description", "challenge_deadline": str(datetime.now())}
 
         url = fastapi_app.url_path_for("create_challenge_route")
         response = await client.post(
             f"{url}?conference_id={CONFERENCE_ID}",
-            json=incomplete_data,
+            json=challenge_data,
             headers={"Authorization": f"Bearer {user_token}"},
         )
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["challenge_name"] == challenge_data["challenge_name"]
+        assert response.json()["challenge_abstract"] is None
 
     async def test_create_and_access_challenge_as_different_user(
         self,
@@ -298,7 +305,11 @@ class TestChallengeRoutes:
         challenge_id = create_resp.json()["id"]
 
         delete_url = fastapi_app.url_path_for("delete_challenge_route", id=challenge_id)
-        response = await client.delete(delete_url, params={"active_user_password": test_user.password}, headers={"Authorization": f"Bearer {user_token}"})
+        response = await client.delete(
+            delete_url,
+            params={"active_user_password": test_user.password},
+            headers={"Authorization": f"Bearer {user_token}"},
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["detail"] == "Challenge deleted"

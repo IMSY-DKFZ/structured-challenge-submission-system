@@ -1,9 +1,7 @@
-from pydantic import ConfigDict
-
-from .base_model import NoExtraBaseModel
+from pydantic import ConfigDict, BaseModel
 
 
-class TaskModelBase(NoExtraBaseModel):
+class TaskModelBase(BaseModel):
     """DTO for task base model."""
 
     task_name: str
@@ -43,7 +41,7 @@ class TaskModelBase(NoExtraBaseModel):
     task_justification_of_data_characteristics: str | None = None
     task_justification_of_metrics: str | None = None
     task_justification_of_rank_computation_method: str | None = None
-    task_justification_of_statistical_analyses: str | None = None
+    # task_justification_of_statistical_analyses: str | None = None
     task_keywords: list | str | None = None
     task_licence: str | None = None
     task_lifecycle: str | None = None
@@ -56,6 +54,7 @@ class TaskModelBase(NoExtraBaseModel):
     task_organizing_team: str | None = None
     # task_participation_policy: str | None = None
     task_platform: str | None = None
+    task_platform_sharing_information: str | None = None
     task_pre_evaluation: str | None = None
     task_pre_processing_methods: str | None = None
     task_pulication_policy: str | None = None
@@ -65,12 +64,21 @@ class TaskModelBase(NoExtraBaseModel):
     task_schedule: str | None = None
     task_sources_of_error_images: str | None = None
     task_sources_of_error_other: str | None = None
-    task_statistical_analyses: str | None = None
+    # task_statistical_analyses: str | None = None
     # task_submission_instructions: str | None = None
     task_target_cohort: str | None = None
     task_task_category: str | None = None
     task_training_data_policy: str | None = None
     task_url: str | None = None
+    task_quantity_of_data: str | None = None
+    task_organizing_team_clinicians: str | None = None
+    task_statistical_analyses_overview: str | None = None
+    task_statistical_analyses_precision_performance_estimates: str | None = None
+    task_statistical_analyses_performance_variability: str | None = None
+    task_statistical_analyses_rankings_variability: str | None = None
+    task_statistical_analyses_test_for_significance: str | None = None
+    task_statistical_analyses_missing_data_handling: str | None = None
+    task_statistical_analyses_software: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

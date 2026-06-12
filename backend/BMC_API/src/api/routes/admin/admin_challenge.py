@@ -434,6 +434,7 @@ async def prune_challenge_route_admin(
     logger.info(f"Challenge with id {id} pruned successfully by {current_active_user.email}.")
     return result
 
+
 @router.delete(
     "/bulk-prune",
     response_model=BulkOperationResponse[Any],

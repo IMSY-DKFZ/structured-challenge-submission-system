@@ -2,15 +2,25 @@
   <div>
     <VueTextSection>
       <template #title>Create challenge proposals</template>
-      <div class="accordion accordion-flush" id="accordionCreateChallengeProposals">
+      <div
+        class="accordion accordion-flush"
+        id="accordionCreateChallengeProposals">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challenge-1" aria-expanded="false" aria-controls="challenge-1">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challenge-1"
+              aria-expanded="false"
+              aria-controls="challenge-1">
               I want to create a task in my proposal but it doesn't work. What is wrong?
             </button>
           </h2>
-          <div id="challenge-1" class="accordion-collapse collapse" data-bs-parent="#challenge-1">
+          <div
+            id="challenge-1"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challenge-1">
             <VueTextSection>
               <template #text>
                 <p>This may have multiple reasons:</p>
@@ -34,12 +44,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challenge-2" aria-expanded="false" aria-controls="challenge-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challenge-2"
+              aria-expanded="false"
+              aria-controls="challenge-2">
               I cannot save my proposal. What should I do?
             </button>
           </h2>
-          <div id="challenge-2" class="accordion-collapse collapse" data-bs-parent="#challenge-2">
+          <div
+            id="challenge-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challenge-2">
             <VueTextSection>
               <template #text>
                 <p>This may have multiple reasons:</p>
@@ -78,12 +96,20 @@
         </div> -->
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challenge-4" aria-expanded="false" aria-controls="challenge-4">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challenge-4"
+              aria-expanded="false"
+              aria-controls="challenge-4">
               How many parameters do I have to fill out to submit?
             </button>
           </h2>
-          <div id="challenge-4" class="accordion-collapse collapse" data-bs-parent="#challenge-4">
+          <div
+            id="challenge-4"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challenge-4">
             <VueTextSection>
               <template #text>
                 <p>At least 90% of parameters have to be filled out.</p>
@@ -93,12 +119,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challenge-5" aria-expanded="false" aria-controls="challenge-5">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challenge-5"
+              aria-expanded="false"
+              aria-controls="challenge-5">
               How many tasks can I create?
             </button>
           </h2>
-          <div id="challenge-5" class="accordion-collapse collapse" data-bs-parent="#challenge-5">
+          <div
+            id="challenge-5"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challenge-5">
             <VueTextSection>
               <template #text>
                 <p>
@@ -150,25 +184,36 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>Submit challenge proposals</template>
-      <div class="accordion accordion-flush" id="accordionSubmitChallengeProposals">
+      <div
+        class="accordion accordion-flush"
+        id="accordionSubmitChallengeProposals">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#submitProposal-1" aria-expanded="false" aria-controls="#submitProposal-1">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#submitProposal-1"
+              aria-expanded="false"
+              aria-controls="#submitProposal-1">
               How can I submit my proposal?
             </button>
           </h2>
-          <div id="submitProposal-1" class="accordion-collapse collapse" data-bs-parent="#submitProposal-1">
+          <div
+            id="submitProposal-1"
+            class="accordion-collapse collapse"
+            data-bs-parent="#submitProposal-1">
             <VueTextSection>
               <template #text>
                 <p>
                   After completing your challenge proposal, make sure that all changes are saved.
-                  Afterwards, click on <button class="my-1 btn btn-primary btn-sm">
-                    <i class=" bi bi-send-arrow-down"></i> Generate proposal</button> button on the right panel and
-                  follow the
-                  instructions. After that you will be able to download your proposal file. Please don't forget to
-                  upload
-                  it to CMT before deadline.
+                  Afterwards, click on
+                  <button class="my-1 btn btn-primary btn-sm">
+                    <i class="bi bi-send-arrow-down"></i> Generate proposal
+                  </button>
+                  button on the right panel and follow the instructions. After that you will be able
+                  to download your proposal file. Please don't forget to upload it to CMT before
+                  deadline.
                 </p>
                 <p>
                   <span class="text-danger">Remark: </span>You are only able to submit a proposal if
@@ -181,19 +226,27 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#submitProposal-2" aria-expanded="false" aria-controls="submitProposal-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#submitProposal-2"
+              aria-expanded="false"
+              aria-controls="submitProposal-2">
               I submitted my proposal, what happens next?
             </button>
           </h2>
-          <div id="submitProposal-2" class="accordion-collapse collapse" data-bs-parent="#submitProposal-2">
+          <div
+            id="submitProposal-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#submitProposal-2">
             <VueTextSection>
               <template #text>
                 <p>
-                  After uploading your proposal to CMT, it will be reviewed by multiple reviewers. Please wait for their
-                  feedback. If a revision is required, you will be asked to write a rebuttal based
-                  on the feedback. Afterwards, a MICCAI challenge (co-)chair will inform you about
-                  the status of your proposal.
+                  After uploading your proposal to CMT, it will be reviewed by multiple reviewers.
+                  Please wait for their feedback. If a revision is required, you will be asked to
+                  write a rebuttal based on the feedback. Afterwards, a MICCAI challenge (co-)chair
+                  will inform you about the status of your proposal.
                 </p>
               </template>
             </VueTextSection>
@@ -201,12 +254,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#submitProposal-3" aria-expanded="false" aria-controls="submitProposal-3">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#submitProposal-3"
+              aria-expanded="false"
+              aria-controls="submitProposal-3">
               When is the deadline for proposal submission?
             </button>
           </h2>
-          <div id="submitProposal-3" class="accordion-collapse collapse" data-bs-parent="#submitProposal-3">
+          <div
+            id="submitProposal-3"
+            class="accordion-collapse collapse"
+            data-bs-parent="#submitProposal-3">
             <VueTextSection>
               <template #text>
                 <p>Please see the submission timeline section on welcome page</p>
@@ -218,15 +279,25 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>I accidentally ...</template>
-      <div class="accordion accordion-flush" id="accordionAccidentally">
+      <div
+        class="accordion accordion-flush"
+        id="accordionAccidentally">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#accidentally-1" aria-expanded="false" aria-controls="#accidentally-1">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#accidentally-1"
+              aria-expanded="false"
+              aria-controls="#accidentally-1">
               I submitted my proposal by accident, what can I do to get it back for editing?
             </button>
           </h2>
-          <div id="accidentally-1" class="accordion-collapse collapse" data-bs-parent="#accidentally-1">
+          <div
+            id="accidentally-1"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accidentally-1">
             <VueTextSection>
               <template #text>
                 <p>Please contact the technical support.</p>
@@ -236,12 +307,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#accidentally-2" aria-expanded="false" aria-controls="accidentally-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#accidentally-2"
+              aria-expanded="false"
+              aria-controls="accidentally-2">
               I deleted my proposal by accident. Can I get it back?
             </button>
           </h2>
-          <div id="accidentally-2" class="accordion-collapse collapse" data-bs-parent="#accidentally-2">
+          <div
+            id="accidentally-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accidentally-2">
             <VueTextSection>
               <template #text>
                 <p>Deleted proposals can not be recovered. Please create a new proposal.</p>
@@ -253,15 +332,25 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>Challenge review</template>
-      <div class="accordion accordion-flush" id="accordionChallengeReview">
+      <div
+        class="accordion accordion-flush"
+        id="accordionChallengeReview">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeReview-1" aria-expanded="false" aria-controls="#challengeReview-1">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeReview-1"
+              aria-expanded="false"
+              aria-controls="#challengeReview-1">
               How does the review process work?
             </button>
           </h2>
-          <div id="challengeReview-1" class="accordion-collapse collapse" data-bs-parent="#challengeReview-1">
+          <div
+            id="challengeReview-1"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challengeReview-1">
             <VueTextSection>
               <template #text>
                 <p>
@@ -280,12 +369,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeReview-2" aria-expanded="false" aria-controls="challengeReview-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeReview-2"
+              aria-expanded="false"
+              aria-controls="challengeReview-2">
               Can I become a reviewer?
             </button>
           </h2>
-          <div id="challengeReview-2" class="accordion-collapse collapse" data-bs-parent="#challengeReview-2">
+          <div
+            id="challengeReview-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#challengeReview-2">
             <VueTextSection>
               <template #text>
                 <p>
@@ -300,16 +397,24 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>7 reasons why challenges were rejected</template>
-      <div class="accordion accordion-flush" id="accordionChallengeRejectedReasons">
+      <div
+        class="accordion accordion-flush"
+        id="accordionChallengeRejectedReasons">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-1" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-1"
+              aria-expanded="false"
               aria-controls="#challengeRejectedReasons-1">
               1. Small datasets
             </button>
           </h2>
-          <div id="challengeRejectedReasons-1" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-1"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-1">
             <VueTextSection>
               <template #text>
@@ -327,13 +432,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-2" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-2"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-2">
               2. Training-test dataset imbalance
             </button>
           </h2>
-          <div id="challengeRejectedReasons-2" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-2"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-2">
             <VueTextSection>
               <template #text>
@@ -351,13 +462,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-3" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-3"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-3">
               3. Metric/assessment aim doesn't fit the challenge goal
             </button>
           </h2>
-          <div id="challengeRejectedReasons-3" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-3"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-3">
             <VueTextSection>
               <template #text>
@@ -370,7 +487,6 @@
                   some reads to consider:
                 </p>
                 <ul>
-
                   <li>Common Limitations of Image Processing Metrics: A Picture Story</li>
                   <li>
                     A discovery dive into the world of evaluation — Do’s, don’ts and other
@@ -383,13 +499,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-4" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-4"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-4">
               4. No statistical or uncertainty analyses
             </button>
           </h2>
-          <div id="challengeRejectedReasons-4" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-4"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-4">
             <VueTextSection>
               <template #text>
@@ -416,13 +538,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-5" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-5"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-5">
               5. Challenge motivation not convincing
             </button>
           </h2>
-          <div id="challengeRejectedReasons-5" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-5"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-5">
             <VueTextSection>
               <template #text>
@@ -438,13 +566,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-6" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-6"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-6">
               6. Too little information provided/no justification
             </button>
           </h2>
-          <div id="challengeRejectedReasons-6" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-6"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-6">
             <VueTextSection>
               <template #text>
@@ -473,13 +607,19 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#challengeRejectedReasons-7" aria-expanded="false"
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#challengeRejectedReasons-7"
+              aria-expanded="false"
               aria-controls="challengeRejectedReasons-7">
               7. Many typos, grammatical errors, incomplete sentences
             </button>
           </h2>
-          <div id="challengeRejectedReasons-7" class="accordion-collapse collapse"
+          <div
+            id="challengeRejectedReasons-7"
+            class="accordion-collapse collapse"
             data-bs-parent="#challengeRejectedReasons-7">
             <VueTextSection>
               <template #text>
@@ -498,7 +638,9 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>Feedback and questions</template>
-      <div class="accordion accordion-flush" id="accordionFeedback">
+      <div
+        class="accordion accordion-flush"
+        id="accordionFeedback">
         <!-- <div class="accordion-item">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -516,12 +658,20 @@
         </div> -->
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#feedback-2" aria-expanded="false" aria-controls="feedback-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#feedback-2"
+              aria-expanded="false"
+              aria-controls="feedback-2">
               I've found a bug in the system, how can I report it?
             </button>
           </h2>
-          <div id="feedback-2" class="accordion-collapse collapse" data-bs-parent="#feedback-2">
+          <div
+            id="feedback-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#feedback-2">
             <VueTextSection>
               <template #text>
                 <!-- <p>Please contact the technical support as recipient.</p> -->
@@ -532,12 +682,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#feedback-3" aria-expanded="false" aria-controls="feedback-3">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#feedback-3"
+              aria-expanded="false"
+              aria-controls="feedback-3">
               Can I give feedback to the submission system?
             </button>
           </h2>
-          <div id="feedback-3" class="accordion-collapse collapse" data-bs-parent="#feedback-3">
+          <div
+            id="feedback-3"
+            class="accordion-collapse collapse"
+            data-bs-parent="#feedback-3">
             <VueTextSection>
               <template #text>
                 <!-- <p>Yes. Please use our contact form and choose Technical support as recipient.</p> -->
@@ -550,19 +708,30 @@
     </VueTextSection>
     <VueTextSection>
       <template #title>General questions related to the submission system</template>
-      <div class="accordion accordion-flush" id="accordionGeneralQuestions">
+      <div
+        class="accordion accordion-flush"
+        id="accordionGeneralQuestions">
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-1" aria-expanded="false" aria-controls="#generalQuestions-1">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-1"
+              aria-expanded="false"
+              aria-controls="#generalQuestions-1">
               How can I log out?
             </button>
           </h2>
-          <div id="generalQuestions-1" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-1">
+          <div
+            id="generalQuestions-1"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-1">
             <VueTextSection>
               <template #text>
-                <p>Click your name on the left panel. Then click the "Sign out" button at the bottom of the pop-up
-                  window.
+                <p>
+                  Click your name on the left panel. Then click the "Sign out" button at the bottom
+                  of the pop-up window.
                 </p>
               </template>
             </VueTextSection>
@@ -570,12 +739,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-2" aria-expanded="false" aria-controls="generalQuestions-2">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-2"
+              aria-expanded="false"
+              aria-controls="generalQuestions-2">
               How can I edit my profile?
             </button>
           </h2>
-          <div id="generalQuestions-2" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-2">
+          <div
+            id="generalQuestions-2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-2">
             <VueTextSection>
               <template #text>
                 <p>Click your name on the left panel. Then click the "Edit profile" button.</p>
@@ -585,12 +762,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-3" aria-expanded="false" aria-controls="generalQuestions-3">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-3"
+              aria-expanded="false"
+              aria-controls="generalQuestions-3">
               How can I change the view from (e.g.) organizer to reviewer?
             </button>
           </h2>
-          <div id="generalQuestions-3" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-3">
+          <div
+            id="generalQuestions-3"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-3">
             <VueTextSection>
               <template #text>
                 <p>
@@ -603,17 +788,25 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-4" aria-expanded="false" aria-controls="generalQuestions-4">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-4"
+              aria-expanded="false"
+              aria-controls="generalQuestions-4">
               How can I delete my account?
             </button>
           </h2>
-          <div id="generalQuestions-4" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-4">
+          <div
+            id="generalQuestions-4"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-4">
             <VueTextSection>
               <template #text>
                 <p>
-                  Please contact the technical support. Write a short
-                  statement that your account should be deleted.
+                  Please contact the technical support. Write a short statement that your account
+                  should be deleted.
                 </p>
                 <p>
                   <span class="text-danger">Please keep in mind</span> that this decision cannot be
@@ -625,12 +818,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-5" aria-expanded="false" aria-controls="generalQuestions-5">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-5"
+              aria-expanded="false"
+              aria-controls="generalQuestions-5">
               I downloaded my proposal, but it differs from my current version. What should I do?
             </button>
           </h2>
-          <div id="generalQuestions-5" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-5">
+          <div
+            id="generalQuestions-5"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-5">
             <VueTextSection>
               <template #text>
                 <p>
@@ -643,12 +844,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-6" aria-expanded="false" aria-controls="generalQuestions-6">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-6"
+              aria-expanded="false"
+              aria-controls="generalQuestions-6">
               Can I link proposals from the ISBI submission system to the MICCAI submission system?
             </button>
           </h2>
-          <div id="generalQuestions-6" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-6">
+          <div
+            id="generalQuestions-6"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-6">
             <VueTextSection>
               <template #text>
                 <p>Unfortunately, this is not supported.</p>
@@ -658,12 +867,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-7" aria-expanded="false" aria-controls="generalQuestions-7">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-7"
+              aria-expanded="false"
+              aria-controls="generalQuestions-7">
               What does BIAS mean?
             </button>
           </h2>
-          <div id="generalQuestions-7" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-7">
+          <div
+            id="generalQuestions-7"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-7">
             <VueTextSection>
               <template #text>
                 <p>
@@ -680,12 +897,20 @@
         </div>
         <div class="accordion-item">
           <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#generalQuestions-8" aria-expanded="false" aria-controls="generalQuestions-8">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#generalQuestions-8"
+              aria-expanded="false"
+              aria-controls="generalQuestions-8">
               My parameters changed after my proposal was accepted. Shall I tell somebody?
             </button>
           </h2>
-          <div id="generalQuestions-8" class="accordion-collapse collapse" data-bs-parent="#generalQuestions-8">
+          <div
+            id="generalQuestions-8"
+            class="accordion-collapse collapse"
+            data-bs-parent="#generalQuestions-8">
             <VueTextSection>
               <template #text>
                 <p>

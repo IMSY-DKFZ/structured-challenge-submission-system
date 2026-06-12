@@ -1,36 +1,57 @@
 <template>
   <div class="col-md-3 col-lg-2 bg-body-tertiary min-vh-md-100">
     <div class="py-3">
-      <div class="d-none d-md-block  text-center">
-        <router-link class="dropdown-item" :to="{ name: 'About' }"><img alt="logo"
-            src="@/assets/images/MICCAI_logo_bkg_1.png" class="card-logo" /></router-link>
-        <hr>
+      <div class="d-none d-md-block text-center">
+        <router-link
+          class="dropdown-item"
+          :to="{ name: 'About' }"
+          ><img
+            alt="logo"
+            src="@/assets/images/MICCAI_logo_bkg_1.png"
+            class="card-logo"
+        /></router-link>
+        <hr />
         <div v-if="userIsLoggedIn">
           <RoleSwitch />
         </div>
         <div class="d-flex justify-content-center">
-
-          <div class="dropdown d-block pb-3" v-if="userIsLoggedIn">
-            <div style="cursor: pointer"
+          <div
+            class="dropdown d-block pb-3"
+            v-if="userIsLoggedIn">
+            <div
+              style="cursor: pointer"
               class="d-flex align-items-center text-decoration-none btn btn-sm btn-primary shadow text-wrap"
-              data-bs-toggle="dropdown" aria-expanded="true">
-              <div class="py-0">
-                {{ userName }} <i class="bi bi-caret-down-fill"></i>
-              </div>
+              data-bs-toggle="dropdown"
+              aria-expanded="true">
+              <div class="py-0">{{ userName }} <i class="bi bi-caret-down-fill"></i></div>
             </div>
-            <ul class="dropdown-menu shadow" style="position: absolute" data-popper-placement="bottom-end">
+            <ul
+              class="dropdown-menu shadow"
+              style="position: absolute"
+              data-popper-placement="bottom-end">
               <li>
-                <router-link class="dropdown-item" :to="{ name: 'User Profile' }">Profile</router-link>
+                <router-link
+                  class="dropdown-item"
+                  :to="{ name: 'User Profile' }"
+                  >Profile</router-link
+                >
               </li>
               <li>
-                <router-link class="dropdown-item" :to="{ name: 'Edit profile' }">Edit profile</router-link>
+                <router-link
+                  class="dropdown-item"
+                  :to="{ name: 'Edit profile' }"
+                  >Edit profile</router-link
+                >
               </li>
               <li>
                 <hr class="dropdown-divider" />
               </li>
               <li>
                 <div>
-                  <button type="button" class="btn dropdown-item" @click="logout()">
+                  <button
+                    type="button"
+                    class="btn dropdown-item"
+                    @click="logout()">
                     Sign out
                   </button>
                 </div>
@@ -61,13 +82,23 @@
               </li>
             </ul>
           </div> -->
-          <div v-else class="d-flex justify-content-between my-3 gap-3">
-            <router-link :to="{
-              name: 'Login',
-            }" class="btn btn-outline-success btn-sm"><i class="bi bi-unlock"></i> Login</router-link>
-            <router-link :to="{
-              name: 'Registration',
-            }" class="btn btn-outline-primary btn-sm"><i class="bi bi-person-plus"></i> Registration</router-link>
+          <div
+            v-else
+            class="d-flex justify-content-between my-3 gap-3">
+            <router-link
+              :to="{
+                name: 'Login',
+              }"
+              class="btn btn-outline-success btn-sm"
+              ><i class="bi bi-unlock"></i> Login</router-link
+            >
+            <router-link
+              :to="{
+                name: 'Registration',
+              }"
+              class="btn btn-outline-primary btn-sm"
+              ><i class="bi bi-person-plus"></i> Registration</router-link
+            >
           </div>
         </div>
       </div>
@@ -76,14 +107,24 @@
       </div> -->
 
       <!--DESKTOP-->
-      <div class="d-none d-md-block " v-for="(menu, index) in restrictedMenu" :key="index">
+      <div
+        class="d-none d-md-block"
+        v-for="(menu, index) in restrictedMenu"
+        :key="index">
         <ul class="nav flex-column">
-          <li class="nav-item pb-2" v-for="(item, idx) in menu.menu" :key="idx">
-            <router-link v-if="item.action"
+          <li
+            class="nav-item pb-2"
+            v-for="(item, idx) in menu.menu"
+            :key="idx">
+            <router-link
+              v-if="item.action"
               :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']"
-              class="nav-link py-0 my-0" :to="item.to">
+              class="nav-link py-0 my-0"
+              :to="item.to">
               <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex gap-2 align-items-center" :style="{ color: item.color ? item.color : '' }">
+                <div
+                  class="d-flex gap-2 align-items-center"
+                  :style="{ color: item.color ? item.color : '' }">
                   <i :class="`bi fs-5 bi-${item.icon}`"></i>
                   <span>
                     {{ item.name }}
@@ -97,15 +138,25 @@
                 </router-link> -->
               </div>
             </router-link>
-            <router-link v-else-if="index === restrictedMenu.length - 1" class="nav-link py-0 my-0" :to="item.to">
-              <div class="row g-1 p-0 m-0 link-secondary" style="color: rgb(145, 148, 154)">
+            <router-link
+              v-else-if="index === restrictedMenu.length - 1"
+              class="nav-link py-0 my-0"
+              :to="item.to">
+              <div
+                class="row g-1 p-0 m-0 link-secondary"
+                style="color: rgb(145, 148, 154)">
                 {{ item.name }}
               </div>
             </router-link>
-            <router-link v-else class="nav-link py-0"
-              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']" :to="item.to">
+            <router-link
+              v-else
+              class="nav-link py-0"
+              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']"
+              :to="item.to">
               <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex gap-2 align-items-center" :style="{ color: item.color ? item.color : '' }">
+                <div
+                  class="d-flex gap-2 align-items-center"
+                  :style="{ color: item.color ? item.color : '' }">
                   <i :class="`bi fs-5 bi-${item.icon}`"></i>
                   <span>
                     {{ item.name }}
@@ -119,17 +170,30 @@
       </div>
 
       <!--        MOBILE-->
-      <div class="d-block d-md-none" v-for="(menu, index) in restrictedMenu" :key="index">
+      <div
+        class="d-block d-md-none"
+        v-for="(menu, index) in restrictedMenu"
+        :key="index">
         <ul class="nav flex-column">
-          <li data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
-            class="nav-item" v-for="(item, idx) in menu.menu" :key="idx">
+          <li
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu"
+            aria-expanded="false"
+            class="nav-item"
+            v-for="(item, idx) in menu.menu"
+            :key="idx">
             <hr v-if="index === restrictedMenu.length - 1 && idx === 0" />
 
-            <router-link v-if="item.action"
-              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']" class="nav-link"
+            <router-link
+              v-if="item.action"
+              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']"
+              class="nav-link"
               :to="item.to">
               <div class="d-flex justify-content-center align-items-center">
-                <div class="d-flex gap-2 align-items-center" :style="{ color: item.color ? item.color : '' }">
+                <div
+                  class="d-flex gap-2 align-items-center"
+                  :style="{ color: item.color ? item.color : '' }">
                   <i :class="`bi fs-5 bi-${item.icon}`"></i>
                   <span>
                     {{ item.name }}
@@ -143,15 +207,25 @@
                 </router-link> -->
               </div>
             </router-link>
-            <router-link v-else-if="index === restrictedMenu.length - 1" class="nav-link" :to="item.to">
-              <div class="row g-1 pb-3 link-secondary" style="color: rgb(145, 148, 154)">
+            <router-link
+              v-else-if="index === restrictedMenu.length - 1"
+              class="nav-link"
+              :to="item.to">
+              <div
+                class="row g-1 pb-3 link-secondary"
+                style="color: rgb(145, 148, 154)">
                 {{ item.name }}
               </div>
             </router-link>
-            <router-link v-else class="nav-link"
-              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']" :to="item.to">
+            <router-link
+              v-else
+              class="nav-link"
+              :class="[isTabActive(item.to) ? 'bg-primary-subtle text-primary-emphasis' : '']"
+              :to="item.to">
               <div class="d-flex justify-content-center align-items-center">
-                <div class="d-flex gap-2 align-items-center" :style="{ color: item.color ? item.color : '' }">
+                <div
+                  class="d-flex gap-2 align-items-center"
+                  :style="{ color: item.color ? item.color : '' }">
                   <i :class="`bi fs-5 bi-${item.icon}`"></i>
                   <span>
                     {{ item.name }}
@@ -167,7 +241,7 @@
             src="@/assets/images/DKFZ_Logo_blue.png" alt=""></a><a href="https://helmholtz-imaging.de/" target="_blank"
           class="mx-auto d-block"><img style="width: auto; height: 25px; " src="@/assets/images/HI_Logo_small.png"
             alt="" title=""></a>
-		<a href="https://miccai.org/" target="_blank"
+            <a href="https://miccai.org/" target="_blank"
           class="mx-auto d-block"><img style="width: auto; height: 25px; " src="@/assets/images/MICCAI_logo_bkg_1.png"
             alt="" title=""></a>
       </div> -->
@@ -223,13 +297,18 @@ export default {
       ) {
         return true
       } else if (
+        this.$route?.fullPath.toLowerCase().includes('/admin-conferences') &&
+        tab.toLowerCase() === '/submission-system/admin-conferences'
+      ) {
+        return true
+      } else if (
         this.$route?.fullPath.toLowerCase().includes('/users') &&
-        tab.toLowerCase() === '/submission-system/users'
+        tab.toLowerCase() === '/submission-system/admin-users'
       ) {
         return true
       } else if (
         this.$route?.fullPath.toLowerCase().includes('/challenges') &&
-        tab.toLowerCase() === '/submission-system/challenges'
+        tab.toLowerCase() === '/submission-system/admin-challenges'
       ) {
         return true
       } else {
@@ -246,10 +325,25 @@ export default {
         {
           access: ['admin', 'subAdmin'],
           menu: [
-            { name: 'Challenges', to: '/submission-system/challenges', icon: 'trophy', color: 'red' },
-            { name: 'Users', to: '/submission-system/users', icon: 'person-video2', color: 'red' },
+            {
+              name: 'Challenges',
+              to: '/submission-system/admin-challenges',
+              icon: 'trophy',
+              color: 'red',
+            },
+            {
+              name: 'Conferences',
+              to: '/submission-system/admin-conferences',
+              icon: 'calendar-event',
+              color: 'red',
+            },
+            {
+              name: 'Users',
+              to: '/submission-system/admin-users',
+              icon: 'person-video2',
+              color: 'red',
+            },
             // { name: 'Management', to: '/management', icon: 'gear' },
-
           ],
         },
         {
@@ -263,22 +357,16 @@ export default {
               },
               icon: 'file-earmark-text',
             },
-
           ],
         },
 
         {
           access: '',
-          menu: [
-            { name: 'Welcome', to: '/submission-system/', icon: 'layers-half' },
-          ],
+          menu: [{ name: 'Welcome', to: '/submission-system/', icon: 'layers-half' }],
         },
         {
           access: '',
-          menu: [
-
-            { name: 'Workflow', to: '/submission-system/workflow', icon: 'book' },
-          ],
+          menu: [{ name: 'Workflow', to: '/submission-system/workflow', icon: 'book' }],
         },
         // {
         //   access: '',
@@ -288,11 +376,8 @@ export default {
         // },
         {
           access: '',
-          menu: [
-            { name: 'FAQ', to: '/submission-system/faq', icon: 'question-square' },
-          ],
+          menu: [{ name: 'FAQ', to: '/submission-system/faq', icon: 'question-square' }],
         },
-
 
         // {
         // access: '',

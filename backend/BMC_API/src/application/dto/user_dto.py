@@ -90,9 +90,7 @@ class UserResponseDTO(UserModelBase):
     last_login_time: Optional[datetime] = Field(None, description="Timestamp of the user's last login.")
     modified_time: Optional[datetime] = Field(None, description="Timestamp when the user was last modified.")
     notifications: Optional[Json] = Field(None, description="User's notification settings.")
-    roles: Optional[List] = Field(
-        None, description="List of roles assigned to the user."
-    )
+    roles: Optional[List] = Field(None, description="List of roles assigned to the user.")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -122,7 +120,9 @@ class UserUpdateAdminDTO(UserCreateAdminDTO):
     """
 
     email_confirmation_token: Optional[str] = Field(None, description="Token used for email confirmation.")
-    roles: Optional[List[Roles]] = Field(None,  description="List of roles assigned to the user.",
+    roles: Optional[List[Roles]] = Field(
+        None,
+        description="List of roles assigned to the user.",
     )
 
 

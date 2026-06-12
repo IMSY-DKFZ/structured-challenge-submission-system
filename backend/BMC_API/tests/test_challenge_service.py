@@ -229,6 +229,33 @@ async def test_download_challenge_success(service, repository, tmp_path, monkeyp
 
 
 @pytest.mark.anyio
+async def test_download_challenge_encodes_non_latin_filename(service, repository, tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        challenge_module.settings,
+        "submissions_folder",
+        str(tmp_path),
+    )
+    file_name = "challenge - test\u2013proposal.pdf"
+    (tmp_path / file_name).write_bytes(b"dummy")
+    repository.get.return_value = SimpleNamespace(challenge_file=file_name)
+
+    response = await service.download_challenge(id=1)
+
+    assert isinstance(response, FileResponse)
+    assert response.headers["X-Content-Filename"] == "challenge%20-%20test%E2%80%93proposal.pdf"
+
+
+@pytest.mark.anyio
+async def test_download_challenge_not_submitted(service, repository):
+    repository.get.return_value = SimpleNamespace(challenge_file=None)
+
+    with pytest.raises(HTTPException) as exc:
+        await service.download_challenge(id=1)
+
+    assert exc.value.status_code == 403
+
+
+@pytest.mark.anyio
 async def test_download_challenge_not_found(service, repository, tmp_path, monkeypatch):
     monkeypatch.setattr(
         challenge_module.settings,
@@ -291,6 +318,41 @@ async def test_status_success(service, repository, task_service):
     assert result.challenge_status == "DraftUpdated"
     task_service.update_bulk.assert_awaited_once()
     repository.update.assert_awaited_once()
+    repository.session.commit.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_status_accept_regenerates_clean_pdf(service, repository, task_service, tmp_path, monkeypatch):
+    challenge_obj = SimpleNamespace(
+        id=1,
+        challenge_name="Accepted challenge",
+        challenge_status="AcceptedModifiedSubmitted",
+        challenge_tasks=[SimpleNamespace(id=2)],
+        histories=[],
+        challenge_conference=None,
+        challenge_owner=None,
+    )
+    updated_entity = SimpleNamespace(
+        id=1,
+        challenge_name="Accepted challenge",
+        challenge_status="Accept",
+        challenge_file="clean.pdf",
+    )
+    repository.get.side_effect = [challenge_obj, challenge_obj]
+    repository.update.return_value = updated_entity
+    task_service.update_bulk = AsyncMock()
+
+    monkeypatch.setattr(challenge_module.settings, "submissions_folder", str(tmp_path))
+    monkeypatch.setattr(challenge_module, "convert_challenge_to_pdf", lambda cp, tl: "clean.pdf")
+    (tmp_path / "clean.pdf").write_bytes(b"pdf")
+
+    result = await service.status(id=1, new_status=challenge_module.ChallengeStatus.ACCEPT)
+
+    assert isinstance(result, ChallengeModelBaseOutputDTO)
+    assert result.challenge_status == "Accept"
+    repository.update.assert_awaited_once()
+    update_payload = repository.update.await_args.args[1]
+    assert update_payload["challenge_file"] == "clean.pdf"
 
 
 @pytest.mark.anyio
@@ -329,6 +391,25 @@ async def test_bulk_status_success(service, repository, task_service):
     assert isinstance(result.successful[0], ChallengeModelBaseOutputDTO)
     assert result.failed == []
     task_service.update_bulk.assert_awaited_once()
+    repository.session.commit.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_bulk_status_commits_each_success_and_continues_on_failure(service, repository, task_service):
+    challenge_obj_1 = SimpleNamespace(id=1, challenge_status="Draft", challenge_tasks=[SimpleNamespace(id=3)])
+    challenge_obj_2 = SimpleNamespace(id=2, challenge_status="Draft", challenge_tasks=[SimpleNamespace(id=4)])
+    updated_entity = SimpleNamespace(id=1, challenge_name="Test challenge updated", challenge_status="DraftUpdated")
+
+    repository.get.side_effect = [challenge_obj_1, challenge_obj_1, challenge_obj_2]
+    repository.update = AsyncMock(side_effect=[updated_entity, Exception("db error")])
+    task_service.update_bulk = AsyncMock()
+
+    result = await service.bulk_status(ids=[1, 2], new_status="DraftUpdated")
+
+    assert len(result.successful) == 1
+    assert result.failed == [{"id": 2, "error": ""}]
+    assert repository.session.commit.await_count == 1
+    assert repository.session.rollback.await_count == 1
 
 
 @pytest.mark.anyio

@@ -1,9 +1,14 @@
 <template>
   <div class="mb-3 VueTextSection">
-    <component :is="titleSize" v-if="$slots?.title" class="pb-1">
+    <component
+      :is="titleSize"
+      v-if="$slots?.title"
+      class="pb-1">
       <slot name="title"></slot>
     </component>
-    <div class="py-2" v-if="$slots?.text">
+    <div
+      class="py-2"
+      v-if="$slots?.text">
       <slot name="text"></slot>
     </div>
     <div v-if="$slots?.default">

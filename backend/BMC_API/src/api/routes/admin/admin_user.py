@@ -150,7 +150,6 @@ async def bulk_update_users_route_admin(
     Each update in the list must contain the user ID and the fields to update.
     """
     logger.info(f"Received admin request to bulk update {len(updates)} users")
-    [entity_data.update({"modified_time": datetime.now()}) for entity_data in updates]
     results = await service.update_bulk(updates=updates)
     logger.info(results.detail, f"Requested by {current_active_user.email}.")
     return results

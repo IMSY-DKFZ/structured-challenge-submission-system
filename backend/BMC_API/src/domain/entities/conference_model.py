@@ -11,9 +11,7 @@ class ConferenceModel(Base):
     __tablename__ = "conferences"
 
     id = Column(Integer, primary_key=True, index=True)
-    challenges = relationship(
-        "ChallengeModel", back_populates="challenge_conference", lazy="selectin"
-    )
+    challenges = relationship("ChallengeModel", back_populates="challenge_conference", lazy="selectin")
     city = Column(String(length=255))
     country = Column(String(length=255))
     created_time = Column(DateTime, nullable=False)

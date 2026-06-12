@@ -5,6 +5,7 @@ Revises: 48fc5a4e1357
 Create Date: 2024-10-16 11:13:28.958250
 
 """
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -25,9 +26,7 @@ def upgrade() -> None:
         "challenges",
         sa.Column("challenge_duration_explanation", sa.String(), nullable=True),
     )
-    op.add_column(
-        "challenges", sa.Column("challenge_novelty", sa.String(), nullable=True)
-    )
+    op.add_column("challenges", sa.Column("challenge_novelty", sa.String(), nullable=True))
     op.add_column("tasks", sa.Column("task_new_data", sa.String(), nullable=True))
     # ### end Alembic commands ###
 

@@ -1,5 +1,6 @@
 # application/use_cases/admin_use_cases.py
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Type
 
 from fastapi import BackgroundTasks
@@ -20,6 +21,7 @@ from BMC_API.src.application.interfaces.password_hasher_impl import BcryptPasswo
 from BMC_API.src.application.use_cases.base_use_cases import BaseService
 from BMC_API.src.core.config.settings import settings
 from BMC_API.src.core.exceptions import RepositoryException, UserAlreadyExistsException
+from BMC_API.src.core.validation_errors import format_validation_error
 from BMC_API.src.domain.entities.user_model import UserModel
 from BMC_API.src.domain.interfaces.token_cache import TokenCache
 from BMC_API.src.domain.repositories.user_repository import UserRepositoryProtocol
@@ -97,9 +99,33 @@ class AdminUserService(BaseService[UserModel, UserResponseAdminDTO]):
         return await super().update(id=id, model_update=user_update)
 
     async def update_bulk(self, updates: List[Dict[str, Any]]) -> BulkOperationResponse[UserResponseAdminDTO]:
-        # Call the parent's update_bulk with your specific DTO class
-        # This replaces the generic UpdateDTO with your specific UserUpdateAdminDTO
-        return await super().update_bulk(updates, update_dto_class=UserUpdateAdminDTO)
+        prepared_updates = []
+        failed_results = []
+
+        for entity_data in updates:
+            if "id" not in entity_data:
+                prepared_updates.append(entity_data)
+                continue
+
+            entity_id = entity_data["id"]
+            update_data = {key: value for key, value in entity_data.items() if key != "id"}
+            try:
+                validated_data = UserUpdateAdminDTO.model_validate(update_data).model_dump(exclude_unset=True)
+
+                if "password" in validated_data and validated_data["password"] is not None:
+                    UserPasswordDTO(password=validated_data["password"])
+                    validated_data["password"] = self.password_hasher.hash(validated_data["password"])
+
+            except ValidationError as e:
+                failed_results.append({"data": entity_data, "error": format_validation_error(e)})
+                continue
+
+            prepared_updates.append({"id": entity_id, **validated_data, "modified_time": datetime.now()})
+
+        result = await super().update_bulk(prepared_updates)
+        result.failed.extend(failed_results)
+        result.detail = f"Bulk update completed: {len(result.successful)} successful, {len(result.failed)} failed."
+        return result
 
 
 # class AdminConferenceService(BaseService[ConferenceModel, ConferenceResponseAdminDTO]):

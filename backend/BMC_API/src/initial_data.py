@@ -37,8 +37,5 @@ async def _create_initial_admin(app: FastAPI) -> None:
             await session.close()
 
 
-
-
 async def create_initial_data(app: FastAPI) -> None:
     await _create_initial_admin(app)
-

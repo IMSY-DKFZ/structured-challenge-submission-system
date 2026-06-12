@@ -8,9 +8,7 @@ from BMC_API.src.domain.repositories.base_repository import (
 )
 
 
-class ConferenceRepositoryProtocol(
-    BaseRepositoryProtocol[TInput, ConferenceModel], Protocol
-):
+class ConferenceRepositoryProtocol(BaseRepositoryProtocol[TInput, ConferenceModel], Protocol):
     async def list_conferences_of_user(
         self, user_id: int, offset: int = 0, limit: int = 50
     ) -> Optional[ConferenceModel]: ...

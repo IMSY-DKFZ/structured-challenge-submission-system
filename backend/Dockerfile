@@ -1,5 +1,5 @@
 ## ------------------------------- Builder Stage ------------------------------ ## 
-FROM python:3.13-bookworm AS builder
+FROM --platform=linux/amd64 python:3.13-bookworm AS builder
 ENV TZ=Europe/Berlin 
 
 # This prevents Python from writing out pyc files
@@ -21,11 +21,12 @@ ENV PATH="/root/.local/bin:${PATH}"
 WORKDIR /app/src
 
 COPY pyproject.toml .
+COPY uv.lock .
 
-RUN uv lock && uv sync --no-dev --no-install-project --frozen
+RUN uv sync --no-dev --no-install-project --frozen
 
 ## ------------------------------- Production Stage ------------------------------ ##
-FROM python:3.13-slim-bookworm AS prod
+FROM --platform=linux/amd64 python:3.13-slim-bookworm AS prod
 ENV TZ=Europe/Berlin 
 
 WORKDIR /app/src

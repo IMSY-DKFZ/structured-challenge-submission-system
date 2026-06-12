@@ -57,7 +57,9 @@ class ChallengeModelCreateDTO(ChallengeModelBase):
     model_config = ConfigDict(from_attributes=False)
 
 
-ChallengeModelUpdateDTO: BaseModel = create_all_optional_model(model_name="ChallengeModelUpdateDTO", base_model=ChallengeModelBase)
+ChallengeModelUpdateDTO: BaseModel = create_all_optional_model(
+    model_name="ChallengeModelUpdateDTO", base_model=ChallengeModelBase
+)
 
 
 class ChallengeModelStatusUpdateDTO(BaseModel):
@@ -80,9 +82,13 @@ class ChallengeInputAdminDTO(ChallengeModelCreateDTO):
     version: int | None = None
     # challenge_owner_id: int | None = None
     is_allowed_for_further_editing: bool | None = None
-    model_config = ConfigDict(from_attributes=False, extra='allow')
+    model_config = ConfigDict(from_attributes=False, extra="allow")
 
-ChallengeUpdateAdminDTO: BaseModel = create_all_optional_model(model_name="ChallengeUpdateAdminDTO", base_model=ChallengeInputAdminDTO)
+
+ChallengeUpdateAdminDTO: BaseModel = create_all_optional_model(
+    model_name="ChallengeUpdateAdminDTO", base_model=ChallengeInputAdminDTO
+)
+
 
 class ChallengeResponseAdminDTO(ChallengeModelBaseOutputDTO):
     """

@@ -5,6 +5,7 @@ Revises: 4ad25203924f
 Create Date: 2025-01-31 13:42:05.800695
 
 """
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -34,9 +35,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("challenge_histories", schema=None) as batch_op:
-        batch_op.create_index(
-            batch_op.f("ix_challenge_histories_id"), ["id"], unique=False
-        )
+        batch_op.create_index(batch_op.f("ix_challenge_histories_id"), ["id"], unique=False)
 
     op.create_table(
         "task_histories",

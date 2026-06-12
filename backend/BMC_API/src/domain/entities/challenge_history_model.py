@@ -18,8 +18,6 @@ class ChallengeHistoryModel(Base):
     old_status = Column(String)
     new_status = Column(String)
     version = Column(Integer)
-    challenge = relationship(
-        "ChallengeModel", back_populates="histories", lazy="selectin"
-    )
+    challenge = relationship("ChallengeModel", back_populates="histories", lazy="selectin")
     changes = Column(JSON)
     snapshot = Column(JSON)

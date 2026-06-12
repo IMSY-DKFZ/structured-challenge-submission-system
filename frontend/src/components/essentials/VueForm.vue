@@ -1,17 +1,33 @@
 <template>
   <div class="mb-3 d-flex flex-column">
-    <form class="d-block order-last" @submit.prevent="submitEvent" :id="formID">
+    <form
+      class="d-block order-last"
+      @submit.prevent="submitEvent"
+      :id="formID">
       <slot></slot>
-      <div class="alert alert-info opacity-75 lh-sm" v-if="errorMessage">
+      <div
+        class="alert alert-info opacity-75 lh-sm"
+        v-if="errorMessage">
         {{ errorMessage }}
       </div>
-      <button v-if="showActionBtn" type="submit" class="btn btn-primary mt-4" :class="classListBtn">
+      <button
+        v-if="showActionBtn"
+        type="submit"
+        class="btn btn-primary mt-4"
+        :class="classListBtn">
         {{ actionBtn }}
       </button>
     </form>
-    <div v-if="missingInputsList.length > 0" :class="classList">
-      <div v-for="(item, index) in missingInputsList" :key="index" class="py-3">
-        <div class="alert alert-danger" role="alert">
+    <div
+      v-if="missingInputsList.length > 0"
+      :class="classList">
+      <div
+        v-for="(item, index) in missingInputsList"
+        :key="index"
+        class="py-3">
+        <div
+          class="alert alert-danger"
+          role="alert">
           {{ item.label }} - {{ item.message }}
         </div>
       </div>

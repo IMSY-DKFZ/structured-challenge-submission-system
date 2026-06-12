@@ -4,7 +4,6 @@ import MainLayout from '../components/layouts/MainLayout.vue'
 import HomeLayout from '../components/layouts/HomeLayout.vue'
 import { useAuthStore } from '@/stores/auth'
 
-
 const routes = [
   {
     path: '/',
@@ -151,7 +150,6 @@ const routes = [
     meta: {
       requiresAuth: false,
       groupName: 'Main',
-
     },
     children: [
       //Default Dashboard Pages
@@ -198,7 +196,7 @@ const routes = [
 
       //Admin
       {
-        path: 'challenges',
+        path: 'admin-challenges',
         name: 'Challenges',
         component: () => import('../pages/admin/ChallengesPage.vue'),
         meta: {
@@ -208,7 +206,7 @@ const routes = [
         },
       },
       {
-        path: 'challenges/:id',
+        path: 'admin-challenges/:id',
         name: 'Challenges Overview',
         component: () => import('../pages/admin/ChallengesPage.vue'),
         meta: {
@@ -218,7 +216,38 @@ const routes = [
         },
       },
       {
-        path: 'users',
+        path: 'challenges',
+        redirect: { name: 'Challenges' },
+      },
+      {
+        path: 'challenges/:id',
+        redirect: (to) => ({
+          name: 'Challenges Overview',
+          params: { id: to.params.id },
+        }),
+      },
+      {
+        path: 'admin-conferences',
+        name: 'Admin Conferences',
+        component: () => import('../pages/admin/ConferencesPage.vue'),
+        meta: {
+          access: ['admin', 'subadmin'],
+          requiresAuth: true,
+          groupName: 'Main',
+        },
+      },
+      {
+        path: 'admin-conferences/:id',
+        name: 'Admin Conference Overview',
+        component: () => import('../pages/admin/ConferencesPage.vue'),
+        meta: {
+          access: ['admin', 'subadmin'],
+          requiresAuth: true,
+          groupName: 'Main',
+        },
+      },
+      {
+        path: 'admin-users',
         name: 'Users',
         component: () => import('../pages/admin/UsersPage.vue'),
         meta: {
@@ -228,7 +257,7 @@ const routes = [
         },
       },
       {
-        path: 'users/:id',
+        path: 'admin-users/:id',
         name: 'User Overview',
         component: () => import('../pages/admin/UsersPage.vue'),
         meta: {
@@ -236,6 +265,17 @@ const routes = [
           requiresAuth: true,
           groupName: 'Main',
         },
+      },
+      {
+        path: 'users',
+        redirect: { name: 'Users' },
+      },
+      {
+        path: 'users/:id',
+        redirect: (to) => ({
+          name: 'User Overview',
+          params: { id: to.params.id },
+        }),
       },
       {
         path: 'management',
@@ -310,10 +350,8 @@ const routes = [
       //     groupName: 'Main',
       //   },
       // },
-
     ],
   },
-
 
   {
     path: '/submission-system/auth',
@@ -404,10 +442,9 @@ const routes = [
 
   {
     // Dynamic route for MICCAI pattern, redirect to "SubmissionSystem"
-    path: '/MICCAI:year(.*)',  // The dynamic part of the route with regex to capture the year
-    redirect: { name: 'SubmissionSystem' }
+    path: '/MICCAI:year(.*)', // The dynamic part of the route with regex to capture the year
+    redirect: { name: 'SubmissionSystem' },
   },
-
 
   {
     path: '/:catchAll(.*)*',

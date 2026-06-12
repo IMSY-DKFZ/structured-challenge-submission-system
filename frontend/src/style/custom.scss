@@ -1,4 +1,4 @@
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap');
 // @import "./node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
@@ -27,7 +27,6 @@
     position: -webkit-sticky;
     position: sticky;
     top: 0px;
-
   }
 }
 
@@ -69,17 +68,16 @@ body {
   font-style: normal;
   font-weight: 500;
   letter-spacing: 0.3px;
-  font-family: 'Red Hat Display',
+  font-family:
+    'Red Hat Display',
     -apple-system,
     BlinkMacSystemFont,
-
     sans-serif;
   font-size: 17px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 a {
   text-decoration: none;
@@ -92,8 +90,8 @@ a {
 .input-invalid {
   display: block;
   width: 100%;
-  margin-top: .25rem;
-  font-size: .875em;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
   color: var(--bs-form-invalid-color);
 }
 
@@ -101,6 +99,13 @@ a {
   width: auto !important;
   max-width: 600px !important;
   min-width: 300px !important;
+}
+
+.quick-filter-info-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
 }
 
 ///////// Navbar ////
@@ -123,7 +128,6 @@ a {
   // transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
-
 .nav-link-home:hover {
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -143,11 +147,10 @@ a {
 }
 
 .submission-system-main {
-  box-shadow: inset 5px 0px 10px -3px rgba(0, 0, 0, 0.1),
-    /* Left shadow */
-    inset 0px 5px 10px -3px rgba(0, 0, 0, 0.1),
-    /* Bottom shadow */
-    inset 0px -5px 10px -3px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 5px 0px 10px -3px rgba(0, 0, 0, 0.1),
+    /* Left shadow */ inset 0px 5px 10px -3px rgba(0, 0, 0, 0.1),
+    /* Bottom shadow */ inset 0px -5px 10px -3px rgba(0, 0, 0, 0.1);
   /* Top shadow */
 }
 
@@ -165,7 +168,7 @@ a {
   font-weight: bold;
 }
 
-[data-bs-theme="dark"] {
+[data-bs-theme='dark'] {
   // --bs-list-group-item-success-dark: #ffffff;
   // --bs-list-group-bg-dark: #ffffff;
 

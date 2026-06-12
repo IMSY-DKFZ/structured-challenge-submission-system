@@ -109,7 +109,6 @@ class StatusBusiness:
             tasks.append(Assignments.SUBMISSION_EMAIL_TO_CHAIRS)
             tasks.append(Assignments.SUBMISSION_EMAIL_TO_ADMINS)
 
-
         if status in [
             ChallengeStatus.ACCEPTED_MODIFIED_SUBMITTED,
             ChallengeStatus.ACCEPT,
@@ -125,11 +124,12 @@ class StatusBusiness:
             tasks.append(Assignments.SUBMISSION_EMAIL_TO_CHAIRS)
             tasks.append(Assignments.SUBMISSION_EMAIL_TO_ADMINS)
 
-        if status in [
-            ChallengeStatus.CLEAN_PROPOSAL
-        ]:
+        if status in [ChallengeStatus.CLEAN_PROPOSAL]:
             tasks.append(Assignments.TAKE_SNAPSHOT)
             tasks.append(Assignments.EXPORT_PROPOSAL)
-            tasks.append(Assignments.SUBMISSION_EMAIL_TO_USER)
 
         return tasks
+
+    @staticmethod
+    def should_export_clean_pdf(status: ChallengeStatus) -> bool:
+        return status == ChallengeStatus.ACCEPT

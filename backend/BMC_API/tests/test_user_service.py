@@ -20,9 +20,9 @@ pytest_plugins = [
     "BMC_API.tests.fixtures.user_fixtures",
 ]
 
+
 @pytest.mark.anyio
 class TestUserService:
-    
     async def test_create_user_success(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -74,7 +74,6 @@ class TestUserService:
         assert result.first_name == test_user.first_name
         assert result.last_name == test_user.last_name
 
-    
     async def test_create_user_already_exists(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -100,7 +99,6 @@ class TestUserService:
         # Ensure create_obj was never called since user already exists
         mock_repository.create_obj.assert_not_called()
 
-    
     async def test_update_user_success(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -126,7 +124,6 @@ class TestUserService:
 
         assert result.first_name == "Updated"
 
-    
     async def test_update_user_not_found(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -143,7 +140,6 @@ class TestUserService:
         mock_repository.get.assert_called_once_with(id=999)
         mock_repository.update.assert_not_called()
 
-    
     async def test_update_user_change_password_success(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -164,7 +160,7 @@ class TestUserService:
         service.password_hasher.hash = MagicMock(return_value="$2b$10$neWHashEdPaSsWoRd")
 
         # Act
-        result = await service.update_user(1, update_dto, active_user_password="CurrentPassword94215!")
+        await service.update_user(1, update_dto, active_user_password="CurrentPassword94215!")
 
         # Assert: Expecting repository.get to be called twice with id=1.
         mock_repository.get.assert_called_with(id=1)
@@ -174,7 +170,6 @@ class TestUserService:
         service.password_hasher.hash.assert_called_once_with("NewPassword94215!")
         mock_repository.update.assert_called_once()
 
-    
     async def test_update_user_change_password_wrong_current_password(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -198,7 +193,6 @@ class TestUserService:
         service.password_hasher.verify.assert_called_once_with("WrongPassword94215!", "$2b$10$soMeHashEdPaSsWoRd")
         mock_repository.update.assert_not_called()
 
-    
     async def test_login_user_success(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -232,7 +226,6 @@ class TestUserService:
                 mock_repository.login.assert_called_once_with(test_user.email.lower())
                 assert result == expected_token
 
-    
     async def test_login_user_not_found(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -246,7 +239,6 @@ class TestUserService:
 
         mock_repository.get_by_email.assert_called_once_with(test_user.email.lower())
 
-    
     async def test_logout_user_success(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -278,7 +270,6 @@ class TestUserService:
             # Check if token cache was called to set tokens
             assert mock_token_cache.set_token.call_count == 2
 
-    
     async def test_confirm_email_success(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -292,7 +283,6 @@ class TestUserService:
         # Assert
         mock_repository.confirm_email.assert_called_once_with(confirmation_token)
 
-    
     async def test_reset_password_request_success(self, test_user):
         # Arrange
         mock_repository = AsyncMock()
@@ -315,7 +305,6 @@ class TestUserService:
             # Check if user model's reset_token was updated
             assert user_model.reset_token == "mock-uuid"
 
-    
     async def test_reset_password_request_user_not_found(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -332,7 +321,6 @@ class TestUserService:
         mock_repository.get_by_email.assert_called_once_with("nonexistent@example.com")
         mock_repository.update_obj.assert_not_called()
 
-    
     async def test_reset_password_success(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -350,7 +338,6 @@ class TestUserService:
         service.password_hasher.hash.assert_called_once_with(new_password)
         mock_repository.reset_password.assert_called_once_with(reset_token, hashed_password)
 
-    
     async def test_reset_password_validation_error(self):
         # Arrange
         mock_repository = AsyncMock()
@@ -381,9 +368,7 @@ class TestUserService:
         token_cache = AsyncMock()
 
         # decode_token returns wrong type
-        monkeypatch.setattr(
-            auth, "decode_token", lambda t: {"type": "access", "sub": "user@example.com"}
-        )
+        monkeypatch.setattr(auth, "decode_token", lambda t: {"type": "access", "sub": "user@example.com"})
         token_data = Token(access_token="foo", refresh_token="bar")
 
         with pytest.raises(InvalidTokenException) as exc:
@@ -396,29 +381,32 @@ class TestUserService:
 
         # stubbed admin service
         admin_service = AsyncMock()
+
         async def fake_list(search_filters):
-            class U: id = 42
+            class U:
+                id = 42
+
             return ([U()], None, None)
+
         admin_service.list.side_effect = fake_list
         admin_service.update = AsyncMock()
 
         # stubbed token cache that says token is blacklisted
         token_cache = AsyncMock()
+
         async def fake_get(token):
             return True
+
         token_cache.get_token.side_effect = fake_get
 
         # decode_token returns a valid refresh token payload
-        monkeypatch.setattr(
-            auth, "decode_token", lambda t: {"type": "refresh", "sub": "user@example.com"}
-        )
+        monkeypatch.setattr(auth, "decode_token", lambda t: {"type": "refresh", "sub": "user@example.com"})
         token_data = Token(access_token="foo", refresh_token="blacklisted")
 
         with pytest.raises(InvalidTokenException):
             await service.refresh_token(admin_service, token_data, token_cache)
 
         admin_service.update.assert_awaited_once_with(id=42, user_update={"disabled": True})
-
 
     async def test_refresh_token_success(self, monkeypatch):
         mock_repo = AsyncMock()
@@ -427,18 +415,16 @@ class TestUserService:
         token_cache = AsyncMock()
 
         # decode_token returns a valid refresh payload
-        monkeypatch.setattr(
-            auth, "decode_token", lambda t: {"type": "refresh", "sub": "user@example.com"}
-        )
+        monkeypatch.setattr(auth, "decode_token", lambda t: {"type": "refresh", "sub": "user@example.com"})
+
         async def fake_get(token):
             return False
+
         token_cache.get_token.side_effect = fake_get
 
         # generate_bearer_tokens returns known tokens
         expected = Token(access_token="new_access", refresh_token="new_refresh")
-        monkeypatch.setattr(
-            auth, "generate_bearer_tokens", lambda data: expected
-        )
+        monkeypatch.setattr(auth, "generate_bearer_tokens", lambda data: expected)
 
         token_data = Token(access_token="foo", refresh_token="valid")
         result = await service.refresh_token(admin_service, token_data, token_cache)

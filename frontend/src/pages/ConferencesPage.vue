@@ -14,17 +14,21 @@
         <li>2019: MICCAI</li>
         <li>2018: MICCAI</li>
       </ul>
-      <p>Please click the button below to access submission system for current
-        applications:</p>
-      <p class="text-center"><router-link :to="{ name: 'SubmissionSystem' }"
-          class="btn btn-lg btn-primary d-none d-lg-inline-block" role="button">Submission
-          system </router-link></p>
+      <p>Please click the button below to access submission system for current applications:</p>
+      <p class="text-center">
+        <router-link
+          :to="{ name: 'SubmissionSystem' }"
+          class="btn btn-lg btn-primary d-none d-lg-inline-block"
+          role="button"
+          >Submission system
+        </router-link>
+      </p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ConferencesPage'
+  name: 'ConferencesPage',
 }
 </script>

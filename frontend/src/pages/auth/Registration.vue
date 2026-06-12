@@ -1,21 +1,57 @@
 <template>
-  <ContentCard headline="Registration" :backlink="backlink" :show-logo="false" :showLinks="false"
+  <ContentCard
+    headline="Registration"
+    :backlink="backlink"
+    :show-logo="false"
+    :showLinks="false"
     subtitle="Please read the privacy policy and the data protection policy below carefully!">
-    <BaseAlert :model-value="alert" @dismiss="dismissAlert" />
-    <VueForm actionBtn="Create Account" name="registration-form" :actionBtnFullwidth="true" @submit-event="register">
-      <VueInput label="First name" type="text" :required="true" v-model="firstName"></VueInput>
-      <VueInput label="Last name" type="text" :required="true" v-model="lastName"></VueInput>
-      <VueInput label="Email" type="email" :required="true" v-model="email"></VueInput>
-      <VueInput label="Password" type="password-repeat" :required="true" text-min-length="8" v-model="password">
+    <BaseAlert
+      :model-value="alert"
+      @dismiss="dismissAlert" />
+    <VueForm
+      actionBtn="Create Account"
+      name="registration-form"
+      :actionBtnFullwidth="true"
+      @submit-event="register">
+      <VueInput
+        label="First name"
+        type="text"
+        :required="true"
+        v-model="firstName"></VueInput>
+      <VueInput
+        label="Last name"
+        type="text"
+        :required="true"
+        v-model="lastName"></VueInput>
+      <VueInput
+        label="Email"
+        type="email"
+        :required="true"
+        v-model="email"></VueInput>
+      <VueInput
+        label="Password"
+        type="password-repeat"
+        :required="true"
+        text-min-length="8"
+        v-model="password">
       </VueInput>
       <VueInput
         label="I agree that I will be registered to the MICCAI submission system for biomedical challenges. In addition, I agree that my personal and challenge proposal data will be used for the purposes described above."
-        type="checkbox" :required="true" v-model="readAgreement"></VueInput>
+        type="checkbox"
+        :required="true"
+        v-model="readAgreement"></VueInput>
     </VueForm>
-    <div class="text-center  d-flex flex-column">
-      <router-link class="text-decoration-underline" :to="{ name: 'Login' }">You have an Account? Login</router-link>
-      <router-link class="text-decoration-underline" :to="{ name: 'ConfirmationPage' }">Activate your
-        account</router-link>
+    <div class="text-center d-flex flex-column">
+      <router-link
+        class="text-decoration-underline"
+        :to="{ name: 'Login' }"
+        >You have an Account? Login</router-link
+      >
+      <router-link
+        class="text-decoration-underline"
+        :to="{ name: 'ConfirmationPage' }"
+        >Activate your account</router-link
+      >
     </div>
   </ContentCard>
 </template>
@@ -74,7 +110,11 @@ export default {
       )
         .then(() => {
           this.$router.push({ name: 'SubmissionSystem' })
-          useToastAlertStore().showAlert('Your registration has been successful, please check your email for the activation steps.', 'success', 6000);
+          useToastAlertStore().showAlert(
+            'Your registration has been successful, please check your email for the activation steps.',
+            'success',
+            6000
+          )
         })
         .catch((error) => {
           this.showAlert(error.message, 'danger', 0)
@@ -84,7 +124,7 @@ export default {
   watch: {
     email(newVal) {
       this.email = this.email.toLowerCase()
-    }
+    },
   },
 }
 </script>

@@ -310,6 +310,30 @@ def add_challenge_to_document(story, challenge, styles):
     )
     story.append(Paragraph(str(challenge.challenge_publication_and_future or "N/A"), styles["Normal"]))
 
+    story.append(Paragraph("MICCAI LNCS proceedings", styles["Heading3"]))
+    story.append(
+        Paragraph(
+            "Indicate if you want to offer MICCAI Springer LNCS proceedings to the participants. Publishing a proceedings volume is optional and at the discretion of each challenge’s organizers. At a minimum, organizers must ensure that a description of each participant's submission is publicly available. Organizers who wish to publish MICCAI Springer LNCS proceedings must adhere to the MICCAI Satellite events publication process.",
+            styles["Definition"],
+        )
+    )
+    story.append(Paragraph(str(challenge.challenge_lncs_proceedings or "N/A"), styles["Normal"]))
+
+    story.append(Paragraph("Collaboration with European Society of Radiology (ESR)", styles["Heading3"]))
+    story.append(
+        Paragraph(
+            "In collaboration with European Society of Radiology (ESR), we announce special clinical interest topics with associated clinicians who can help with the preparation of the proposals; the best 3 challenge proposals on these topics will get the opportunity to present their challenges at the European Congress of Radiology (ECR) 2027 in a special session. If you want to organize a challenge in collaboration with ESR on one of these topics, please reach out to the MICCAI Challenges Team (miccai-challenges-2026@dkfz-heidelberg.de) and we will put you in contact with the corresponding clinician.",
+            styles["Definition"],
+        )
+    )
+    story.append(
+        Paragraph(
+            "Challenge in collaboration with ESR. Ticking 'Yes' implies that the challenge has been prepared in collaboration with the clinical contact point.",
+            styles["Definition"],
+        )
+    )
+    story.append(Paragraph(str(challenge.challenge_esr_collaboration or "N/A"), styles["Normal"]))
+
     # Space and hardware requirements
     story.append(Paragraph("Space and hardware requirements", styles["Heading3"]))
     story.append(

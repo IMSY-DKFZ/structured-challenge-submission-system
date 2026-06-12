@@ -40,7 +40,7 @@ class ChallengeStatus(StrEnum):
     # 4. Special status if non-marked version of proposal document is necessary
     CLEAN_PROPOSAL = "CleanProposal"
 
-    # 
+    #
     # RevisionOfSubmittedNewParameters = "RevisionOfSubmittedNewParameters"
     # Deleted = "Deleted"
 

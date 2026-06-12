@@ -207,7 +207,6 @@ async def bulk_update_conferences_route_admin(
     Each update in the list must contain the conference ID and the fields to update.
     """
     logger.info(f"Received admin request to bulk update {len(updates)} conferences  by {current_active_user.email}.")
-    [entity_data.update({"modified_time": datetime.now()}) for entity_data in updates]
     result = await service.update_bulk(updates=updates)
     logger.info(result.detail, "Bulk updates successful.")
     return result

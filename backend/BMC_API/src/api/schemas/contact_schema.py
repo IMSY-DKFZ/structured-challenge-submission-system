@@ -1,11 +1,9 @@
 from typing import List
 
-from pydantic import ConfigDict, EmailStr
-
-from .base_model import NoExtraBaseModel
+from pydantic import ConfigDict, EmailStr, BaseModel
 
 
-class MessageDTO(NoExtraBaseModel):
+class MessageDTO(BaseModel):
     """MessageDTO model."""
 
     message: str
@@ -14,9 +12,9 @@ class MessageDTO(NoExtraBaseModel):
     sender_name: str | None = None
     sender_email: EmailStr
 
+
 class Message(MessageDTO):
     """Message model."""
 
     recipients: List[str]
     model_config = ConfigDict(extra="allow")
-    

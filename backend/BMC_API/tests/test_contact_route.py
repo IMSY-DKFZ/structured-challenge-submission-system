@@ -1,4 +1,3 @@
-
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -30,6 +29,7 @@ def mock_contact_dependencies(fastapi_app):
         "email_scheduler": mock_scheduler,
     }
 
+
 @pytest.mark.anyio
 async def test_send_to_challenge_chairs(client, fastapi_app, mock_contact_dependencies):
     mock_conference = MagicMock()
@@ -42,7 +42,7 @@ async def test_send_to_challenge_chairs(client, fastapi_app, mock_contact_depend
         "message": "Please update submission deadlines.",
         "recipients_group": "Challenge chairs",
         "sender_name": "Alice",
-        "sender_email": "alice@example.com"
+        "sender_email": "alice@example.com",
     }
 
     response = await client.post(url, json=data)
@@ -64,7 +64,7 @@ async def test_send_to_technical_support(client, fastapi_app, mock_contact_depen
         "message": "Can't access my submission.",
         "recipients_group": "Technical support",
         "sender_name": "Bob",
-        "sender_email": "bob@example.com"
+        "sender_email": "bob@example.com",
     }
 
     response = await client.post(url, json=data)
@@ -82,7 +82,7 @@ async def test_invalid_recipients_group(client: AsyncClient, fastapi_app: FastAP
         "message": "Should fail validation",
         "recipients_group": "Martians",
         "sender_name": "Fake User",
-        "sender_email": "fake@example.com"
+        "sender_email": "fake@example.com",
     }
 
     response = await client.post(url, json=message_data)
@@ -101,7 +101,7 @@ async def test_no_open_conferences(client, fastapi_app, mock_contact_dependencie
         "message": "Test when no open conferences exist.",
         "recipients_group": "Challenge chairs",
         "sender_name": "Carl Confused",
-        "sender_email": "carl@example.com"
+        "sender_email": "carl@example.com",
     }
 
     response = await client.post(url, json=data)
@@ -122,7 +122,7 @@ async def test_string_admin_list(client, fastapi_app, mock_contact_dependencies)
         "message": "Edge case with string list return",
         "recipients_group": "Technical support",
         "sender_name": "Test User",
-        "sender_email": "testuser@example.com"
+        "sender_email": "testuser@example.com",
     }
 
     response = await client.post(url, json=data)
@@ -135,35 +135,34 @@ async def test_string_admin_list(client, fastapi_app, mock_contact_dependencies)
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("payload,missing_field", [
-    ({
-        "subject": "Hi",
-        "recipients_group": "Challenge chairs",
-        "sender_name": "John",
-        "sender_email": "valid@example.com"
-    }, "message"),
-
-    ({
-        "message": "Hello",
-        "subject": "Hi",
-        "sender_name": "John",
-        "sender_email": "valid@example.com"
-    }, "recipients_group"),
-
-    ({
-        "message": "Hello",
-        "subject": "Hi",
-        "recipients_group": "Challenge chairs",
-        "sender_name": "John"
-    }, "sender_email"),
-])
+@pytest.mark.parametrize(
+    "payload,missing_field",
+    [
+        (
+            {
+                "subject": "Hi",
+                "recipients_group": "Challenge chairs",
+                "sender_name": "John",
+                "sender_email": "valid@example.com",
+            },
+            "message",
+        ),
+        (
+            {"message": "Hello", "subject": "Hi", "sender_name": "John", "sender_email": "valid@example.com"},
+            "recipients_group",
+        ),
+        (
+            {"message": "Hello", "subject": "Hi", "recipients_group": "Challenge chairs", "sender_name": "John"},
+            "sender_email",
+        ),
+    ],
+)
 async def test_missing_required_fields(payload, missing_field, client, fastapi_app):
     url = fastapi_app.url_path_for("send_message")
     response = await client.post(url, json=payload)
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert any(missing_field in err["loc"] for err in response.json()["detail"])
-
 
 
 @pytest.mark.anyio
@@ -173,7 +172,7 @@ async def test_invalid_email_format(client: AsyncClient, fastapi_app: FastAPI):
         "subject": "Email Test",
         "recipients_group": "Challenge chairs",
         "sender_name": "NotAnEmail",
-        "sender_email": "not-an-email"
+        "sender_email": "not-an-email",
     }
 
     url = fastapi_app.url_path_for("send_message")

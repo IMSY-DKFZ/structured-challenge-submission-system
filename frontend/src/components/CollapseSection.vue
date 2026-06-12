@@ -1,11 +1,18 @@
 <template>
-  <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" :data-bs-target="'#' + name + 'body'"
-    aria-expanded="false" :aria-controls="name + 'body'">
+  <button
+    class="btn btn-outline-primary"
+    type="button"
+    data-bs-toggle="collapse"
+    :data-bs-target="'#' + name + 'body'"
+    aria-expanded="false"
+    :aria-controls="name + 'body'">
     <i class="bi bi-info-circle pe-1"></i>
     {{ triggerBtn }}
   </button>
 
-  <div class="collapse py-3" :id="name + 'body'">
+  <div
+    class="collapse py-3"
+    :id="name + 'body'">
     <div class="card card-body">
       <slot></slot>
     </div>

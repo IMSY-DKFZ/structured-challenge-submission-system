@@ -1,8 +1,14 @@
 <template>
   <div>
-    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel">
+    <div
+      class="modal fade"
+      id="alertModal"
+      tabindex="-1"
+      aria-labelledby="alertModalLabel">
       <div class="modal-dialog">
-        <div :class="`alert alert-${color}`" role="alert">
+        <div
+          :class="`alert alert-${color}`"
+          role="alert">
           {{ text }}
         </div>
       </div>
@@ -14,7 +20,7 @@
 import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { useToastAlertStore } from '@/stores/alert'
-import { Modal } from 'bootstrap';
+import { Modal } from 'bootstrap'
 
 const alertStore = useToastAlertStore()
 const { text, color } = storeToRefs(alertStore)

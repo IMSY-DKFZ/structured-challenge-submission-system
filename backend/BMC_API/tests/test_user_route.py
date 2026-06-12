@@ -199,14 +199,20 @@ class TestUserRoutes:
         await client.post(url, json=user_data)
 
         # Mock the repository's get_by_email method to bypass "email_confirmed" and "disabled" checks
-        
-        with patch("BMC_API.src.infrastructure.persistence.dao.user_dao.SQLAlchemyUserRepository.get_by_email", new_callable=AsyncMock) as mock_get_by_email:
+
+        with patch(
+            "BMC_API.src.infrastructure.persistence.dao.user_dao.SQLAlchemyUserRepository.get_by_email",
+            new_callable=AsyncMock,
+        ) as mock_get_by_email:
             from BMC_API.src.domain.entities.user_model import UserModel
-            user_obj = UserModel(email="fake@email.com",
-                                password="1234",
-                                created_time=datetime.now(),
-                                email_confirmed=True, 
-                                disabled=False)
+
+            user_obj = UserModel(
+                email="fake@email.com",
+                password="1234",
+                created_time=datetime.now(),
+                email_confirmed=True,
+                disabled=False,
+            )
             mock_get_by_email.return_value = user_obj
 
             # Act
@@ -411,7 +417,7 @@ class TestUserRoutes:
         test_user: UserCreateDTO,
         fastapi_app: FastAPI,
         monkeypatch,
-        ):
+    ):
         # Arrange: patch confirmation token to a known value
         monkeypatch.setattr(UserModel, "generate_confirmation_token", lambda: "123456")
         user_data = test_user.model_dump()
@@ -471,7 +477,7 @@ class TestUserRoutes:
         # Assert
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert "Incorrect token" in response.json()["detail"]
-    
+
     async def test_refresh_token_blacklisted(
         self,
         client: AsyncClient,
@@ -497,6 +503,7 @@ class TestUserRoutes:
         from BMC_API.src.infrastructure.external_services.redis.token_cache_impl import (
             RedisTokenCache,
         )
+
         async def fake_get_token(self, token: str) -> bool:
             return True
 
@@ -516,4 +523,3 @@ class TestUserRoutes:
         # Assert: should be rejected as invalid due to blacklist
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert "Invalid refresh token" in response.json()["detail"]
-

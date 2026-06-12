@@ -1,5 +1,7 @@
 # backend/BMC_API/src/api/exception_handlers.py
 from fastapi import Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from BMC_API.src.core.exceptions import (
@@ -28,6 +30,13 @@ def register_exception_handlers(app):
     @app.exception_handler(RepositoryException)
     async def repository_exception_handler(request: Request, exc: RepositoryException):
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(exc)})
+
+    @app.exception_handler(RequestValidationError)
+    async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({"detail": exc.errors()}),
+        )
 
     @app.exception_handler(NotFoundException)
     async def entity_not_found_exception_handler(request: Request, exc: NotFoundException):

@@ -1,10 +1,14 @@
 <template>
-  <div id="fistElement"
+  <div
+    id="fistElement"
     class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">{{ title }}</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <router-link v-if="isProposalsPage" :to="{ name: 'New Proposal' }" class="btn btn-lg btn-primary shadow">
+        <router-link
+          v-if="isProposalsPage"
+          :to="{ name: 'New Proposal' }"
+          class="btn btn-lg btn-primary shadow">
           <i class="bi bi-file-earmark-plus"></i> Create new proposal
         </router-link>
         <!-- <button

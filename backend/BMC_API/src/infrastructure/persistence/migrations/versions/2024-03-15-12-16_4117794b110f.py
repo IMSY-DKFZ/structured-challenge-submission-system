@@ -5,6 +5,7 @@ Revises: 2600256f9595
 Create Date: 2024-03-15 12:16:41.450698
 
 """
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -23,9 +24,7 @@ def upgrade() -> None:
     )
     op.add_column(
         "challenges",
-        sa.Column(
-            "challenge_lighthouse_general_terms_agreed", sa.Boolean(), nullable=True
-        ),
+        sa.Column("challenge_lighthouse_general_terms_agreed", sa.Boolean(), nullable=True),
     )
     op.add_column(
         "challenges",
@@ -37,15 +36,11 @@ def upgrade() -> None:
     )
     op.add_column(
         "challenges",
-        sa.Column(
-            "challenge_lighthouse_test_set_already_used", sa.String(), nullable=True
-        ),
+        sa.Column("challenge_lighthouse_test_set_already_used", sa.String(), nullable=True),
     )
     op.add_column(
         "challenges",
-        sa.Column(
-            "challenge_lighthouse_clinical_affiliation", sa.String(), nullable=True
-        ),
+        sa.Column("challenge_lighthouse_clinical_affiliation", sa.String(), nullable=True),
     )
     op.add_column(
         "challenges",
@@ -53,16 +48,10 @@ def upgrade() -> None:
     )
     op.add_column(
         "challenges",
-        sa.Column(
-            "challenge_lighthouse_compute_per_participant", sa.String(), nullable=True
-        ),
+        sa.Column("challenge_lighthouse_compute_per_participant", sa.String(), nullable=True),
     )
-    op.add_column(
-        "conferences", sa.Column("is_lighthouse_challenge", sa.Boolean(), nullable=True)
-    )
-    op.add_column(
-        "conferences", sa.Column("is_open_for_submissions", sa.Boolean(), nullable=True)
-    )
+    op.add_column("conferences", sa.Column("is_lighthouse_challenge", sa.Boolean(), nullable=True))
+    op.add_column("conferences", sa.Column("is_open_for_submissions", sa.Boolean(), nullable=True))
     op.add_column(
         "conferences",
         sa.Column("message_before_generate_proposal", sa.Text(), nullable=True),

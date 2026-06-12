@@ -1,25 +1,63 @@
 <template>
-  <VueForm @submit-event="updateProfilData" actionBtn="Update Profile" name="profile-form" :action-btn-fullwidth="false"
+  <VueForm
+    @submit-event="updateProfilData"
+    actionBtn="Update Profile"
+    name="profile-form"
+    :action-btn-fullwidth="false"
     :actionBtnFullwidth="true">
     <VueTextSection>
       <h4>User information</h4>
       <span class="opacity-75 small">(Fields you leave empty will not be updated)</span>
-      <VueInput label="Bio" type="text" v-model="bio"></VueInput>
-      <VueInput label="Titel" type="text" v-model="titel"></VueInput>
-      <VueInput label="First Name" type="text" v-model="first_name"></VueInput>
-      <VueInput label="Last name" type="text" v-model="last_name"></VueInput>
-      <VueInput label="Country" type="text" v-model="country"></VueInput>
-      <VueInput label="City" type="text" v-model="city"></VueInput>
-      <VueInput label="Institution" type="text" v-model="institution"></VueInput>
-      <VueInput label="Newsletter" type="checkbox" v-model="newsletter"></VueInput>
-      <VueInput label="Website" type="text" v-model="website"></VueInput>
+      <VueInput
+        label="Bio"
+        type="text"
+        v-model="bio"></VueInput>
+      <VueInput
+        label="Titel"
+        type="text"
+        v-model="titel"></VueInput>
+      <VueInput
+        label="First Name"
+        type="text"
+        v-model="first_name"></VueInput>
+      <VueInput
+        label="Last name"
+        type="text"
+        v-model="last_name"></VueInput>
+      <VueInput
+        label="Country"
+        type="text"
+        v-model="country"></VueInput>
+      <VueInput
+        label="City"
+        type="text"
+        v-model="city"></VueInput>
+      <VueInput
+        label="Institution"
+        type="text"
+        v-model="institution"></VueInput>
+      <VueInput
+        label="Newsletter"
+        type="checkbox"
+        v-model="newsletter"></VueInput>
+      <VueInput
+        label="Website"
+        type="text"
+        v-model="website"></VueInput>
     </VueTextSection>
     <VueTextSection :highlight="true">
       <h4>Password update</h4>
-      <VueInput label="New Password" type="password-repeat" v-model="password"></VueInput>
+      <VueInput
+        label="New Password"
+        type="password-repeat"
+        v-model="password"></VueInput>
       <span>Please enter your current password if you want to change password:</span>
 
-      <VueInput label="Current password" type="password" :required="password.length > 0" v-model="current_password">
+      <VueInput
+        label="Current password"
+        type="password"
+        :required="password.length > 0"
+        v-model="current_password">
       </VueInput>
     </VueTextSection>
   </VueForm>
@@ -50,7 +88,6 @@ export default {
       website: '',
       current_password: '',
     }
-
   },
   computed: {
     userData() {
@@ -88,8 +125,8 @@ export default {
         .then((resp) => {
           useToastAlertStore().showAlert('Your data has been updated', 'success')
           this.$router.push({ to: '/' })
-          setTimeout(1000);
-          location.reload();
+          setTimeout(1000)
+          location.reload()
         })
         .catch((e) => {
           useToastAlertStore().showAlert(e, 'danger', 6000)

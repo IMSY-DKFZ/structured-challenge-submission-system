@@ -1,4 +1,5 @@
 # backend/BMC_API/tests/test_admin_challenge_route.py
+from datetime import datetime
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -9,6 +10,8 @@ from httpx import AsyncClient
 from BMC_API.src.application.dependencies import get_challenge_service_admin
 from BMC_API.src.application.use_cases.challenge_use_cases import ChallengeService
 from BMC_API.src.application.use_cases.conference_use_cases import ConferenceService
+from BMC_API.src.domain.entities.challenge_model import ChallengeModel
+from BMC_API.src.domain.entities.task_model import TaskModel
 
 pytest_plugins = [
     "BMC_API.tests.fixtures.admin_user_fixtures",
@@ -125,6 +128,90 @@ class TestAdminChallengeRoutes:
         assert response.json()["content"][0]["challenge_name"] == "Bulk 1"
         assert response.json()["content"][1]["challenge_name"] == "Bulk 2"
 
+    async def test_admin_can_get_projected_challenges_with_legacy_values(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, dbsession
+    ):
+        legacy_challenge = ChallengeModel(
+            challenge_name="Legacy challenge",
+            challenge_year="2024/2025",
+            challenge_created_time=datetime.now(),
+        )
+        dbsession.add(legacy_challenge)
+        await dbsession.commit()
+        await dbsession.refresh(legacy_challenge)
+        legacy_challenge_id = legacy_challenge.id
+
+        get_url = fastapi_app.url_path_for("list_challenges_route_admin")
+        response = await client.post(
+            get_url,
+            json={"output_filters": ["id", "challenge_name", "challenge_year"]},
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["content"] == [
+            {
+                "id": legacy_challenge_id,
+                "challenge_name": "Legacy challenge",
+                "challenge_year": "2024/2025",
+            }
+        ]
+
+    async def test_admin_can_get_projected_challenges_with_task_fields(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, dbsession
+    ):
+        challenge = ChallengeModel(
+            challenge_name="Challenge with projected tasks",
+            challenge_acronym="CWPT",
+            challenge_year="2027",
+            challenge_status="Accept",
+            challenge_created_time=datetime.now(),
+        )
+        dbsession.add(challenge)
+        await dbsession.flush()
+
+        task = TaskModel(
+            task_name="Segmentation task",
+            task_licence="CC-BY-4.0",
+            task_created_time=datetime.now(),
+            task_challenge_id=challenge.id,
+        )
+        dbsession.add(task)
+        await dbsession.commit()
+
+        get_url = fastapi_app.url_path_for("list_challenges_route_admin")
+        response = await client.post(
+            get_url,
+            json={
+                "output_filters": [
+                    "challenge_name",
+                    "challenge_acronym",
+                    "challenge_year",
+                    "challenge_status",
+                    "challenge_tasks",
+                    "task_name",
+                    "task_licence",
+                ]
+            },
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["content"] == [
+            {
+                "challenge_name": "Challenge with projected tasks",
+                "challenge_acronym": "CWPT",
+                "challenge_year": "2027",
+                "challenge_status": "Accept",
+                "challenge_tasks": [
+                    {
+                        "task_name": "Segmentation task",
+                        "task_licence": "CC-BY-4.0",
+                    }
+                ],
+            }
+        ]
+
     async def test_admin_can_update_other_users_challenge(
         self,
         client: AsyncClient,
@@ -192,6 +279,32 @@ class TestAdminChallengeRoutes:
         assert response.json()["successful"][0]["challenge_name"] == "Bulk 1"
         assert response.json()["successful"][1]["challenge_name"] == "Bulk 2"
         assert len(response.json()["failed"]) == 0
+
+    async def test_admin_bulk_update_rejects_invalid_challenge_year(
+        self, client: AsyncClient, fastapi_app: FastAPI, user_token, admin_token, patch_challenge_and_conference
+    ):
+        data = {
+            "challenge_name": "Bulk invalid year",
+            "challenge_abstract": "Abstract",
+            "challenge_year": "2024",
+        }
+        create_url = fastapi_app.url_path_for("create_challenge_route")
+        create_response = await client.post(
+            f"{create_url}?conference_id={CONFERENCE_ID}",
+            json=data,
+            headers={"Authorization": f"Bearer {user_token}"},
+        )
+        challenge_id = create_response.json()["id"]
+
+        bulk_update_url = fastapi_app.url_path_for("bulk_update_challenges_route_admin")
+        updates = [{"id": challenge_id, "challenge_year": "2024/2025"}]
+
+        response = await client.put(bulk_update_url, json=updates, headers={"Authorization": f"Bearer {admin_token}"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["successful"]) == 0
+        assert len(response.json()["failed"]) == 1
+        assert "challenge_year must be a four-digit integer" in response.json()["failed"][0]["error"]
 
     async def test_admin_can_delete_other_users_challenge(
         self,

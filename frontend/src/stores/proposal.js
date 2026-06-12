@@ -119,7 +119,7 @@ export const useProposalStore = defineStore('proposal', {
           text: 'Please indicate the year of the challenge. If you are applying for next yearʼs conference, please write the year of that conference..',
           value: '',
           type: 'text',
-          validation: { required: true },
+          validation: { required: true, pattern: '^[0-9]{4}$' },
           errorState: false,
         },
         {
@@ -140,27 +140,29 @@ export const useProposalStore = defineStore('proposal', {
           validation: { required: false },
           errorState: false,
         },
-
       ]
 
       if (challengeIsLighthouseChallenge === true) {
-        generalQuestions.push({ //////////////////////////////////////////////
-          key: 'challenge_lighthouse_general_terms_agreed',
-          title: 'Lighthouse challenge agreement',
-          text:
-            '<p>The organizers agree to all of the following points:</p>' +
-            '<ul>\n' +
-            '<li>The full labeling protocol will be sent to the challenge chairs in addition to the full proposal document.</li>\n' +
-            '<li>A set of a few representative data samples including annotations will be sent to the challenge chairs in addition to the full proposal document.</li>\n' +
-            '<li>The challenge will be open for at least 4 months.</li>\n' +
-            '<li>For the dataset review, the challenge chairs will get access to the data at least 3 months before challenge opening.</li>\n' +
-            '</ul>',
-          value: false,
-          type: 'checkbox',
-          label: 'Challenge organizers have read and agree to all of the above terms and conditions.',
-          validation: { required: true },
-          errorState: false,
-        },
+        generalQuestions.push(
+          {
+            //////////////////////////////////////////////
+            key: 'challenge_lighthouse_general_terms_agreed',
+            title: 'Lighthouse challenge agreement',
+            text:
+              '<p>The organizers agree to all of the following points:</p>' +
+              '<ul>\n' +
+              '<li>The full labeling protocol will be sent to the challenge chairs in addition to the full proposal document.</li>\n' +
+              '<li>A set of a few representative data samples including annotations will be sent to the challenge chairs in addition to the full proposal document.</li>\n' +
+              '<li>The challenge will be open for at least 4 months.</li>\n' +
+              '<li>For the dataset review, the challenge chairs will get access to the data at least 3 months before challenge opening.</li>\n' +
+              '</ul>',
+            value: false,
+            type: 'checkbox',
+            label:
+              'Challenge organizers have read and agree to all of the above terms and conditions.',
+            validation: { required: true },
+            errorState: false,
+          },
           {
             key: 'challenge_lighthouse_what_is_different',
             title: 'Lighthouse challenge information',
@@ -232,7 +234,7 @@ export const useProposalStore = defineStore('proposal', {
             type: 'textarea',
             validation: { required: true },
             errorState: false,
-          },
+          }
 
           // {
           //   key: 'challenge_author_names',
@@ -254,7 +256,7 @@ export const useProposalStore = defineStore('proposal', {
           //   errorState: false,
           //   convertToList: true,
           // },
-        );
+        )
       }
 
       const conferenceQuestions = [
@@ -305,6 +307,44 @@ export const useProposalStore = defineStore('proposal', {
           validation: { required: true },
           errorState: false,
         },
+
+        {
+          key: 'challenge_lncs_proceedings',
+          title: 'MICCAI LNCS proceedings',
+          text:
+            'Indicate if you want to offer MICCAI Springer LNCS proceedings to the participants. Publishing a proceedings volume is optional and at the discretion of each challenge’s organizers. \n' +
+            "At a minimum, organizers must ensure that a description of each participant's submission is publicly available. Organizers who wish to publish MICCAI Springer LNCS proceedings must adhere to the MICCAI Satellite events publication process.",
+          value: '',
+          type: 'select',
+          options: ['Yes', 'No'],
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'challenge_esr_collaboration',
+          title: 'Collaboration with European Society of Radiology (ESR)',
+          text: 'In collaboration with European Society of Radiology (ESR), we announce special clinical interest topics with associated clinicians who can help with the preparation of the proposals; the best 3 challenge proposals on these topics will get the opportunity to present their challenges at the European Congress of Radiology (ECR) 2027 in a special session. If you want to organize a challenge in collaboration with ESR on one of these topics, please reach out to the MICCAI Challenges Team (miccai-challenges-2026@dkfz-heidelberg.de) and we will put you in contact with the corresponding clinician.',
+          value: '',
+          default: '',
+          type: 'conditionalSelect',
+          label:
+            'Challenge in collaboration with ESR. Ticking "Yes" implies that the challenge has been prepared in collaboration with the clinical contact point.',
+          placeholder: 'ESR Topics',
+          options: [
+            'Detection and quantification of colorectal liver metastasis on CT',
+            'Quantification of Osteoporosis on CT',
+            'Prediction of pulmonary function based on a single chest CT scan',
+            'Automated RECIST assessment on baseline and follow-up Thorax-Abdomen CT',
+            'AI-based Positive Assessment of Brain Imaging in Multiple Sclerosis (MS)',
+            'AI-based assessment of PET imaging for oncology',
+            'AI-based generation of full radiology report from imaging',
+            'Ultrasound, Doppler, and MRI-Based Multimodal Segmentation and Characterization of Parotid Tumours',
+            'From single to multi-sequence synthetic MRI for MSK imaging',
+          ],
+          validation: { required: true },
+          errorState: false,
+        },
+
         {
           key: 'challenge_space_and_hardware_requirements',
           title: 'Space/ hardware requirements',
@@ -369,6 +409,15 @@ export const useProposalStore = defineStore('proposal', {
           errorState: false,
         },
         {
+          key: 'task_organizing_team_clinicians',
+          title: 'Are clinicians part of the organizing team?',
+          text: 'Indicate whether clinicians are part of the organizing team. If yes, describe their role.',
+          value: [],
+          type: 'textarea',
+          validation: { required: false, minlength: 1 },
+          errorState: false,
+        },
+        {
           key: 'task_lifecycle',
           title: 'Life cycle type',
           text:
@@ -404,10 +453,26 @@ export const useProposalStore = defineStore('proposal', {
         },
         {
           key: 'task_platform',
-          title: 'Report the platform (e.g. grand-challenge.org) used to run the challenge.',
-          text: '<p>Report the platform (e.g. grand-challenge.org) used to run the challenge.<br><br><i>Please note:</i> If you would like to run your challenge on <b>grand-challenge.org</b>, please also fill out their <a href="https://grand-challenge.org/challenges/requests/create/" target="_blank">challenge request form</a> as soon as possible. You can upload the PDF from your MICCAI application and then fill most fields in their form with “see PDF”. You will also need to provide details regarding your compute and storage requirements. You can find more information about that <a href="https://grand-challenge.org/documentation/create-your-own-challenge/#budget" target="_blank">here</a>. Finally, please also note that the Grand Challenge platform strongly encourages open science and hence requires that you publish your training data with a permissive CC-BY license and that you encourage your participants to publish their source code with an appropriate license as well.</p>',
+          title: 'Report the platform used to run the challenge.',
+          text: '<p>Report the platform (e.g. grand-challenge.org, synapse, Kaggle, …) used to run the challenge.</p>',
           value: [],
           type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'task_platform_sharing_information',
+          title:
+            'Do you agree that the your submission is shared with the platform (e.g., grand-challenge, synapse...) that you indicated?',
+          text:
+            '<p><i>Please note:</i> 1) this purpose of such sharing is that the challenge chairs and the platform\n' +
+            'can communicate smoothly, your answer will not impact the review of your proposal; \n' +
+            '2) regardless of your response to this question, it is your responsibility to perform all actions required\n' +
+            'by the platform (e.g. filling their submission request).</p>',
+          value: [],
+          default: 'No',
+          type: 'select',
+          options: ['Yes', 'No'],
           validation: { required: true },
           errorState: false,
         },
@@ -423,36 +488,34 @@ export const useProposalStore = defineStore('proposal', {
         {
           key: 'task_interaction_level_policy',
           title: 'Allowed user interaction',
-          text: '<p>Define the <b>allowed user interaction </b>of the algorithms assessed (e.g. only (semi-)automatic methods allowed).</p>',
+          text:
+            '<p>Define the <b>allowed user interaction </b>of the algorithms assessed. This includes the policy regarding any curation, (pre-)processing and (pre-)training steps.</p>' +
+            '<small>Examples:' +
+            '          <ul>' +
+            '            <li>No user interaction is allowed at any step </li>' +
+            '            <li>User interaction is allowed for curating training data (i.e. excluding some training samples).' +
+            '          </ul>' +
+            '        </small>',
           value: [],
-          // type: 'textarea',
-          type: 'selectMultipleWithOther',
-          options: ['Fully automatic', 'Semi automatic', 'Fully interactive'],
+          type: 'textarea',
+          // type: 'selectMultipleWithOther',
+          // options: ['Fully automatic', 'Semi automatic', 'Fully interactive'],
           validation: { required: true },
           errorState: false,
         },
         {
           key: 'task_training_data_policy',
           title: 'Training data policy',
-          text:
-            '<p>Define the policy on the <b>usage of training data</b>. The data used to train algorithms may, for example, be restricted to the data provided by the challenge or to publicly available data including (open) pre-trained nets.</p>' +
-            '<small>Examples:' +
-            '          <ul>' +
-            '            <li>No policy defined.</li>' +
-            '            <li>No additional data allowed.' +
-            '            <li>Private data is allowed.</li>' +
-            '            <li>Publicly available data is allowed.</li>' +
-            '          </ul>' +
-            '        </small>',
+          text: '<p>Define the policy on the <b>usage of training data</b>. The data used to train algorithms may, for example, be restricted to the data provided by the challenge or may also include publicly available data including (open) pre-trained nets. Clarify whether such additional data needs to be publicly  available at the time of the challenge launch. Clarify whether adding (private) annotations of the public data is allowed.</p>',
           value: [],
-          // type: 'textarea',
-          type: 'selectWithOther',
-          options: [
-            'No policy defined',
-            'No additional data allowed',
-            'Private data is allowed',
-            'Publicly available data is allowed',
-          ],
+          type: 'textarea',
+          // type: 'selectWithOther',
+          // options: [
+          //   'No policy defined',
+          //   'No additional data allowed',
+          //   'Private data is allowed',
+          //   'Publicly available data is allowed',
+          // ],
           validation: { required: true },
           errorState: false,
         },
@@ -571,11 +634,9 @@ export const useProposalStore = defineStore('proposal', {
           errorState: false,
         },
         {
-          // this ok?
           key: 'task_licence',
           title: 'Data usage agreement',
-          text:
-            '<p>Clarify how the data can be used and distributed by the teams that participate in the challenge and by others during and after the challenge. This should include the explicit <b>listing of the license</b> applied (click <a href="https://creativecommons.org/licenses/" target="_blank">here</a> for more information).</p>',
+          text: '<p>Clarify how the data can be used and distributed by the teams that participate in the challenge and by others during and after the challenge. This should include the explicit <b>listing of the license</b> applied (click <a href="https://creativecommons.org/licenses/" target="_blank">here</a> for more information).</p><p>Please note that the data license should not differ among sources. In case a license has to be changed, it has to be reported to the MICCAI challenges team and changed in the proposal.</p>',
           // '<small>Examples:\n' +
           // '          <ul>\n' +
           // '            <li>CC BY (Attribution)\n' +
@@ -596,10 +657,6 @@ export const useProposalStore = defineStore('proposal', {
             'CC BY-NC (Attribution-NonCommercial)',
             'CC BY-NC-SA (Attribution-NonCommercial-ShareAlike)',
             'CC BY-NC-ND (Attribution-NonCommercial-NoDerivs)',
-            'GNU General Public License',
-            'MIT License',
-            'Apache License',
-
           ],
           validation: { required: true },
           errorState: false,
@@ -881,6 +938,15 @@ export const useProposalStore = defineStore('proposal', {
           errorState: false,
         },
         {
+          key: 'task_quantity_of_data',
+          title: 'Quantity of data which is already annotated',
+          text: '<p>How much of the data are already annotated (stratified by train test in percentage)?.</p>',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
           key: 'task_explanation_number_proportion_data',
           title: 'Explanation of data proportion',
           text: '<p>Explain why a total number of cases and the specific <b>proportion</b> of training, validation and test cases was chosen.</p>',
@@ -998,7 +1064,7 @@ export const useProposalStore = defineStore('proposal', {
         {
           key: 'task_rank_computation_method',
           title: 'Method used to compute a performance rank',
-          text: '<p>Describe the method used to compute a performance rank for all submitted algorithms based on the generated metric results on the test cases. Typically the text will describe how results obtained per case and metric are aggregated to arrive at a final score/ranking.</p>',
+          text: '<p>Describe the method used to compute a performance rank for all submitted algorithms based on the generated metric results on the test cases. Typically the text will describe how results obtained per case and metric are aggregated to arrive at a final score/ranking. Ideally, provide the ranking scheme as a concrete pseudo code.</p>',
           value: [],
           type: 'textarea',
           validation: { required: true },
@@ -1022,31 +1088,94 @@ export const useProposalStore = defineStore('proposal', {
           validation: { required: true },
           errorState: false,
         },
+        // {
+        //   key: 'task_statistical_analyses',
+        //   title: 'Details for the statistical methods',
+        //   text:
+        //     '<div>Provide details for the statistical methods used in the scope of the challenge analysis. This may include</div>' +
+        //     '          <ul>\n' +
+        //     '            <li>description of the missing data handling,</li>\n' +
+        //     '            <li>details about the assessment of variability of rankings,</li>\n' +
+        //     '            <li>description of any method used to assess whether the data met the assumptions, required for the particular statistical approach, or</li>\n' +
+        //     '            <li>indication of any software product that was used for all data analysis methods.</li>\n' +
+        //     '          </ul>',
+        //   value: [],
+        //   type: 'textarea',
+        //   validation: { required: true },
+        //   errorState: false,
+        // },
         {
-          key: 'task_statistical_analyses',
-          title: 'Details for the statistical methods',
-          text:
-            '<div>Provide details for the statistical methods used in the scope of the challenge analysis. This may include</div>' +
-            '          <ul>\n' +
-            '            <li>description of the missing data handling,</li>\n' +
-            '            <li>details about the assessment of variability of rankings,</li>\n' +
-            '            <li>description of any method used to assess whether the data met the assumptions, required for the particular statistical approach, or</li>\n' +
-            '            <li>indication of any software product that was used for all data analysis methods.</li>\n' +
-            '          </ul>',
+          key: 'task_statistical_analyses_overview',
+          title: 'Statistics - Overview',
+          text: 'Provide an overview of the statistical approaches used in the scope of the challenge analysis. Details can be provided in the parameters below. For each parameter, justify why the described statistical method(s) was/were used and, if necessary, add a description of any method used to assess whether the data met the assumptions required for the particular statistical approach.',
           value: [],
           type: 'textarea',
           validation: { required: true },
           errorState: false,
         },
         {
-          key: 'task_justification_of_statistical_analyses',
-          title: 'Justification of statistical methods',
-          text: '<p>Justify why the described statistical method(s) was/were used.</p>',
+          key: 'task_statistical_analyses_precision_performance_estimates',
+          title: 'Statistics - Precision of the performance estimates',
+          text: 'Provide a description of how the precision of the performance estimates of individual algorithms is assessed (e.g. confidence interval of the mean on the test set computed using percentile bootstrap, confidence interval of the accuracy on the test set computed using percentile bootstrap).',
           value: [],
           type: 'textarea',
           validation: { required: true },
           errorState: false,
         },
+        {
+          key: 'task_statistical_analyses_performance_variability',
+          title: 'Statistics - Performance variability across cases',
+          text: 'Provide a description of how variability of the performance of individual algorithms across tests cases is assessed (e.g. SD across test cases, IQR, graphs, reporting outliers…).',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'task_statistical_analyses_rankings_variability',
+          title: 'Statistics - Rankings variability',
+          text: 'Provide a description of how variability of rankings is assessed.',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'task_statistical_analyses_test_for_significance',
+          title: 'Statistics - Tests for significance',
+          text: 'Provide a description of statistical tests that are used to assess whether the differences in performance between algorithms are statistically significant.',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'task_statistical_analyses_missing_data_handling',
+          title: 'Statistics - Missing data handling',
+          text: 'Provide a description of the missing data handling.',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        {
+          key: 'task_statistical_analyses_software',
+          title: 'Statistics - Software',
+          text: 'Indicate any software product that is used for all data analysis methods.',
+          value: [],
+          type: 'textarea',
+          validation: { required: true },
+          errorState: false,
+        },
+        // {
+        //   key: 'task_justification_of_statistical_analyses',
+        //   title: 'Justification of statistical methods',
+        //   text: '<p>Justify why the described statistical method(s) was/were used.</p>',
+        //   value: [],
+        //   type: 'textarea',
+        //   validation: { required: true },
+        //   errorState: false,
+        // },
         {
           key: 'task_further_analyses',
           title: 'Further analyses',
@@ -1089,20 +1218,20 @@ export const useProposalStore = defineStore('proposal', {
       return [
         {
           formName: 'General',
-          questions: generalQuestions
+          questions: generalQuestions,
         },
         {
           formName: 'Conference',
-          questions: conferenceQuestions
+          questions: conferenceQuestions,
         },
         {
           formName: 'Tasks',
           useTaskForm: true,
-          questions: taskQuestions
+          questions: taskQuestions,
         },
         {
           formName: 'Additional',
-          questions: additionalQuestions
+          questions: additionalQuestions,
         },
       ]
     },
@@ -1134,10 +1263,14 @@ export const useProposalStore = defineStore('proposal', {
           useTaskForm: form.formName === 'Tasks',
           questions: form.questions.map((x) => {
             if (form.formName === 'Tasks') {
-
               let searchForKey = x.key
               let indexOfKey = keys.indexOf(searchForKey)
               let vals = indexOfKey !== -1 ? values[indexOfKey] : []
+
+              if (vals.length === 0 && tasksRaw.length > 0) {
+                const defaultValue = x.default !== undefined ? x.default : ''
+                vals = new Array(tasksRaw.length).fill(defaultValue)
+              }
 
               return {
                 ...x,
@@ -1161,11 +1294,12 @@ export const useProposalStore = defineStore('proposal', {
             let indexOfKey = keys.indexOf(searchForKey)
             return {
               ...x,
-              value: indexOfKey >= 0
-                ? values[indexOfKey]
-                  ? values[indexOfKey].toString()
-                  : x.value
-                : x.value,
+              value:
+                indexOfKey >= 0
+                  ? values[indexOfKey]
+                    ? values[indexOfKey].toString()
+                    : x.value
+                  : x.value,
             }
           }),
         })
@@ -1177,7 +1311,10 @@ export const useProposalStore = defineStore('proposal', {
       this.created = new Date()
       this.activeProposalOnline = false
       this.proposal = this.getProposalTemplate()
-      this.proposalConference = { 'conferenceName': 'MICCAI 2025 Lighthouse Challenges', 'submitMessage': '<p>Thanks for preparing your structured challenge design document.</p>' }
+      this.proposalConference = {
+        conferenceName: 'MICCAI 2026 Challenges',
+        submitMessage: '<p>Thanks for preparing your structured challenge design document.</p>',
+      }
     },
     resetCreated() {
       this.created = ''
@@ -1196,6 +1333,7 @@ export const useProposalStore = defineStore('proposal', {
             ...x,
             value: x.value.push({
               ...item,
+              value: x.default !== undefined ? x.default : item.value,
               key: item.name + idx,
               uniqueId: item.name + idx,
               questionKey: x.key,

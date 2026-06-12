@@ -72,6 +72,7 @@ def get_challenge_service(
         user_service=user_svc,
     )
 
+
 def get_challenge_service_admin(
     conference_repo: ConferenceRepositoryProtocol = Depends(get_repository(SQLAlchemyConferenceRepository)),
     challenge_repo: ChallengeRepositoryProtocol = Depends(get_repository(SQLAlchemyChallengeRepository)),

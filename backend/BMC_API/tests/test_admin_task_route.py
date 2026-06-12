@@ -190,6 +190,31 @@ class TestAdminTaskRoutes:
         assert response.json()["successful"][1]["task_name"] == "Bulk 2"
         assert len(response.json()["failed"]) == 0
 
+    async def test_admin_bulk_update_rejects_invalid_task_field_type(
+        self, client: AsyncClient, fastapi_app: FastAPI, user_token, admin_token, patch_challenge_and_conference_open
+    ):
+        data = {
+            "task_name": "Bulk invalid type",
+            "task_abstract": "Abstract",
+        }
+        create_url = fastapi_app.url_path_for("create_task_route")
+        create_response = await client.post(
+            f"{create_url}?challenge_id={CHALLENGE_ID}",
+            json=data,
+            headers={"Authorization": f"Bearer {user_token}"},
+        )
+        task_id = create_response.json()["id"]
+
+        bulk_update_url = fastapi_app.url_path_for("bulk_update_tasks_route_admin")
+        updates = [{"id": task_id, "task_author_names": "not-a-list"}]
+
+        response = await client.put(bulk_update_url, json=updates, headers={"Authorization": f"Bearer {admin_token}"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["successful"]) == 0
+        assert len(response.json()["failed"]) == 1
+        assert "task_author_names" in response.json()["failed"][0]["error"]
+
     async def test_admin_can_delete_other_users_task(
         self,
         client: AsyncClient,

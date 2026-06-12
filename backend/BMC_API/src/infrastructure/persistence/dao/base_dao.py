@@ -6,6 +6,7 @@ from loguru import logger
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.inspection import inspect
 
 from BMC_API.src.infrastructure.persistence.base import Base
 
@@ -18,10 +19,37 @@ class QueryHelper(Generic[DataObject]):
     def __init__(self, model_class: Type[DataObject]):
         self.model = model_class
 
+    def _column_names(self, model: Type[DataObject] | None = None) -> set[str]:
+        return {column.key for column in inspect(model or self.model).column_attrs}
+
+    def _relationship_names(self) -> set[str]:
+        return {relationship.key for relationship in inspect(self.model).relationships}
+
+    def _requested_relationships(self, output_filters: List[str] | None = None) -> dict[str, list[str]]:
+        if not output_filters:
+            return {}
+
+        requested_relationships = {}
+        for relationship in inspect(self.model).relationships:
+            relationship_name = relationship.key
+            if relationship_name not in output_filters:
+                continue
+
+            related_column_names = self._column_names(relationship.mapper.class_)
+            requested_relationships[relationship_name] = [
+                field for field in output_filters if field in related_column_names
+            ]
+
+        return requested_relationships
+
     def build_query_with_output_filters(self, output_filters: List[str] | None = None):
         """Build the initial query with output filters if specified."""
         if output_filters:
-            selected_columns = [getattr(self.model, field) for field in output_filters if hasattr(self.model, field)]
+            if self._requested_relationships(output_filters):
+                return select(self.model)
+
+            column_names = self._column_names()
+            selected_columns = [getattr(self.model, field) for field in output_filters if field in column_names]
             if not selected_columns:  # Fallback if no valid columns provided
                 return select(self.model)
             else:
@@ -105,7 +133,7 @@ class QueryHelper(Generic[DataObject]):
             "startswith": lambda col, val: col.like(f"{val}%"),
             "endswith": lambda col, val: col.like(f"%{val}"),
             # "contains": lambda col, val: col.like(f"%{val}%"),
-            "contains":  lambda col, val: col.contains(val),
+            "contains": lambda col, val: col.contains(val),
         }
 
         # Handle special cases
@@ -155,10 +183,19 @@ class QueryHelper(Generic[DataObject]):
 
     def process_query_results(self, result, output_filters: List[str] | None = None):
         """Process query results based on output filters."""
-        if output_filters and any(hasattr(self.model, field) for field in output_filters):
+        requested_relationships = self._requested_relationships(output_filters)
+        if output_filters and requested_relationships:
+            model_column_names = self._column_names()
+            scalar_filters = [field for field in output_filters if field in model_column_names]
+            return [
+                self._serialize_projected_model(entity, scalar_filters, requested_relationships)
+                for entity in result.scalars().all()
+            ]
+
+        if output_filters and any(field in self._column_names() for field in output_filters):
             # When selecting specific columns, result will be tuples
             rows_result = result.all()
-            valid_filters = [f for f in output_filters if hasattr(self.model, f)]
+            valid_filters = [f for f in output_filters if f in self._column_names()]
 
             # Convert to dictionaries if specific columns were requested
             return [
@@ -168,6 +205,33 @@ class QueryHelper(Generic[DataObject]):
         else:
             # Normal case - full model objects
             return result.scalars().all()
+
+    def _serialize_projected_model(
+        self,
+        entity: DataObject,
+        scalar_filters: List[str],
+        requested_relationships: dict[str, list[str]],
+    ) -> dict:
+        row = {field: getattr(entity, field) for field in scalar_filters}
+
+        for relationship_name, related_fields in requested_relationships.items():
+            related_value = getattr(entity, relationship_name)
+            if related_value is None:
+                row[relationship_name] = None
+            elif isinstance(related_value, list):
+                row[relationship_name] = [
+                    self._serialize_related_model(related_entity, related_fields) for related_entity in related_value
+                ]
+            else:
+                row[relationship_name] = self._serialize_related_model(related_value, related_fields)
+
+        return row
+
+    @staticmethod
+    def _serialize_related_model(entity: Any, fields: List[str]) -> dict:
+        if not fields:
+            fields = [column.key for column in inspect(entity.__class__).column_attrs]
+        return {field: getattr(entity, field) for field in fields}
 
 
 class BaseDAO(Generic[DataObject]):

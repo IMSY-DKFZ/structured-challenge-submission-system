@@ -10,14 +10,12 @@ The models in "BMC_API.src.application.dto.user_dto" are inherited from these mo
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import ConfigDict, EmailStr, Field, Json
+from pydantic import ConfigDict, EmailStr, Field, Json, BaseModel
 
 from BMC_API.src.domain.value_objects.enums.user_enums import Roles
 
-from .base_model import NoExtraBaseModel
 
-
-class UserModelBase(NoExtraBaseModel):
+class UserModelBase(BaseModel):
     """
     Base model for user data used in requests.
     """
@@ -26,13 +24,9 @@ class UserModelBase(NoExtraBaseModel):
     city: Optional[str] = Field(None, description="City of the user.")
     country: Optional[str] = Field(None, description="Country of the user.")
     first_name: Optional[str] = Field(None, description="User's first name.")
-    institution: Optional[str] = Field(
-        None, description="Institution affiliated with the user."
-    )
+    institution: Optional[str] = Field(None, description="Institution affiliated with the user.")
     last_name: Optional[str] = Field(None, description="User's last name.")
-    newsletter: Optional[bool] = Field(
-        False, description="Whether the user is subscribed to the newsletter."
-    )
+    newsletter: Optional[bool] = Field(False, description="Whether the user is subscribed to the newsletter.")
     titel: Optional[str] = Field(None, description="User's title.")
     website: Optional[str] = Field(None, description="User's website URL.")
 
@@ -44,37 +38,17 @@ class UserInDB(UserModelBase):
     """
 
     id: int = Field(..., description="Unique identifier for the user.")
-    created_time: Optional[datetime] = Field(
-        None, description="Timestamp when the user was created."
-    )
-    disabled: Optional[bool] = Field(
-        False, description="Flag indicating if the user account is disabled."
-    )
+    created_time: Optional[datetime] = Field(None, description="Timestamp when the user was created.")
+    disabled: Optional[bool] = Field(False, description="Flag indicating if the user account is disabled.")
     email: EmailStr = Field(..., description="User's email address.")
-    email_confirmation_token: Optional[str] = Field(
-        None, description="Token used for email confirmation."
-    )
-    email_confirmed: Optional[bool] = Field(
-        False, description="Flag indicating if the user's email is confirmed."
-    )
-    last_login_time: Optional[datetime] = Field(
-        None, description="Timestamp of the last login."
-    )
-    modified_time: Optional[datetime] = Field(
-        None, description="Timestamp when the user was last modified."
-    )
+    email_confirmation_token: Optional[str] = Field(None, description="Token used for email confirmation.")
+    email_confirmed: Optional[bool] = Field(False, description="Flag indicating if the user's email is confirmed.")
+    last_login_time: Optional[datetime] = Field(None, description="Timestamp of the last login.")
+    modified_time: Optional[datetime] = Field(None, description="Timestamp when the user was last modified.")
     notes: Optional[str] = Field(None, description="Additional notes about the user.")
-    notifications: Optional[Json] = Field(
-        None, description="User's notification settings in JSON format."
-    )
-    reset_token: Optional[str] = Field(
-        None, description="Token used for password reset."
-    )
-    roles: Optional[List[Roles]] = Field(
-        None, description="List of roles assigned to the user."
-    )
-    token_expiry: Optional[datetime] = Field(
-        None, description="Expiry time of the user's token."
-    )
+    notifications: Optional[Json] = Field(None, description="User's notification settings in JSON format.")
+    reset_token: Optional[str] = Field(None, description="Token used for password reset.")
+    roles: Optional[List[Roles]] = Field(None, description="List of roles assigned to the user.")
+    token_expiry: Optional[datetime] = Field(None, description="Expiry time of the user's token.")
 
     model_config = ConfigDict(from_attributes=True)

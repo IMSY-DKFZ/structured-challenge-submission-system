@@ -1,14 +1,13 @@
 from datetime import datetime
 from typing import TypeVar
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, BaseModel, field_validator
 
-from .base_model import NoExtraBaseModel
 
 T = TypeVar("T")
 
 
-class ChallengeModelBase(NoExtraBaseModel):
+class ChallengeModelBase(BaseModel):
     """DTO for challenge base model."""
 
     challenge_name: str
@@ -45,8 +44,19 @@ class ChallengeModelBase(NoExtraBaseModel):
     challenge_lighthouse_deadline_for_data: str | None = None
     challenge_lighthouse_prize_money: str | None = None
     challenge_lighthouse_compute_per_participant: str | None = None
+    challenge_lncs_proceedings: str | None = None
+    challenge_esr_collaboration: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("challenge_year")
+    @classmethod
+    def validate_challenge_year(cls, v: str | None) -> str | None:
+        """Validate that challenge_year is a four-digit integer."""
+        if v is not None and v != "":
+            if not v.isdigit() or len(v) != 4:
+                raise ValueError("challenge_year must be a four-digit integer (e.g., 2024)")
+        return v
 
 
 # class ChallengeInDB(ChallengeModelBase):

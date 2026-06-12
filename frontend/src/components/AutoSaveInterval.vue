@@ -1,10 +1,19 @@
 <template>
-  <div class="toast-container position-fixed bottom-0 end-0  end-0">
-    <div id="toastLive" class="toast align-items-center bg-secondary-subtle border-0" role="alert" aria-live="assertive"
+  <div class="toast-container position-fixed bottom-0 end-0 end-0">
+    <div
+      id="toastLive"
+      class="toast align-items-center bg-secondary-subtle border-0"
+      role="alert"
+      aria-live="assertive"
       aria-atomic="true">
-      <div v-if="show" class="d-flex justify-content-between align-items-center align-content-center p-2 m-auto shadow">
+      <div
+        v-if="show"
+        class="d-flex justify-content-between align-items-center align-content-center p-2 m-auto shadow">
         <div>Auto Saving Proposal...</div>
-        <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+        <div
+          class="spinner-border ms-auto"
+          role="status"
+          aria-hidden="true"></div>
       </div>
     </div>
   </div>

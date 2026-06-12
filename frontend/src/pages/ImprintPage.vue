@@ -6,7 +6,10 @@
         Deutsches Krebsforschungszentrum (German Cancer Research Center, DKFZ)
       </template>
       <div class="bg-info p-3">
-        <img src="@/assets/images/dkfz.png" style="max-width: 15rem" alt="" />
+        <img
+          src="@/assets/images/dkfz.png"
+          style="max-width: 15rem"
+          alt="" />
       </div>
     </VueTextSection>
     <VueTextSection>

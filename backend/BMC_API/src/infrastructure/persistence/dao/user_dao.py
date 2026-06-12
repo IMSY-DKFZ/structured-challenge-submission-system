@@ -20,9 +20,7 @@ class SQLAlchemyUserRepository(BaseDAO[UserModel]):
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
-        logger.debug(
-            "SQLAlchemyUserRepository initialized for model: {}", self.model.__name__
-        )
+        logger.debug("SQLAlchemyUserRepository initialized for model: {}", self.model.__name__)
 
     async def get_by_email(self, email: str) -> Optional[UserModel]:
         logger.debug("Retrieving user by email: {}", email)
@@ -37,9 +35,7 @@ class SQLAlchemyUserRepository(BaseDAO[UserModel]):
 
     async def confirm_email(self, confirmation_token: str) -> None:
         logger.debug("Confirming email with token: {}", confirmation_token)
-        query = select(self.model).where(
-            self.model.email_confirmation_token == confirmation_token
-        )
+        query = select(self.model).where(self.model.email_confirmation_token == confirmation_token)
         result = await self.session.execute(query)
         user = result.scalars().first()
         if not user:
@@ -57,9 +53,7 @@ class SQLAlchemyUserRepository(BaseDAO[UserModel]):
             logger.debug("User  confirmed: {}", user.email)
         except IntegrityError as e:
             await self.session.rollback()
-            logger.error(
-                "Error confirming email for token {}: {}", confirmation_token, e
-            )
+            logger.error("Error confirming email for token {}: {}", confirmation_token, e)
             raise RepositoryException("Error confirming email.") from e
 
     async def reset_password(self, reset_token: str, new_password: str) -> None:
@@ -96,9 +90,7 @@ class SQLAlchemyUserRepository(BaseDAO[UserModel]):
             await self.session.refresh(user)
             logger.debug("Login successful for user: {}", user.email)
         except IntegrityError as e:
-            logger.error(
-                "Error during logging user with ID: {}. Error: {e}", user.id, e
-            )
+            logger.error("Error during logging user with ID: {}. Error: {e}", user.id, e)
             await self.session.rollback()
         except Exception as e:
             await self.session.rollback()

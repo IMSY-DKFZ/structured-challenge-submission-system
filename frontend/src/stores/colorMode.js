@@ -16,7 +16,7 @@ export const useColorStore = defineStore('color', {
   actions: {
     setTheme(mode) {
       this.colorMode = mode
-      this.isDarkTheme = mode === 'dark';
+      this.isDarkTheme = mode === 'dark'
       document.documentElement.setAttribute('data-bs-theme', mode)
       document.documentElement.setAttribute('color-scheme', mode)
       document.documentElement.setAttribute('prefers-color-scheme', mode)
@@ -27,7 +27,7 @@ export const useColorStore = defineStore('color', {
     },
     setPreferredTheme() {
       this.colorMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      this.isDarkTheme = this.colorMode === 'dark';
+      this.isDarkTheme = this.colorMode === 'dark'
       if (localStorage.getItem('theme')) {
         this.setTheme(localStorage.getItem('theme'))
       } else {

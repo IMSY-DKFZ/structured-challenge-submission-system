@@ -51,18 +51,17 @@ class Settings(BaseSettings):
     backup_folder: str = os.path.join(ROOT_DIR, "backups")
 
     # Periodic tasks
-    db_file_backup_period_in_sec: int # Defined in .env file
-    db_file_backups_clean_period_in_sec: int # Defined in .env file
-    db_file_backups_age_limit_in_day: int # Defined in .env file
-
+    db_file_backup_period_in_sec: int  # Defined in .env file
+    db_file_backups_clean_period_in_sec: int  # Defined in .env file
+    db_file_backups_age_limit_in_day: int  # Defined in .env file
 
     # Variables for the database
-    db_file: Path =  "./database/database.sqlite3"
-    
+    db_file: Path = "./database/database.sqlite3"
+
     db_echo: bool = False
 
     # Rate limiter value
-    rate_limit: str # Defined in .env file
+    rate_limit: str  # Defined in .env file
 
     # Variables for Redis
     redis_host: str = "localhost"  # --> testing on local machine
@@ -73,7 +72,7 @@ class Settings(BaseSettings):
     redis_base: str | None = None
 
     # Secret information. All of them are defined in .env file
-    ALGORITHM: str 
+    ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
     SECRET_KEY: str
@@ -98,18 +97,21 @@ class Settings(BaseSettings):
         return Path(ROOT_DIR).joinpath(self.db_file).resolve()
 
     @property
-    def db_url(self) -> URL:
+    def db_url(self) -> str:
         """
         Assemble database URL from settings.
 
         :return: database URL.
         """
-        
-        return URL.build(
-            scheme="sqlite+aiosqlite",
-            path="/" + str(self.db_file_abs),
-            encoded=True,
-        )
+        db_path = self.db_file_abs.as_posix()
+
+        # SQLAlchemy requires 4 slashes for absolute POSIX paths while
+        # Windows drive-letter paths work with the typical 3 slashes form.
+        if os.name == "nt":
+            return f"sqlite+aiosqlite:///{db_path}"
+
+        normalized_path = db_path.lstrip("/")
+        return f"sqlite+aiosqlite:////{normalized_path}"
 
     @property
     def redis_url(self) -> URL:

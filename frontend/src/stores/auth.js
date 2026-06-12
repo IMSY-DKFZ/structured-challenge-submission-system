@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
       this.roles = roles
     },
     async getAndSetUserDataMe() {
-      await apiGet('user/me/', {
+      await apiGet('user/me', {
         accept: 'application/json',
         Authorization:
           localStorage.getItem('tokenType') + ' ' + localStorage.getItem('accessToken'),
@@ -67,7 +67,7 @@ export const useAuthStore = defineStore('auth', {
           }
         })
         .catch((e) => {
-          setTimeout(1000);
+          setTimeout(1000)
           useToastAlertStore().showAlert(e, 'danger', 6000)
         })
     },
@@ -99,7 +99,9 @@ export const useAuthStore = defineStore('auth', {
         this.isLoggedIn = false
         const loginString = `grant_type=&username=${encodeURIComponent(
           email
-        )}&password=${encodeURIComponent(password)}&grant_type=password&scope=&client_id=&client_secret=`
+        )}&password=${encodeURIComponent(
+          password
+        )}&grant_type=password&scope=&client_id=&client_secret=`
 
         apiPost(
           'user/token',
@@ -120,13 +122,13 @@ export const useAuthStore = defineStore('auth', {
                 this.isLoggedIn = true
               })
               .catch((e) => {
-                setTimeout(1000);
+                setTimeout(1000)
                 useToastAlertStore().showAlert(e, 'danger', 6000)
                 reject(new Error(e))
               })
           })
           .catch((e) => {
-            setTimeout(1000);
+            setTimeout(1000)
             useToastAlertStore().showAlert(e, 'danger', 6000)
             reject(new Error(e))
           })

@@ -14,7 +14,10 @@
   <!--    </div>-->
   <!--  </div>-->
 
-  <button type="button" class="btn btn-primary d-flex gap-1 py-3" @click="controlModal">
+  <button
+    type="button"
+    class="btn btn-primary d-flex gap-1 py-3"
+    @click="controlModal">
     <i class="bi d-block d-md-none bi-info-circle"></i>
     Conference Period
   </button>
@@ -22,29 +25,43 @@
   <!-- Dialog -->
   <confirm-dialogue ref="modalDialogue">
     <hr />
-    <section v-for="(item, idx) in conferences" :key="idx">
+    <section
+      v-for="(item, idx) in conferences"
+      :key="idx">
       <div class="row g-3 pb-3">
-        <div class="col-12" v-if="item?.title">
+        <div
+          class="col-12"
+          v-if="item?.title">
           <h6 class="mb-0 text-nowrap">Title</h6>
           <small class="mb-0 opacity-75">{{ item?.title }}</small>
         </div>
-        <div class="col-12" v-if="item?.timeline">
+        <div
+          class="col-12"
+          v-if="item?.timeline">
           <h6 class="mb-0 text-nowrap">Timeline</h6>
           <small class="mb-0 opacity-75">{{ item?.timelime }}</small>
         </div>
-        <div class="col-12 col-md-6" v-if="item?.name">
+        <div
+          class="col-12 col-md-6"
+          v-if="item?.name">
           <h6 class="mb-0 text-nowrap">Name</h6>
           <small class="mb-0 opacity-75">{{ item?.name }}</small>
         </div>
-        <div class="col-12 col-md-6" v-if="item?.city">
+        <div
+          class="col-12 col-md-6"
+          v-if="item?.city">
           <h6 class="mb-0 text-nowrap">City</h6>
           <small class="mb-0 opacity-75">{{ item?.city }}</small>
         </div>
-        <div class="col-12 col-md-6" v-if="item?.country">
+        <div
+          class="col-12 col-md-6"
+          v-if="item?.country">
           <h6 class="mb-0 text-nowrap">Country</h6>
           <small class="mb-0 opacity-75">{{ item?.country }}</small>
         </div>
-        <div class="col-12 col-md-6" v-if="item?.venue">
+        <div
+          class="col-12 col-md-6"
+          v-if="item?.venue">
           <h6 class="mb-0 text-nowrap">Venue</h6>
           <small class="mb-0 opacity-75">{{ item?.venue }}</small>
         </div>
@@ -82,7 +99,7 @@ export default {
       await apiGet('/conference/all_limited?limit=0&offset=0')
         .then((resp) => {
           if (resp) {
-            resp["content"].forEach((x, idx) => {
+            resp['content'].forEach((x, idx) => {
               if (
                 isBefore(new Date(), new Date(x.proposal_end_date)) &&
                 isAfter(new Date(), new Date(x.proposal_start_date))

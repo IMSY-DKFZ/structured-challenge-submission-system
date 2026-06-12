@@ -178,7 +178,9 @@ async def refresh_token_route(
     6) The 🚓 Auth0 Authorization Server requires re-authentication to get new access and refresh tokens.
     """
     logger.info("Received new token request")
-    bearer_tokens: Token = await service.refresh_token(user_service_admin=service_admin, token_data=token_data, token_cache=token_cache)
+    bearer_tokens: Token = await service.refresh_token(
+        user_service_admin=service_admin, token_data=token_data, token_cache=token_cache
+    )
     logger.info("New tokens created successfully.")
     return bearer_tokens
 
@@ -285,7 +287,11 @@ async def my_challenges_route(
     """
 
     entity_list, total_pages, total_records = await challenge_service.list(
-        limit=limit, offset=offset, search_filters={"challenge_owner_id": current_active_user.id}, sort_by="challenge_created_time", sort_desc=True
+        limit=limit,
+        offset=offset,
+        search_filters={"challenge_owner_id": current_active_user.id},
+        sort_by="challenge_created_time",
+        sort_desc=True,
     )
     return PaginationResponse(
         total_pages=total_pages,

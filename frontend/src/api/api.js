@@ -81,7 +81,11 @@ async function apiDelete(path, payload) {
     })
     .catch((error) => {
       data = error
-      throw new Error(typeof error?.response.data.detail == "string" ? error?.response.data.detail : error?.message)
+      throw new Error(
+        typeof error?.response.data.detail == 'string'
+          ? error?.response.data.detail
+          : error?.message
+      )
     })
   return data.data
 }

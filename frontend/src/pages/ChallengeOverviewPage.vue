@@ -1,8 +1,14 @@
 <template>
   <div>
-    <div class="d-flex justify-content-between" :class="[dataSelected ? 'flex-column' : '']">
+    <div
+      class="d-flex justify-content-between"
+      :class="[dataSelected ? 'flex-column' : '']">
       <p v-if="dataSelected">
-        <router-link type="button" class="btn btn-secondary" @click="unselectData" :to="{ name: 'Overview' }">
+        <router-link
+          type="button"
+          class="btn btn-secondary"
+          @click="unselectData"
+          :to="{ name: 'Overview' }">
           <i class="be bi-arrow-left pe-1" />
           Go Back
         </router-link>
@@ -21,8 +27,13 @@
               <h6 class="mb-0">DOI</h6>
               <div class="mb-3 opacity-75">{{ selectedChallenge.data?.doi }}</div>
             </div>
-            <div class="col-6" v-if="useAuthStore().adminSubOnly">
-              <a :href="selectedChallenge?.data?.name" target="_blank" class="btn btn-info text-nowrap shadow mb-3"
+            <div
+              class="col-6"
+              v-if="useAuthStore().adminSubOnly">
+              <a
+                :href="selectedChallenge?.data?.name"
+                target="_blank"
+                class="btn btn-info text-nowrap shadow mb-3"
                 type="button">
                 <i class="bi bi-download"></i>
                 <span class="ps-2">Download complete challenge design</span>
@@ -33,7 +44,7 @@
               <div class="mb-3 opacity-75">
                 <a :href="selectedChallenge.data?.workshop">{{
                   selectedChallenge.data?.workshop
-                  }}</a>
+                }}</a>
               </div>
             </div>
             <div class="col-12 col-md-12">
@@ -45,11 +56,21 @@
       </VueTextSection>
     </div>
 
-    <div v-else class="accordion" id="overviewList">
+    <div
+      v-else
+      class="accordion"
+      id="overviewList">
       <LoadingCircle :activated="LoadingCircleState"></LoadingCircle>
-      <div v-if="!LoadingCircleState" class="accordion-item mb-3">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-          aria-expanded="false" aria-controls="collapseOne">
+      <div
+        v-if="!LoadingCircleState"
+        class="accordion-item mb-3">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapseOne"
+          aria-expanded="false"
+          aria-controls="collapseOne">
           <div class="d-flex align-items-center gap-3 w-100 pe-5">
             <div class="d-flex gap-2 w-100 justify-content-between">
               <div>
@@ -58,12 +79,24 @@
             </div>
           </div>
         </button>
-        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#proposalList">
+        <div
+          id="collapseOne"
+          class="accordion-collapse collapse"
+          data-bs-parent="#proposalList">
           <div class="accordion-body">
-            <div v-for="(item, idx) in overviewList" :key="item" @click="selectData(item, idx)" class="py-2">
-              <router-link class="list-group-item list-group-item-action d-flex gap-3 align-items-center"
-                :to="getChallengeURL(idx)" aria-current="true">
-                <img class="rounded-circle flex-shrink-0" src="@/assets/images/challengeLogo_Reg.png" width="32"
+            <div
+              v-for="(item, idx) in overviewList"
+              :key="item"
+              @click="selectData(item, idx)"
+              class="py-2">
+              <router-link
+                class="list-group-item list-group-item-action d-flex gap-3 align-items-center"
+                :to="getChallengeURL(idx)"
+                aria-current="true">
+                <img
+                  class="rounded-circle flex-shrink-0"
+                  src="@/assets/images/challengeLogo_Reg.png"
+                  width="32"
                   height="32" />
                 <div class="d-flex gap-2 w-100 justify-content-between px-2">
                   <div>
@@ -116,10 +149,9 @@ export default {
   methods: {
     useAuthStore,
     async getChallengeAllLimited() {
-
       await apiGet('/challenge/all_limited')
         .then((resp) => {
-          this.overviewList = resp["content"]
+          this.overviewList = resp['content']
           this.LoadingCircleState = false
         })
         .catch((e) => {

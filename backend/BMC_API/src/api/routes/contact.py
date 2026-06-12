@@ -52,13 +52,13 @@ async def send_message(
         incoming_message_dict = incoming_message.model_dump()
         if incoming_message_dict["recipients_group"] == "Challenge chairs":
             try:
-                open_conferences, *_  = await conference_service.list(search_filters={"is_open_for_submissions": True})
+                open_conferences, *_ = await conference_service.list(search_filters={"is_open_for_submissions": True})
                 if open_conferences:
                     recipients = set()
                     for conference in open_conferences:
                         recipients.update(conference.chairperson_emails)
                     incoming_message_dict["recipients"] = list(recipients)
-                    message=Message(**incoming_message_dict)
+                    message = Message(**incoming_message_dict)
             except NotFoundException:
                 return JSONResponse(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -73,10 +73,10 @@ async def send_message(
 
             # Clear fake e-mail address of DEFAULT_ADMIN_NAME
             admin_emails = [admin.email for admin in admin_list if admin.email != settings.DEFAULT_ADMIN_NAME]
-            
+
             incoming_message_dict["recipients"] = list(set(admin_emails))
 
-            message=Message(**incoming_message_dict)
+            message = Message(**incoming_message_dict)
         else:
             return JSONResponse(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -88,6 +88,6 @@ async def send_message(
     except Exception as e:
         raise e
     return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"message": "Your message has been sent successfully."},
-            )
+        status_code=status.HTTP_200_OK,
+        content={"message": "Your message has been sent successfully."},
+    )

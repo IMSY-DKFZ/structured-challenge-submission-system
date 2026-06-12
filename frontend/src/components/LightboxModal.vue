@@ -3,7 +3,11 @@
     <div @click="show">
       <slot></slot>
     </div>
-    <div class="modal fade modal" :id="'lightboxModal' + id" tabindex="-1" :aria-labelledby="'lightboxModalLabel' + id"
+    <div
+      class="modal fade modal"
+      :id="'lightboxModal' + id"
+      tabindex="-1"
+      :aria-labelledby="'lightboxModalLabel' + id"
       @click="close()">
       <div class="modal-dialog modal-dialog-centered modal-fullscreen">
         <div class="d-none d-md-flex justify-content-center w-100 p-5">
@@ -22,7 +26,7 @@
 </template>
 
 <script setup>
-import { Modal } from 'bootstrap';
+import { Modal } from 'bootstrap'
 </script>
 <script>
 export default {

@@ -1,4 +1,3 @@
-
 # backend/BMC_API/src/core/lifetime.py
 from contextlib import asynccontextmanager
 
@@ -42,9 +41,7 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
 
     :param app: fastAPI application.
     """
-    engine = create_async_engine(
-        str(settings.db_url), echo=settings.db_echo, echo_pool=False
-    )
+    engine = create_async_engine(str(settings.db_url), echo=settings.db_echo, echo_pool=False)
     session_factory = async_sessionmaker(
         engine,
         expire_on_commit=False,
@@ -125,12 +122,12 @@ async def backup_database_task():
     await backup_database()
     logger.info("backup_database (periodic job) completed.")
 
+
 @repeat_every(seconds=settings.db_file_backups_clean_period_in_sec, logger=logger)
 async def clean_database_backups_task():
     logger.info("clean_database_backups (periodic job) started.")
     await clean_database_backups(age_limit=settings.db_file_backups_age_limit_in_day)
     logger.info("clean_database_backups (periodic job) completed.")
-    
 
 
 @asynccontextmanager
@@ -156,6 +153,7 @@ async def lifespan(app: FastAPI):
     await shutdown_redis(app)
     stop_opentelemetry(app)
     logger.info("Server shutdown successfully")
+
 
 # def register_startup_event(
 #     app: FastAPI,

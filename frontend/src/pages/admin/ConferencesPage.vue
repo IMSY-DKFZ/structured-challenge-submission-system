@@ -24,14 +24,13 @@
       <div
         v-if="dataSelected || showCreatePanel"
         class="pb-3">
-        <router-link
+        <button
           type="button"
           class="btn btn-secondary"
-          @click="closePanels"
-          :to="{ name: 'Admin Conferences' }">
+          @click="closePanels">
           <i class="be bi-arrow-left pe-1" />
           Go Back
-        </router-link>
+        </button>
       </div>
     </div>
 
@@ -181,31 +180,35 @@
                   </div>
                 </div>
                 <div class="col-12 col-md-6 mt-3">
-                  <label class="form-label">Proposal Start Date</label>
+                  <label class="form-label">Proposal Start Date and Time</label>
                   <input
                     v-model="editForm.proposal_start_date"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     class="form-control" />
                 </div>
                 <div class="col-12 col-md-6 mt-3">
-                  <label class="form-label">Proposal End Date</label>
+                  <label class="form-label">Proposal End Date and Time</label>
                   <input
                     v-model="editForm.proposal_end_date"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     class="form-control" />
                 </div>
                 <div class="col-12 col-md-6 mt-3">
-                  <label class="form-label">Conference Start Date</label>
+                  <label class="form-label">Conference Start Date and Time</label>
                   <input
                     v-model="editForm.start_date"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     class="form-control" />
                 </div>
                 <div class="col-12 col-md-6 mt-3">
-                  <label class="form-label">Conference End Date</label>
+                  <label class="form-label">Conference End Date and Time</label>
                   <input
                     v-model="editForm.end_date"
-                    type="date"
+                    type="datetime-local"
+                    step="1"
                     class="form-control" />
                 </div>
                 <div class="col-12 mt-3">
@@ -246,8 +249,9 @@
               <button
                 type="button"
                 class="btn btn-primary mt-4"
+                :disabled="updatePending"
                 @click="updateConference">
-                Save Conference
+                {{ updatePending ? 'Saving...' : 'Save Conference' }}
               </button>
             </VueTextSection>
 
@@ -267,11 +271,11 @@
                   v-model="current_password"></VueInput>
                 <button
                   type="button"
-                  :disabled="!current_password"
+                  :disabled="!current_password || deletePending"
                   class="btn btn-danger mt-3"
                   @click="deleteConference(dataSelected.id)">
                   <i class="be bi-trash2-fill" />
-                  Delete conference
+                  {{ deletePending ? 'Deleting...' : 'Delete conference' }}
                 </button>
               </VueTextSection>
             </VueTextSection>
@@ -372,31 +376,35 @@
             </div>
           </div>
           <div class="col-12 col-md-6 mt-3">
-            <label class="form-label">Proposal Start Date</label>
+            <label class="form-label">Proposal Start Date and Time</label>
             <input
               v-model="createForm.proposal_start_date"
-              type="date"
+              type="datetime-local"
+              step="1"
               class="form-control" />
           </div>
           <div class="col-12 col-md-6 mt-3">
-            <label class="form-label">Proposal End Date</label>
+            <label class="form-label">Proposal End Date and Time</label>
             <input
               v-model="createForm.proposal_end_date"
-              type="date"
+              type="datetime-local"
+              step="1"
               class="form-control" />
           </div>
           <div class="col-12 col-md-6 mt-3">
-            <label class="form-label">Conference Start Date</label>
+            <label class="form-label">Conference Start Date and Time</label>
             <input
               v-model="createForm.start_date"
-              type="date"
+              type="datetime-local"
+              step="1"
               class="form-control" />
           </div>
           <div class="col-12 col-md-6 mt-3">
-            <label class="form-label">Conference End Date</label>
+            <label class="form-label">Conference End Date and Time</label>
             <input
               v-model="createForm.end_date"
-              type="date"
+              type="datetime-local"
+              step="1"
               class="form-control" />
           </div>
           <div class="col-12 mt-3">
@@ -437,8 +445,9 @@
         <button
           type="button"
           class="btn btn-primary mt-4"
+          :disabled="createPending"
           @click="createConference">
-          Create Conference
+          {{ createPending ? 'Creating...' : 'Create Conference' }}
         </button>
       </VueTextSection>
     </div>
@@ -455,6 +464,7 @@
           <button
             type="button"
             class="btn btn-primary"
+            :disabled="LoadingCircleState"
             @click="openCreatePanel">
             <i class="bi bi-plus-circle me-2"></i>Create Conference
           </button>
@@ -462,7 +472,7 @@
 
         <div class="card mb-3">
           <div
-            class="card-header bg-light cursor-pointer"
+            class="card-header bg-body-tertiary cursor-pointer"
             @click="showSearchPanel = !showSearchPanel">
             <div class="d-flex justify-content-between align-items-center">
               <h6 class="mb-0">
@@ -480,7 +490,8 @@
           <div
             v-show="showSearchPanel"
             class="card-body">
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">ID</label>
                 <input
@@ -515,7 +526,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Year</label>
                 <select
@@ -548,7 +560,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">City</label>
                 <input
@@ -587,7 +600,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Proposal Start</label>
                 <select
@@ -617,7 +631,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Proposal End</label>
                 <select
@@ -742,7 +757,7 @@
               :class="{ disabled: currentPage === 1 }">
               <a
                 class="page-link"
-                @click="changePage(currentPage - 1)"
+                @click.prevent="changePage(currentPage - 1)"
                 aria-label="Previous"
                 href="#">
                 <span aria-hidden="true">&laquo;</span>
@@ -750,11 +765,13 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
-              :key="page">
+              v-for="page in visiblePages"
+              :key="page"
+              :class="{ active: currentPage === page }">
               <a
                 class="page-link"
-                @click="changePage(page)"
+                @click.prevent="changePage(page)"
+                :aria-current="currentPage === page ? 'page' : undefined"
                 href="#"
                 >{{ page }}</a
               >
@@ -762,11 +779,11 @@
             <li
               class="page-item"
               :class="{
-                disabled: currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0,
+                disabled: currentPage === totalPages || totalPages === 0,
               }">
               <a
                 class="page-link"
-                @click="changePage(currentPage + 1)"
+                @click.prevent="changePage(currentPage + 1)"
                 aria-label="Next"
                 href="#">
                 <span aria-hidden="true">&raquo;</span>
@@ -787,10 +804,11 @@
                 </th>
                 <th
                   v-for="(item, idx) in tableHeader"
-                  :key="idx"
+                  :key="item"
                   @click="sortTable(item)">
                   <a
                     href="#"
+                    @click.prevent
                     class="link-underline-primary link-offset-2 link-underline-opacity-50"
                     >{{ item }}
                     <span v-if="sortColumn === item">
@@ -806,7 +824,7 @@
             <tbody v-if="!LoadingCircleState">
               <tr
                 v-for="(item, idx) in list"
-                :key="idx"
+                :key="item.id"
                 style="cursor: pointer"
                 @click="selectData(item)">
                 <td @click.stop>
@@ -863,7 +881,7 @@
               :class="{ disabled: currentPage === 1 }">
               <a
                 class="page-link"
-                @click="changePage(currentPage - 1)"
+                @click.prevent="changePage(currentPage - 1)"
                 aria-label="Previous"
                 href="#">
                 <span aria-hidden="true">&laquo;</span>
@@ -871,11 +889,13 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
-              :key="page">
+              v-for="page in visiblePages"
+              :key="page"
+              :class="{ active: currentPage === page }">
               <a
                 class="page-link"
-                @click="changePage(page)"
+                @click.prevent="changePage(page)"
+                :aria-current="currentPage === page ? 'page' : undefined"
                 href="#"
                 >{{ page }}</a
               >
@@ -883,11 +903,11 @@
             <li
               class="page-item"
               :class="{
-                disabled: currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0,
+                disabled: currentPage === totalPages || totalPages === 0,
               }">
               <a
                 class="page-link"
-                @click="changePage(currentPage + 1)"
+                @click.prevent="changePage(currentPage + 1)"
                 aria-label="Next"
                 href="#">
                 <span aria-hidden="true">&raquo;</span>
@@ -904,7 +924,8 @@
       class="modal fade"
       :class="{ show: showBulkUpdatePanel, 'd-block': showBulkUpdatePanel }"
       tabindex="-1"
-      @click.self="showBulkUpdatePanel = false">
+      @click.self="closeBulkUpdateModal"
+      @keydown.esc="closeBulkUpdateModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-info text-white">
@@ -914,7 +935,8 @@
             <button
               type="button"
               class="btn-close btn-close-white"
-              @click="showBulkUpdatePanel = false"></button>
+              aria-label="Close"
+              @click="closeBulkUpdateModal"></button>
           </div>
           <div class="modal-body">
             <p class="mb-3">
@@ -948,14 +970,16 @@
             <button
               type="button"
               class="btn btn-secondary"
-              @click="showBulkUpdatePanel = false">
+              @click="closeBulkUpdateModal">
               Cancel
             </button>
             <button
               type="button"
               class="btn btn-info"
+              :disabled="bulkUpdatePending"
               @click="bulkUpdateConferences">
-              <i class="bi bi-check-circle me-2"></i>Apply
+              <i class="bi bi-check-circle me-2"></i
+              >{{ bulkUpdatePending ? 'Applying...' : 'Apply' }}
             </button>
           </div>
         </div>
@@ -969,7 +993,8 @@
       class="modal fade"
       :class="{ show: showBulkDeletePanel, 'd-block': showBulkDeletePanel }"
       tabindex="-1"
-      @click.self="showBulkDeletePanel = false">
+      @click.self="closeBulkDeleteModal"
+      @keydown.esc="closeBulkDeleteModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-danger text-white">
@@ -979,7 +1004,8 @@
             <button
               type="button"
               class="btn-close btn-close-white"
-              @click="showBulkDeletePanel = false"></button>
+              aria-label="Close"
+              @click="closeBulkDeleteModal"></button>
           </div>
           <div class="modal-body">
             <p class="mb-3">
@@ -1002,15 +1028,16 @@
             <button
               type="button"
               class="btn btn-secondary"
-              @click="showBulkDeletePanel = false">
+              @click="closeBulkDeleteModal">
               Cancel
             </button>
             <button
               type="button"
               class="btn btn-danger"
-              :disabled="!bulkCurrentPassword"
+              :disabled="!bulkCurrentPassword || bulkDeletePending"
               @click="bulkDeleteConferences">
-              <i class="bi bi-exclamation-triangle me-2"></i>Delete Forever
+              <i class="bi bi-exclamation-triangle me-2"></i
+              >{{ bulkDeletePending ? 'Deleting...' : 'Delete Forever' }}
             </button>
           </div>
         </div>
@@ -1096,6 +1123,10 @@ export default {
       itemsPerPage: 100,
       itemsPerPageOptions: [20, 50, 100, 200],
       totalItems: 0,
+      totalPages: 0,
+      listLoaded: false,
+      listRequestId: 0,
+      detailRequestId: 0,
       showSearchPanel: false,
       searchFilters: {
         id: '',
@@ -1130,6 +1161,11 @@ export default {
         is_lighthouse_challenge: '',
       },
       bulkCurrentPassword: '',
+      createPending: false,
+      updatePending: false,
+      deletePending: false,
+      bulkUpdatePending: false,
+      bulkDeletePending: false,
     }
   },
   async created() {
@@ -1143,15 +1179,40 @@ export default {
     useAuthStore,
     StringToPrettyDate,
     dateRangeLabel(start, end) {
-      const startLabel = start ? this.dateInputValue(start) : '-'
-      const endLabel = end ? this.dateInputValue(end) : '-'
+      const startLabel = start ? this.dateLabelValue(start) : '-'
+      const endLabel = end ? this.dateLabelValue(end) : '-'
       return `${startLabel} to ${endLabel}`
     },
-    dateInputValue(value) {
+    dateLabelValue(value) {
       if (!value) return ''
+      const rawValue = String(value)
+      if (/^\d{4}-\d{2}-\d{2}T/.test(rawValue) && !/(Z|[+-]\d{2}:\d{2})$/.test(rawValue)) {
+        return rawValue.slice(0, 10)
+      }
       const date = new Date(value)
       if (Number.isNaN(date.getTime())) return ''
-      return date.toISOString().slice(0, 10)
+      const pad = (part) => String(part).padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    },
+    datetimeInputValue(value) {
+      if (!value) return ''
+      const rawValue = String(value)
+      if (
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(rawValue) &&
+        !/(Z|[+-]\d{2}:\d{2})$/.test(rawValue)
+      ) {
+        return rawValue.slice(0, 19)
+      }
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) return ''
+      const pad = (part) => String(part).padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+        date.getHours()
+      )}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    },
+    datetimePayloadValue(value) {
+      if (!value) return null
+      return value.length === 16 ? `${value}:00` : value
     },
     normalizeLines(value) {
       if (!value) return []
@@ -1173,10 +1234,10 @@ export default {
         venue: form.venue?.trim() || null,
         city: form.city?.trim() || null,
         country: form.country?.trim() || null,
-        proposal_start_date: new Date(form.proposal_start_date).toISOString(),
-        proposal_end_date: new Date(form.proposal_end_date).toISOString(),
-        start_date: new Date(form.start_date).toISOString(),
-        end_date: new Date(form.end_date).toISOString(),
+        proposal_start_date: this.datetimePayloadValue(form.proposal_start_date),
+        proposal_end_date: this.datetimePayloadValue(form.proposal_end_date),
+        start_date: this.datetimePayloadValue(form.start_date),
+        end_date: this.datetimePayloadValue(form.end_date),
         is_lighthouse_challenge: Boolean(form.is_lighthouse_challenge),
         is_open_for_submissions: Boolean(form.is_open_for_submissions),
         chairperson_emails: this.normalizeLines(form.chairperson_emails_text),
@@ -1196,7 +1257,12 @@ export default {
       ]
 
       for (const [label, value] of requiredFields) {
-        if (value === null || value === undefined || value === '') {
+        if (
+          value === null ||
+          value === undefined ||
+          value === '' ||
+          (typeof value === 'string' && value.trim() === '')
+        ) {
           useToastAlertStore().showAlert(`${label} is required`, 'warning', 4000)
           return false
         }
@@ -1211,6 +1277,17 @@ export default {
       if (chairpersonEmails.length === 0) {
         useToastAlertStore().showAlert(
           'At least one chairperson email is required',
+          'warning',
+          4000
+        )
+        return false
+      }
+      const invalidEmail = chairpersonEmails.find(
+        (email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      )
+      if (invalidEmail) {
+        useToastAlertStore().showAlert(
+          `Invalid chairperson email: ${invalidEmail}`,
           'warning',
           4000
         )
@@ -1250,10 +1327,10 @@ export default {
         venue: item?.venue || '',
         city: item?.city || '',
         country: item?.country || '',
-        proposal_start_date: this.dateInputValue(item?.proposal_start_date),
-        proposal_end_date: this.dateInputValue(item?.proposal_end_date),
-        start_date: this.dateInputValue(item?.start_date),
-        end_date: this.dateInputValue(item?.end_date),
+        proposal_start_date: this.datetimeInputValue(item?.proposal_start_date),
+        proposal_end_date: this.datetimeInputValue(item?.proposal_end_date),
+        start_date: this.datetimeInputValue(item?.start_date),
+        end_date: this.datetimeInputValue(item?.end_date),
         is_lighthouse_challenge: Boolean(item?.is_lighthouse_challenge),
         is_open_for_submissions: Boolean(item?.is_open_for_submissions),
         chairperson_emails_text: this.arrayToLines(item?.chairperson_emails),
@@ -1261,18 +1338,25 @@ export default {
         message_before_generate_proposal: item?.message_before_generate_proposal || '',
       }
     },
-    closePanels() {
+    async closePanels() {
       this.data = {}
       this.showCreatePanel = false
       this.current_password = ''
-      this.$router.push({ name: 'Admin Conferences' })
+      if (this.$route.name !== 'Admin Conferences') {
+        await this.$router.push({ name: 'Admin Conferences' })
+      }
     },
     openCreatePanel() {
       this.showCreatePanel = true
       this.data = {}
       this.createForm = createEmptyConferenceForm()
     },
+    clearSelection() {
+      this.selectedRows = []
+      this.selectAll = false
+    },
     async getAndSetConferenceAll() {
+      const requestId = ++this.listRequestId
       this.LoadingCircleState = true
       const offset = (this.currentPage - 1) * this.itemsPerPage
       const sortBy = this.tableHeaderColumnNames[this.tableHeader.indexOf(this.sortColumn)] || 'id'
@@ -1307,43 +1391,57 @@ export default {
         search_filters: this.activeSearchFilters || null,
       }
 
-      await apiPost(apiEndpoint, payload)
-        .then((resp) => {
-          this.conferencesList = resp['content'] || []
-          this.totalItems = resp['total_records'] || 0
-          this.LoadingCircleState = false
-        })
-        .catch((e) => {
-          this.LoadingCircleState = false
-          if (e.message.includes('No Conference found') || e.message.includes('not found')) {
-            this.conferencesList = []
-            this.totalItems = 0
-            useToastAlertStore().showAlert('No conferences found matching criteria', 'info', 3000)
-          } else {
-            useToastAlertStore().showAlert(e.message, 'danger', 6000)
-          }
-        })
+      try {
+        const resp = await apiPost(apiEndpoint, payload)
+        if (requestId !== this.listRequestId) return
+        this.conferencesList = resp?.content || []
+        this.totalItems = resp?.total_records || 0
+        this.totalPages = resp?.total_pages || 0
+        this.listLoaded = true
+        if (this.totalPages > 0 && this.currentPage > this.totalPages) {
+          this.currentPage = this.totalPages
+          await this.getAndSetConferenceAll()
+        }
+      } catch (e) {
+        if (requestId !== this.listRequestId) return
+        if (e.message.includes('No Conference found') || e.message.includes('not found')) {
+          this.conferencesList = []
+          this.totalItems = 0
+          this.totalPages = 0
+          this.listLoaded = true
+          useToastAlertStore().showAlert('No conferences found matching criteria', 'info', 3000)
+        } else {
+          useToastAlertStore().showAlert(e.message, 'danger', 6000)
+        }
+      } finally {
+        if (requestId === this.listRequestId) this.LoadingCircleState = false
+      }
     },
     async getConferenceById(id) {
+      if (!Number.isInteger(id) || id < 1) {
+        useToastAlertStore().showAlert('Invalid conference ID', 'danger', 6000)
+        await this.$router.replace({ name: 'Admin Conferences' })
+        return
+      }
+      const requestId = ++this.detailRequestId
       this.LoadingCircleState = true
-      await apiGet(`/admin/conference/${id}`)
-        .then((resp) => {
-          if (!resp) {
-            throw new Error('Conference not found')
-          }
-          this.data = {
-            data: resp,
-            index: 0,
-          }
-          this.populateEditForm(resp)
-          this.showCreatePanel = false
-          this.LoadingCircleState = false
-        })
-        .catch((e) => {
-          this.LoadingCircleState = false
-          useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
-          this.$router.push({ name: 'Admin Conferences' })
-        })
+      try {
+        const resp = await apiGet(`/admin/conference/${id}`)
+        if (requestId !== this.detailRequestId) return
+        if (!resp) throw new Error('Conference not found')
+        this.data = {
+          data: resp,
+          index: 0,
+        }
+        this.populateEditForm(resp)
+        this.showCreatePanel = false
+      } catch (e) {
+        if (requestId !== this.detailRequestId) return
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+        await this.$router.replace({ name: 'Admin Conferences' })
+      } finally {
+        if (requestId === this.detailRequestId) this.LoadingCircleState = false
+      }
     },
     selectData(item) {
       this.data = {
@@ -1356,37 +1454,70 @@ export default {
       this.$router.push({ name: 'Admin Conference Overview', params: { id: item.id } })
     },
     buildDateFilter(operator, firstDate, secondDate, fieldName, filters) {
-      if (!operator || !firstDate) return
-      const date1 = new Date(firstDate).toISOString()
+      if (!operator || !firstDate) return true
+      const startOfFirstDay = new Date(`${firstDate}T00:00:00.000`)
+      const endOfFirstDay = new Date(`${firstDate}T23:59:59.999`)
+      if (Number.isNaN(startOfFirstDay.getTime())) return false
       if (operator === 'lt') {
-        filters[`${fieldName}__lt`] = date1
+        filters[`${fieldName}__lt`] = startOfFirstDay.toISOString()
       } else if (operator === 'gt') {
-        filters[`${fieldName}__gt`] = date1
-      } else if (operator === 'between' && secondDate) {
-        filters[`${fieldName}__between`] = [date1, new Date(secondDate).toISOString()]
+        filters[`${fieldName}__gt`] = endOfFirstDay.toISOString()
+      } else if (operator === 'between') {
+        if (!secondDate) {
+          useToastAlertStore().showAlert('A To Date is required for date ranges', 'warning', 4000)
+          return false
+        }
+        const endOfSecondDay = new Date(`${secondDate}T23:59:59.999`)
+        if (Number.isNaN(endOfSecondDay.getTime()) || startOfFirstDay > endOfSecondDay) {
+          useToastAlertStore().showAlert(
+            'The From Date must not be after the To Date',
+            'warning',
+            4000
+          )
+          return false
+        }
+        filters[`${fieldName}__between`] = [
+          startOfFirstDay.toISOString(),
+          endOfSecondDay.toISOString(),
+        ]
       }
+      return true
     },
     buildSearchFilters() {
       const filters = {}
-      if (this.searchFilters.id) filters.id = this.searchFilters.id
-      if (this.searchFilters.name) filters.name__ilike = `%${this.searchFilters.name.trim()}%`
-      if (this.searchFilters.short_name) {
-        filters.short_name__ilike = `%${this.searchFilters.short_name.trim()}%`
+      if (this.searchFilters.id) filters.id = Number(this.searchFilters.id)
+      const name = this.searchFilters.name.trim()
+      const shortName = this.searchFilters.short_name.trim()
+      const city = this.searchFilters.city.trim()
+      const country = this.searchFilters.country.trim()
+      if (name) filters.name__ilike = name
+      if (shortName) {
+        filters.short_name__ilike = shortName
       }
-      if (this.searchFilters.owner_id) filters.owner_id = this.searchFilters.owner_id
-      if (this.searchFilters.city) filters.city__ilike = `%${this.searchFilters.city.trim()}%`
-      if (this.searchFilters.country) {
-        filters.country__ilike = `%${this.searchFilters.country.trim()}%`
+      if (this.searchFilters.owner_id) filters.owner_id = Number(this.searchFilters.owner_id)
+      if (city) filters.city__ilike = city
+      if (country) {
+        filters.country__ilike = country
       }
       if (this.searchFilters.year_operator && this.searchFilters.year) {
+        const firstYear = Number(this.searchFilters.year)
         if (this.searchFilters.year_operator === 'eq') {
-          filters.year = this.searchFilters.year
+          filters.year = firstYear
         } else if (this.searchFilters.year_operator === 'lt') {
-          filters.year__lt = this.searchFilters.year
+          filters.year__lt = firstYear
         } else if (this.searchFilters.year_operator === 'gt') {
-          filters.year__gt = this.searchFilters.year
-        } else if (this.searchFilters.year_operator === 'between' && this.searchFilters.year2) {
-          filters.year__between = [this.searchFilters.year, this.searchFilters.year2]
+          filters.year__gt = firstYear
+        } else if (this.searchFilters.year_operator === 'between') {
+          const secondYear = Number(this.searchFilters.year2)
+          if (!this.searchFilters.year2 || firstYear > secondYear) {
+            useToastAlertStore().showAlert(
+              'A valid To Year greater than or equal to From Year is required',
+              'warning',
+              4000
+            )
+            return undefined
+          }
+          filters.year__between = [firstYear, secondYear]
         }
       }
       if (this.searchFilters.is_open_for_submissions !== '') {
@@ -1395,33 +1526,37 @@ export default {
       if (this.searchFilters.is_lighthouse_challenge !== '') {
         filters.is_lighthouse_challenge = this.searchFilters.is_lighthouse_challenge === 'true'
       }
-      this.buildDateFilter(
+      const proposalStartValid = this.buildDateFilter(
         this.searchFilters.proposal_start_operator,
         this.searchFilters.proposal_start_date1,
         this.searchFilters.proposal_start_date2,
         'proposal_start_date',
         filters
       )
-      this.buildDateFilter(
+      const proposalEndValid = this.buildDateFilter(
         this.searchFilters.proposal_end_operator,
         this.searchFilters.proposal_end_date1,
         this.searchFilters.proposal_end_date2,
         'proposal_end_date',
         filters
       )
+      if (!proposalStartValid || !proposalEndValid) return undefined
       return Object.keys(filters).length > 0 ? filters : null
     },
-    applySearch() {
-      this.activeSearchFilters = this.buildSearchFilters()
+    async applySearch() {
+      const filters = this.buildSearchFilters()
+      if (filters === undefined) return
+      this.activeSearchFilters = filters
       this.currentPage = 1
-      this.getAndSetConferenceAll()
+      this.clearSelection()
+      await this.getAndSetConferenceAll()
       if (this.activeSearchFilters) {
         useToastAlertStore().showAlert('Search filters applied', 'success', 3000)
       } else {
         useToastAlertStore().showAlert('No filters to apply', 'info', 3000)
       }
     },
-    clearSearch() {
+    async clearSearch() {
       this.searchFilters = {
         id: '',
         name: '',
@@ -1443,94 +1578,110 @@ export default {
       }
       this.activeSearchFilters = null
       this.currentPage = 1
-      this.getAndSetConferenceAll()
+      this.clearSelection()
+      await this.getAndSetConferenceAll()
       useToastAlertStore().showAlert('Search filters cleared', 'success', 3000)
     },
-    changePage(page) {
-      if (page >= 1 && page <= Math.ceil(this.totalItems / this.itemsPerPage)) {
+    async changePage(page) {
+      if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
         this.currentPage = page
+        this.clearSelection()
+        await this.getAndSetConferenceAll()
       }
     },
-    changeItemsPerPage(option) {
+    async changeItemsPerPage(option) {
       this.itemsPerPage = option
       this.currentPage = 1
-      this.getAndSetConferenceAll()
+      this.clearSelection()
+      await this.getAndSetConferenceAll()
     },
-    sortTable(column) {
+    async sortTable(column) {
       if (this.sortColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc'
       } else {
         this.sortDirection = 'asc'
       }
       this.sortColumn = column
-      this.getAndSetConferenceAll()
+      this.clearSelection()
+      await this.getAndSetConferenceAll()
     },
     selectAllRows() {
       if (this.selectAll) {
-        this.selectedRows = this.conferencesList.map((item) => item.id)
+        this.selectedRows = this.list.map((item) => item.id)
       } else {
         this.selectedRows = []
       }
     },
     async createConference() {
+      if (this.createPending) return
       if (!this.validateConferenceForm(this.createForm)) return
       const payload = this.buildConferencePayload(this.createForm)
-      await apiPost('/admin/conference/create', payload)
-        .then(async (resp) => {
-          useToastAlertStore().showAlert('Conference created', 'success')
-          this.createForm = createEmptyConferenceForm()
-          this.showCreatePanel = false
-          this.currentPage = 1
-          await this.getAndSetConferenceAll()
-          if (resp?.id) {
-            this.selectData(resp)
-          }
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
-        })
+      this.createPending = true
+      try {
+        const resp = await apiPost('/admin/conference/create', payload)
+        useToastAlertStore().showAlert('Conference created', 'success')
+        this.createForm = createEmptyConferenceForm()
+        this.showCreatePanel = false
+        this.currentPage = 1
+        this.clearSelection()
+        await this.getAndSetConferenceAll()
+        if (resp?.id) this.selectData(resp)
+      } catch (e) {
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+      } finally {
+        this.createPending = false
+      }
     },
     async updateConference() {
+      if (this.updatePending) return
       if (!this.dataSelected?.id) return
       if (!this.validateConferenceForm(this.editForm)) return
       const payload = this.buildConferencePayload(this.editForm)
-      await apiPut(`/admin/conference/${this.dataSelected.id}/update`, payload)
-        .then(async (resp) => {
-          useToastAlertStore().showAlert('Conference updated', 'success')
-          this.data = {
-            data: resp.data,
-            index: 0,
-          }
-          this.populateEditForm(resp.data)
-          await this.getAndSetConferenceAll()
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
-        })
+      this.updatePending = true
+      try {
+        const resp = await apiPut(`/admin/conference/${this.dataSelected.id}/update`, payload)
+        useToastAlertStore().showAlert('Conference updated', 'success')
+        this.data = {
+          data: resp.data,
+          index: 0,
+        }
+        this.populateEditForm(resp.data)
+        await this.getAndSetConferenceAll()
+      } catch (e) {
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+      } finally {
+        this.updatePending = false
+      }
     },
     async deleteConference(id) {
+      if (this.deletePending) return
       const ok = await this.$refs.confirmDialogue.show({
         title: 'Delete conference',
         message: 'Are you sure you want to delete this conference? It cannot be undone.',
         okButton: 'Delete forever',
         okButtonTheme: 'btn-danger',
       })
-      if (!ok) return
+      if (!ok) {
+        this.current_password = ''
+        return
+      }
 
-      await apiDelete(
-        `/admin/conference/${id}/delete?active_user_password=${encodeURIComponent(
-          this.current_password
-        )}`
-      )
-        .then(async () => {
-          useToastAlertStore().showAlert('Conference deleted', 'success')
-          this.current_password = ''
-          this.closePanels()
-          await this.getAndSetConferenceAll()
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
-        })
+      this.deletePending = true
+      try {
+        await apiDelete(
+          `/admin/conference/${id}/delete?active_user_password=${encodeURIComponent(
+            this.current_password
+          )}`
+        )
+        useToastAlertStore().showAlert('Conference deleted', 'success')
+        this.current_password = ''
+        await this.closePanels()
+        await this.getAndSetConferenceAll()
+      } catch (e) {
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+      } finally {
+        this.deletePending = false
+      }
     },
     openBulkUpdateModal() {
       this.showBulkUpdatePanel = true
@@ -1539,11 +1690,42 @@ export default {
         is_lighthouse_challenge: '',
       }
     },
+    closeBulkUpdateModal() {
+      if (this.bulkUpdatePending) return
+      this.showBulkUpdatePanel = false
+    },
     openBulkDeleteModal() {
       this.showBulkDeletePanel = true
       this.bulkCurrentPassword = ''
     },
+    closeBulkDeleteModal() {
+      if (this.bulkDeletePending) return
+      this.showBulkDeletePanel = false
+      this.bulkCurrentPassword = ''
+    },
+    bulkResultSummary(result, operation) {
+      const successful = Array.isArray(result?.successful) ? result.successful : []
+      const failed = Array.isArray(result?.failed) ? result.failed : []
+      const failedIds = failed
+        .map((item) => item?.id ?? item?.data?.id)
+        .filter((id) => id !== undefined)
+      if (failed.length > 0) {
+        const failedLabel = failedIds.length > 0 ? ` Failed IDs: ${failedIds.join(', ')}.` : ''
+        useToastAlertStore().showAlert(
+          `${operation}: ${successful.length} succeeded, ${failed.length} failed.${failedLabel}`,
+          successful.length > 0 ? 'warning' : 'danger',
+          7000
+        )
+      } else {
+        useToastAlertStore().showAlert(
+          `${operation}: ${successful.length} conference(s) succeeded`,
+          'success'
+        )
+      }
+      return { successfulCount: successful.length, failedIds }
+    },
     async bulkUpdateConferences() {
+      if (this.bulkUpdatePending) return
       if (this.selectedRows.length === 0) return
       if (
         this.bulkUpdate.open_for_submissions === '' &&
@@ -1564,44 +1746,45 @@ export default {
         return update
       })
 
-      await apiPut('/admin/conference/bulk-update', updates)
-        .then(async () => {
-          useToastAlertStore().showAlert(
-            `Updated ${this.selectedRows.length} conference(s)`,
-            'success'
-          )
-          this.showBulkUpdatePanel = false
-          this.selectedRows = []
-          this.selectAll = false
-          await this.getAndSetConferenceAll()
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
-        })
+      this.bulkUpdatePending = true
+      try {
+        const resp = await apiPut('/admin/conference/bulk-update', updates)
+        const summary = this.bulkResultSummary(resp.data, 'Bulk update')
+        this.selectedRows = summary.failedIds
+        this.selectAll = false
+        this.showBulkUpdatePanel = summary.failedIds.length > 0
+        if (summary.successfulCount > 0) await this.getAndSetConferenceAll()
+      } catch (e) {
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+      } finally {
+        this.bulkUpdatePending = false
+      }
     },
     async bulkDeleteConferences() {
+      if (this.bulkDeletePending) return
       if (this.selectedRows.length === 0) return
       if (!this.bulkCurrentPassword) {
         useToastAlertStore().showAlert('Password required', 'warning', 4000)
         return
       }
 
-      await api
-        .delete('/admin/conference/bulk-delete', {
+      this.bulkDeletePending = true
+      try {
+        const result = await apiDelete('/admin/conference/bulk-delete', {
           params: { active_user_password: this.bulkCurrentPassword },
           data: this.selectedRows,
         })
-        .then(async () => {
-          useToastAlertStore().showAlert('Conferences deleted successfully', 'success')
-          this.showBulkDeletePanel = false
-          this.bulkCurrentPassword = ''
-          this.selectedRows = []
-          this.selectAll = false
-          await this.getAndSetConferenceAll()
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e?.response?.data?.detail || e.message, 'danger', 6000)
-        })
+        const summary = this.bulkResultSummary(result, 'Bulk delete')
+        this.selectedRows = summary.failedIds
+        this.selectAll = false
+        this.showBulkDeletePanel = summary.failedIds.length > 0
+        this.bulkCurrentPassword = ''
+        if (summary.successfulCount > 0) await this.getAndSetConferenceAll()
+      } catch (e) {
+        useToastAlertStore().showAlert(e.message || e, 'danger', 6000)
+      } finally {
+        this.bulkDeletePending = false
+      }
     },
   },
   computed: {
@@ -1612,9 +1795,6 @@ export default {
       return this.data.data
     },
     list() {
-      if (this.activeSearchFilters !== null) {
-        return this.conferencesList
-      }
       const needle = this.searchString.toLowerCase().trim()
       return needle === ''
         ? this.conferencesList
@@ -1628,16 +1808,35 @@ export default {
               item.country?.toLowerCase().includes(needle)
           )
     },
+    visiblePages() {
+      if (this.totalPages <= 0) return []
+      const windowSize = 7
+      let start = Math.max(1, this.currentPage - Math.floor(windowSize / 2))
+      const end = Math.min(this.totalPages, start + windowSize - 1)
+      start = Math.max(1, end - windowSize + 1)
+      return Array.from({ length: end - start + 1 }, (_, index) => start + index)
+    },
     hasActiveFilters() {
       return this.activeSearchFilters !== null
     },
   },
   watch: {
-    currentPage: 'getAndSetConferenceAll',
-    $route(val) {
+    searchString() {
+      this.clearSelection()
+    },
+    selectedRows() {
+      const visibleIds = this.list.map((item) => item.id)
+      this.selectAll =
+        visibleIds.length > 0 && visibleIds.every((id) => this.selectedRows.includes(id))
+    },
+    async $route(val) {
       if (val.name === 'Admin Conferences') {
         this.data = {}
         this.showCreatePanel = false
+        if (!this.listLoaded) await this.getAndSetConferenceAll()
+      } else if (val.name === 'Admin Conference Overview') {
+        const id = Number(val.params.id)
+        if (this.dataSelected?.id !== id) await this.getConferenceById(id)
       }
     },
   },

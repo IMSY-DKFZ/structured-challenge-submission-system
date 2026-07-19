@@ -4,7 +4,7 @@
 from datetime import datetime
 from typing import Annotated, Any, Dict, List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, Path, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Path, status
 from loguru import logger
 
 # from pydantic import EmailStr
@@ -34,6 +34,31 @@ from BMC_API.src.infrastructure.persistence.dao.user_dao import SQLAlchemyUserRe
 router = APIRouter(
     dependencies=[Depends(RoleChecker([Roles.ADMIN]))]
 )  # IMPORTANT: dependency injection among al endpoints here for role checking
+
+
+def _validate_role_update(update: Dict[str, Any]) -> None:
+    if "roles" in update and not update["roles"]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="A user must have at least one role.",
+        )
+
+
+def _validate_self_update(user_id: int, current_user_id: int, update: Dict[str, Any]) -> None:
+    roles = update.get("roles")
+    _validate_role_update(update)
+    if user_id != current_user_id:
+        return
+    if update.get("disabled") is True:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot disable your own account.",
+        )
+    if roles is not None and Roles.ADMIN not in roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot remove your own Admin role.",
+        )
 
 
 # Dependency functions
@@ -126,6 +151,8 @@ async def update_user_route_admin(
 
     logger.info(f"Received admin request to update user with id: {id}")
     entity_data = model_update.model_dump()
+    requested_update = model_update.model_dump(include=model_update.model_fields_set)
+    _validate_self_update(id, current_active_user.id, requested_update)
     entity_data["modified_time"] = datetime.now()
     updated_user = await service.update(id=id, user_update=entity_data)
     logger.info(f"User with id {id} updated successfully by {current_active_user.email}.")
@@ -150,6 +177,12 @@ async def bulk_update_users_route_admin(
     Each update in the list must contain the user ID and the fields to update.
     """
     logger.info(f"Received admin request to bulk update {len(updates)} users")
+    for update in updates:
+        user_id = update.get("id")
+        if isinstance(user_id, int):
+            _validate_self_update(user_id, current_active_user.id, update)
+        else:
+            _validate_role_update(update)
     results = await service.update_bulk(updates=updates)
     logger.info(results.detail, f"Requested by {current_active_user.email}.")
     return results
@@ -171,6 +204,11 @@ async def delete_user_route_admin(
     The ID of entity to be deleted is taken from the URI.
     """
     logger.info(f"Received admin request to delete user with id: {id}")
+    if id == current_active_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot delete your own account.",
+        )
     await service.delete(id=id)
     logger.info(f"User with id: {id} deleted successfully by {current_active_user.email}.")
     return {"detail": "User deleted"}
@@ -196,6 +234,11 @@ async def bulk_delete_users_route_admin(
     The IDs of users to be deleted must be provided as a list.
     """
     logger.info(f"Received admin request to bulk delete {len(ids)} users")
+    if current_active_user.id in ids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot delete your own account.",
+        )
     results = await service.delete_bulk(ids=ids)
     logger.info(results.detail, f"Requested by {current_active_user.email}.")
     return results

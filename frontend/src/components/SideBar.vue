@@ -343,7 +343,12 @@ export default {
               icon: 'person-video2',
               color: 'red',
             },
-            // { name: 'Management', to: '/management', icon: 'gear' },
+            {
+              name: 'Management',
+              to: '/submission-system/admin-management',
+              icon: 'gear',
+              color: 'red',
+            },
           ],
         },
         {

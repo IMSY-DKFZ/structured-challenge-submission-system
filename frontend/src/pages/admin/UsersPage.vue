@@ -121,10 +121,17 @@
           </div>
           <div class="col-12 col-md-8">
             <hr />
+            <div
+              v-if="isSelectedCurrentUser"
+              class="alert alert-warning">
+              Your own administrator account cannot be disabled, deleted, or stripped of its Admin
+              role.
+            </div>
             <VueTextSection title-size="h4">
               <template #title>Change users roles</template>
               <VueForm
-                @submit="changeRoles(dataSelected.id)"
+                @submit-event="changeRoles(dataSelected.id)"
+                :disabled="mutationPending"
                 :action-btn-fullwidth="false"
                 action-btn="Send"
                 name="roles">
@@ -158,6 +165,7 @@
                 action-btn="Apply"
                 name="enableDisableUser"
                 :action-btn-fullwidth="false"
+                :disabled="mutationPending || isSelectedCurrentUser"
                 @submit-event="setEnableDisableUser(dataSelected.id)">
                 <VueInput
                   v-model="enableDisableUser"
@@ -178,6 +186,7 @@
               <button
                 type="button"
                 class="btn btn-warning mt-3"
+                :disabled="mutationPending"
                 @click="resetPasswordToken(dataSelected.email)">
                 <i class="be bi-trash2-fill" />
                 Request new reset token
@@ -199,7 +208,7 @@
                   v-model="current_password"></VueInput>
                 <button
                   type="button"
-                  :disabled="!current_password"
+                  :disabled="!current_password || mutationPending || isSelectedCurrentUser"
                   class="btn btn-danger mt-3"
                   @click="deleteUser(dataSelected.id)">
                   <i class="be bi-fire" />
@@ -227,7 +236,7 @@
       <div class="admin-list-shell">
         <div class="card mb-3">
           <div
-            class="card-header bg-light cursor-pointer"
+            class="card-header bg-body-tertiary cursor-pointer"
             @click="showSearchPanel = !showSearchPanel">
             <div class="d-flex justify-content-between align-items-center">
               <h6 class="mb-0">
@@ -245,7 +254,8 @@
           <div
             v-show="showSearchPanel"
             class="card-body">
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">ID</label>
                 <input
@@ -281,7 +291,7 @@
             </div>
 
             <div class="d-flex gap-2 mb-2">
-              <div class="w-100 p-2 text-bg-light border border-secondary-subtle rounded">
+              <div class="w-100 p-2 bg-body-tertiary border border-secondary-subtle rounded">
                 <label class="form-label small fw-bold text-nowrap">Role</label>
                 <select
                   v-model="searchFilters.role"
@@ -292,7 +302,7 @@
                   <option value="Organizer">Organizer</option>
                 </select>
               </div>
-              <div class="w-100 p-2 text-bg-light border border-secondary-subtle rounded">
+              <div class="w-100 p-2 bg-body-tertiary border border-secondary-subtle rounded">
                 <label class="form-label small fw-bold text-nowrap">Disabled?</label>
                 <select
                   v-model="searchFilters.disabled"
@@ -305,7 +315,8 @@
               <div class="w-100 border-0"></div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Created Time</label>
                 <select
@@ -457,10 +468,17 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
+              v-for="page in visiblePages"
               :key="page">
-              <a
+              <span
+                v-if="page === 'ellipsis-left' || page === 'ellipsis-right'"
                 class="page-link"
+                >…</span
+              >
+              <a
+                v-else
+                class="page-link"
+                :class="{ active: currentPage === page }"
                 @click="changePage(page)"
                 href="#"
                 >{{ page }}</a
@@ -576,10 +594,17 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
+              v-for="page in visiblePages"
               :key="page">
-              <a
+              <span
+                v-if="page === 'ellipsis-left' || page === 'ellipsis-right'"
                 class="page-link"
+                >…</span
+              >
+              <a
+                v-else
+                class="page-link"
+                :class="{ active: currentPage === page }"
                 @click="changePage(page)"
                 href="#"
                 >{{ page }}</a
@@ -677,6 +702,7 @@
             <button
               type="button"
               class="btn btn-warning"
+              :disabled="mutationPending"
               @click="bulkChangeRoles">
               <i class="bi bi-check-circle me-2"></i>Apply Roles
             </button>
@@ -728,7 +754,7 @@
             <button
               type="button"
               class="btn btn-info"
-              :disabled="!bulkEnableDisableSelection"
+              :disabled="!bulkEnableDisableSelection || mutationPending"
               @click="bulkEnableDisable">
               <i class="bi bi-check-circle me-2"></i>Apply
             </button>
@@ -783,7 +809,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              :disabled="!bulkCurrentPassword"
+              :disabled="!bulkCurrentPassword || mutationPending"
               @click="bulkDeleteUsers">
               <i class="bi bi-exclamation-triangle me-2"></i>Delete Forever
             </button>
@@ -820,11 +846,6 @@ export default {
     CollapseSection,
     VueTextSection,
     VueForm,
-  },
-  mounted() {
-    if (this.$route.params.id && !this.dataSelected) {
-      this.$router.push({ name: 'Users' })
-    }
   },
   data() {
     return {
@@ -872,20 +893,70 @@ export default {
       },
       bulkEnableDisableSelection: '',
       bulkCurrentPassword: '',
+      mutationPending: false,
+      listRequestId: 0,
+      detailRequestId: 0,
     }
   },
   async created() {
     await this.getAndSetUserAll()
+    await this.loadUserFromRoute()
   },
   methods: {
     useAuthStore,
     StringToPrettyDate,
-    async getAndSetUserAll() {
+    clearSelection() {
+      this.selectedRows = []
+      this.selectAll = false
+    },
+    applyUserSelection(user) {
+      this.data = { data: user, index: this.usersList.findIndex((item) => item.id === user.id) }
+      this.setUserRolesCheckbox()
+      this.enableDisableUser = user.disabled ? 'Enable user' : 'Disable user'
+    },
+    async loadUserFromRoute() {
+      const requestId = ++this.detailRequestId
+      const id = Number(this.$route.params.id)
+      if (!Number.isInteger(id) || id < 1) {
+        if (this.$route.params.id) {
+          useToastAlertStore().showAlert('Invalid user ID', 'danger', 4000)
+          await this.$router.replace({ name: 'Users' })
+        }
+        return
+      }
+      try {
+        const user = await apiGet(`/admin/user/${id}`)
+        if (requestId !== this.detailRequestId || Number(this.$route.params.id) !== id) return
+        this.applyUserSelection(user)
+      } catch (error) {
+        if (requestId !== this.detailRequestId) return
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+        await this.$router.replace({ name: 'Users' })
+      }
+    },
+    async getAndSetUserAll(preserveSelection = false) {
+      const requestId = ++this.listRequestId
+      this.LoadingCircleState = true
+      if (!preserveSelection) this.clearSelection()
       const offset = (this.currentPage - 1) * this.itemsPerPage
       const apiEndpoint = `/admin/user/all?limit=${this.itemsPerPage}&offset=${offset}`
 
       let payload = {
         search_filters: this.activeSearchFilters || {}, // Pass active filters
+        output_filters: [
+          'id',
+          'email',
+          'first_name',
+          'last_name',
+          'roles',
+          'disabled',
+          'created_time',
+          'modified_time',
+          'last_login_time',
+          'institution',
+          'city',
+          'country',
+        ],
       }
 
       // Add sorting params to URL or payload?
@@ -897,11 +968,20 @@ export default {
 
       await apiPost(apiEndpoint + sortParams, payload)
         .then((resp) => {
+          if (requestId !== this.listRequestId) return
           this.usersList = resp['content']
           this.totalItems = resp['total_records']
+          if (
+            this.totalItems > 0 &&
+            this.currentPage > Math.ceil(this.totalItems / this.itemsPerPage)
+          ) {
+            this.currentPage = Math.ceil(this.totalItems / this.itemsPerPage)
+            return
+          }
           this.LoadingCircleState = false
         })
         .catch((e) => {
+          if (requestId !== this.listRequestId) return
           this.LoadingCircleState = false
           if (e.message.includes('No User found') || e.message.includes('not found')) {
             this.usersList = []
@@ -913,57 +993,86 @@ export default {
         })
     },
     selectData(item, idx) {
-      this.data = {
-        data: item,
-        index: idx,
-      }
-      this.setUserRolesCheckbox()
+      this.applyUserSelection(item)
       this.$router.push({ name: 'User Overview', params: { id: item.id } })
     },
     unselectData() {
+      this.detailRequestId += 1
       this.data = {}
       this.searchString = ''
+      this.current_password = ''
+      this.enableDisableUser = ''
     },
     async changeRoles(userId) {
-      this.dataSelected.roles = this.setNewUserRoles
-      await apiPut(`admin/user/update/${userId}`, { roles: this.dataSelected.roles })
-        .then(() => {
-          useToastAlertStore().showAlert('The roles were changed', 'success')
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e, 'danger', 6000)
-        })
+      const roles = this.setNewUserRoles
+      if (roles.length === 0) {
+        useToastAlertStore().showAlert('A user must have at least one role', 'warning', 4000)
+        return
+      }
+      if (this.isSelectedCurrentUser && !roles.includes('Admin')) {
+        useToastAlertStore().showAlert('You cannot remove your own Admin role', 'warning', 4000)
+        this.setUserRolesCheckbox()
+        return
+      }
+      if (this.mutationPending) return
+      this.mutationPending = true
+      try {
+        const response = await apiPut(`admin/user/update/${userId}`, { roles })
+        this.applyUserSelection(response.data)
+        useToastAlertStore().showAlert('The roles were changed', 'success')
+        await this.getAndSetUserAll()
+      } catch (error) {
+        this.setUserRolesCheckbox()
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
+      }
     },
     async setEnableDisableUser(userId) {
-      let user_disabled
-      if (this.enableDisableUser === 'Disable user') {
-        user_disabled = true
-        this.data.data.disabled = true
-      } else {
-        user_disabled = false
-        this.data.data.disabled = false
+      if (!this.enableDisableUser) {
+        useToastAlertStore().showAlert(
+          'Select whether to enable or disable the user',
+          'warning',
+          4000
+        )
+        return
       }
-      let data = {
-        disabled: user_disabled,
+      const disabled = this.enableDisableUser === 'Disable user'
+      if (this.isSelectedCurrentUser && disabled) {
+        useToastAlertStore().showAlert('You cannot disable your own account', 'warning', 4000)
+        return
       }
-      await apiPut(`admin/user/update/${userId}`, data)
-        .then(() => {
-          useToastAlertStore().showAlert('User updated', 'success')
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e, 'danger', 6000)
-        })
+      if (this.mutationPending) return
+      this.mutationPending = true
+      try {
+        const response = await apiPut(`admin/user/update/${userId}`, { disabled })
+        this.applyUserSelection(response.data)
+        useToastAlertStore().showAlert('User updated', 'success')
+        await this.getAndSetUserAll()
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
+      }
     },
     async resetPasswordToken(userEmail) {
-      await apiPost(`user/reset_password_request?email=${encodeURIComponent(userEmail)}`)
-        .then(() => {
-          useToastAlertStore().showAlert('A new password reset token was sent to user', 'success')
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e, 'danger', 6000)
-        })
+      if (this.mutationPending) return
+      this.mutationPending = true
+      try {
+        await apiPost(`user/reset_password_request?email=${encodeURIComponent(userEmail)}`)
+        useToastAlertStore().showAlert('A new password reset token was sent to user', 'success')
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
+      }
     },
     async deleteUser(userId) {
+      if (this.isSelectedCurrentUser) {
+        useToastAlertStore().showAlert('You cannot delete your own account', 'warning', 4000)
+        return
+      }
+      if (this.mutationPending) return
       const ok = await this.$refs.confirmDialogue.show({
         title: 'Delete user',
         message: 'Are you sure you want to delete this user? It cannot be undone.',
@@ -971,28 +1080,29 @@ export default {
         okButtonTheme: 'btn-danger',
       })
       if (ok) {
-        await apiDelete(`admin/user/delete/${userId}?active_user_password=${this.current_password}`)
-          .then(() => {
-            useToastAlertStore().showAlert('The user was permanently deleted', 'success')
-            setTimeout(1000)
-            location.reload()
+        this.mutationPending = true
+        try {
+          await apiDelete(`admin/user/delete/${userId}`, {
+            params: { active_user_password: this.current_password },
           })
-          .catch((e) => {
-            useToastAlertStore().showAlert(e, 'danger', 6000)
-          })
+          useToastAlertStore().showAlert('The user was permanently deleted', 'success')
+          this.current_password = ''
+          await this.$router.push({ name: 'Users' })
+          await this.getAndSetUserAll()
+        } catch (error) {
+          useToastAlertStore().showAlert(error.message, 'danger', 6000)
+        } finally {
+          this.mutationPending = false
+        }
       } else {
+        this.current_password = ''
       }
-    },
-    getUsers() {
-      const request = apiGet('admin/user/all')
-      this.usersList = request ? request : []
     },
     setUserRolesCheckbox() {
       this.isAdmin = false
       this.isOrganizer = false
       this.isSubAdmin = false
-
-      this.dataSelected.roles.forEach((x) => {
+      ;(this.dataSelected?.roles || []).forEach((x) => {
         if (x === 'Admin') {
           this.isAdmin = true
         } else if (x === 'Organizer') {
@@ -1009,8 +1119,11 @@ export default {
     },
     changeItemsPerPage(option) {
       this.itemsPerPage = option
-      this.currentPage = 1 // Reset to the first page when items per page changes
-      this.getAndSetUserAll()
+      this.reloadFromFirstPage()
+    },
+    reloadFromFirstPage() {
+      if (this.currentPage === 1) this.getAndSetUserAll()
+      else this.currentPage = 1
     },
     buildSearchFilters() {
       const filters = {}
@@ -1049,16 +1162,25 @@ export default {
           this.searchFilters.created_time_operator === 'between' &&
           this.searchFilters.created_time_date2
         ) {
-          const date2 = new Date(this.searchFilters.created_time_date2).toISOString()
+          const endDate = new Date(this.searchFilters.created_time_date2)
+          endDate.setHours(23, 59, 59, 999)
+          const date2 = endDate.toISOString()
           filters.created_time__between = [date1, date2]
         }
       }
       return Object.keys(filters).length > 0 ? filters : null
     },
     applySearch() {
+      if (
+        this.searchFilters.created_time_operator === 'between' &&
+        (!this.searchFilters.created_time_date2 ||
+          this.searchFilters.created_time_date1 > this.searchFilters.created_time_date2)
+      ) {
+        useToastAlertStore().showAlert('Choose a valid created date range', 'warning', 4000)
+        return
+      }
       this.activeSearchFilters = this.buildSearchFilters()
-      this.currentPage = 1
-      this.getAndSetUserAll()
+      this.reloadFromFirstPage()
       if (this.activeSearchFilters) {
         useToastAlertStore().showAlert('Search filters applied', 'success', 3000)
       } else {
@@ -1078,8 +1200,7 @@ export default {
         created_time_date2: '',
       }
       this.activeSearchFilters = null
-      this.currentPage = 1
-      this.getAndSetUserAll()
+      this.reloadFromFirstPage()
       useToastAlertStore().showAlert('Search filters cleared', 'success', 3000)
     },
     sortTable(column) {
@@ -1089,11 +1210,11 @@ export default {
         this.sortDirection = 'asc'
       }
       this.sortColumn = column
-      this.getAndSetUserAll() // Reload with server-side sorting
+      this.reloadFromFirstPage()
     },
     selectAllRows() {
       if (this.selectAll) {
-        this.selectedRows = this.usersList.map((item) => item.id)
+        this.selectedRows = this.list.map((item) => item.id)
       } else {
         this.selectedRows = []
       }
@@ -1110,6 +1231,31 @@ export default {
       this.showBulkDeletePanel = true
       this.bulkCurrentPassword = ''
     },
+    selectedIncludesCurrentUser() {
+      return this.selectedRows.includes(this.activeUserId)
+    },
+    finishBulkOperation(result, operationLabel) {
+      const successful = Array.isArray(result?.successful) ? result.successful : []
+      const failed = Array.isArray(result?.failed) ? result.failed : []
+      const failedIds = failed
+        .map((item) => Number(item?.id ?? item?.entity_id ?? item?.data?.id))
+        .filter(Number.isInteger)
+      this.selectedRows = failedIds
+      this.selectAll = failedIds.length > 0 && failedIds.length === this.list.length
+      if (failed.length > 0) {
+        useToastAlertStore().showAlert(
+          `${operationLabel}: ${successful.length} succeeded, ${failed.length} failed. Failed rows remain selected.`,
+          successful.length ? 'warning' : 'danger',
+          6000
+        )
+      } else {
+        useToastAlertStore().showAlert(
+          result?.detail || `${operationLabel}: ${successful.length} succeeded`,
+          'success'
+        )
+      }
+      return failed.length === 0
+    },
     async bulkChangeRoles() {
       if (this.selectedRows.length === 0) return
 
@@ -1117,49 +1263,61 @@ export default {
       if (this.bulkRoles.isAdmin) newRoles.push('Admin')
       if (this.bulkRoles.isOrganizer) newRoles.push('Organizer')
       if (this.bulkRoles.isSubAdmin) newRoles.push('SubAdmin')
+      if (newRoles.length === 0) {
+        useToastAlertStore().showAlert('A user must have at least one role', 'warning', 4000)
+        return
+      }
+      if (this.selectedIncludesCurrentUser() && !newRoles.includes('Admin')) {
+        useToastAlertStore().showAlert('You cannot remove your own Admin role', 'warning', 4000)
+        return
+      }
 
       const updates = this.selectedRows.map((id) => ({
         id: id,
         roles: newRoles,
       }))
 
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
-        await apiPut('/admin/user/bulk-update', updates).then((resp) => {
-          useToastAlertStore().showAlert(
-            `Roles updated for ${this.selectedRows.length} user(s)`,
-            'success'
-          )
+        const response = await apiPut('/admin/user/bulk-update', updates)
+        if (this.finishBulkOperation(response.data, 'Role update')) {
           this.showBulkRolesPanel = false
-          this.selectedRows = []
-          this.selectAll = false
-          this.getAndSetUserAll()
-        })
-      } catch (e) {
-        useToastAlertStore().showAlert(e, 'danger', 6000)
+        }
+        await this.getAndSetUserAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
       }
     },
     async bulkEnableDisable() {
       if (this.selectedRows.length === 0 || !this.bulkEnableDisableSelection) return
 
       const disableUser = this.bulkEnableDisableSelection === 'disable'
+      if (disableUser && this.selectedIncludesCurrentUser()) {
+        useToastAlertStore().showAlert('You cannot disable your own account', 'warning', 4000)
+        return
+      }
       const updates = this.selectedRows.map((id) => ({
         id: id,
         disabled: disableUser,
       }))
 
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
-        await apiPut('/admin/user/bulk-update', updates).then(() => {
-          useToastAlertStore().showAlert(
-            `Users ${disableUser ? 'disabled' : 'enabled'} successfully`,
-            'success'
-          )
+        const response = await apiPut('/admin/user/bulk-update', updates)
+        if (
+          this.finishBulkOperation(response.data, disableUser ? 'Disable users' : 'Enable users')
+        ) {
           this.showBulkEnableDisablePanel = false
-          this.selectedRows = []
-          this.selectAll = false
-          this.getAndSetUserAll()
-        })
-      } catch (e) {
-        useToastAlertStore().showAlert(e, 'danger', 6000)
+        }
+        await this.getAndSetUserAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
       }
     },
     async bulkResetPasswordToken() {
@@ -1177,18 +1335,25 @@ export default {
       // usersList might only have current page. If selectedRows contains IDs from current page (which it does), we can find them.
       const selectedUsers = this.usersList.filter((u) => this.selectedRows.includes(u.id))
 
+      if (this.mutationPending) return
+      this.mutationPending = true
       let successCount = 0
+      const failures = []
       for (const user of selectedUsers) {
         try {
           await apiPost(`user/reset_password_request?email=${encodeURIComponent(user.email)}`)
           successCount++
-        } catch (e) {
-          console.error(`Failed to reset for ${user.email}`, e)
+        } catch (error) {
+          failures.push(user.id)
         }
       }
-      useToastAlertStore().showAlert(`Reset tokens requested for ${successCount} users`, 'success')
-      this.selectedRows = []
-      this.selectAll = false
+      this.selectedRows = failures
+      this.mutationPending = false
+      useToastAlertStore().showAlert(
+        `Password reset requests: ${successCount} succeeded, ${failures.length} failed`,
+        failures.length ? 'warning' : 'success',
+        6000
+      )
     },
     async bulkDeleteUsers() {
       if (this.selectedRows.length === 0) return
@@ -1196,23 +1361,31 @@ export default {
         useToastAlertStore().showAlert('Password required', 'warning')
         return
       }
+      if (this.selectedIncludesCurrentUser()) {
+        useToastAlertStore().showAlert('You cannot delete your own account', 'warning', 4000)
+        return
+      }
 
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
-        await api
-          .delete(`/admin/user/bulk-delete`, {
-            params: { active_user_password: this.bulkCurrentPassword },
-            data: this.selectedRows,
-          })
-          .then(() => {
-            useToastAlertStore().showAlert('Users deleted successfully', 'success')
-            this.showBulkDeletePanel = false
-            this.selectedRows = []
-            this.selectAll = false
-            this.bulkCurrentPassword = ''
-            this.getAndSetUserAll()
-          })
-      } catch (e) {
-        useToastAlertStore().showAlert(e?.response?.data?.detail || e.message, 'danger', 6000)
+        const response = await api.delete(`/admin/user/bulk-delete`, {
+          params: { active_user_password: this.bulkCurrentPassword },
+          data: this.selectedRows,
+        })
+        if (this.finishBulkOperation(response.data, 'Delete users')) {
+          this.showBulkDeletePanel = false
+          this.bulkCurrentPassword = ''
+        }
+        await this.getAndSetUserAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(
+          error?.response?.data?.detail || error.message,
+          'danger',
+          6000
+        )
+      } finally {
+        this.mutationPending = false
       }
     },
     getRoleBadgeClass(role) {
@@ -1229,23 +1402,23 @@ export default {
       return this.data.data
     },
     list() {
-      if (this.activeSearchFilters !== null) {
-        return this.usersList
-      }
+      const query = this.searchString.toLowerCase().trim()
       const filteredList =
-        this.searchString === ''
+        query === ''
           ? this.usersList
           : this.usersList.filter(
               (item) =>
-                item.id.toString() === this.searchString ||
-                item.first_name.toLowerCase().includes(this.searchString.toLowerCase().trim()) ||
-                item.last_name.toLowerCase().includes(this.searchString.toLowerCase().trim()) ||
-                item.email.toLowerCase().includes(this.searchString.toLowerCase().trim()) ||
-                (Array.isArray(item.roles) &&
-                  item.roles
-                    .toString()
-                    .toLowerCase()
-                    .includes(this.searchString.toLowerCase().trim()))
+                String(item.id) === query ||
+                String(item.first_name ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                String(item.last_name ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                String(item.email ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                (Array.isArray(item.roles) && item.roles.toString().toLowerCase().includes(query))
             )
 
       return filteredList
@@ -1266,15 +1439,47 @@ export default {
       }
       return newRoles
     },
+    activeUserId() {
+      return Number(useAuthStore().getUserData?.id)
+    },
+    isSelectedCurrentUser() {
+      return Number(this.dataSelected?.id) === this.activeUserId
+    },
+    totalPages() {
+      return Math.ceil(this.totalItems / this.itemsPerPage)
+    },
+    visiblePages() {
+      const total = this.totalPages
+      if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1)
+      const pages = [1]
+      const start = Math.max(2, this.currentPage - 1)
+      const end = Math.min(total - 1, this.currentPage + 1)
+      if (start > 2) pages.push('ellipsis-left')
+      for (let page = start; page <= end; page += 1) pages.push(page)
+      if (end < total - 1) pages.push('ellipsis-right')
+      pages.push(total)
+      return pages
+    },
   },
   watch: {
-    $route(val) {
+    async $route(val) {
       if (val.name === 'Users') {
-        this.data = {}
-        this.searchString = ''
+        this.unselectData()
+      } else if (val.name === 'User Overview') {
+        await this.loadUserFromRoute()
       }
     },
     currentPage: 'getAndSetUserAll',
+    searchString() {
+      this.clearSelection()
+    },
+    selectedRows(value) {
+      const visibleIds = this.list.map((item) => item.id)
+      this.selectAll = visibleIds.length > 0 && visibleIds.every((id) => value.includes(id))
+    },
+    showBulkDeletePanel(value) {
+      if (!value) this.bulkCurrentPassword = ''
+    },
   },
 }
 </script>

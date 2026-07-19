@@ -200,7 +200,7 @@ const routes = [
         name: 'Challenges',
         component: () => import('../pages/admin/ChallengesPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -210,7 +210,7 @@ const routes = [
         name: 'Challenges Overview',
         component: () => import('../pages/admin/ChallengesPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -231,7 +231,7 @@ const routes = [
         name: 'Admin Conferences',
         component: () => import('../pages/admin/ConferencesPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -241,7 +241,7 @@ const routes = [
         name: 'Admin Conference Overview',
         component: () => import('../pages/admin/ConferencesPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -251,7 +251,7 @@ const routes = [
         name: 'Users',
         component: () => import('../pages/admin/UsersPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -261,7 +261,7 @@ const routes = [
         name: 'User Overview',
         component: () => import('../pages/admin/UsersPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -278,11 +278,11 @@ const routes = [
         }),
       },
       {
-        path: 'management',
+        path: 'admin-management',
         name: 'Management',
         component: () => import('../pages/admin/ManagementPage.vue'),
         meta: {
-          access: ['admin', 'subadmin'],
+          access: ['admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -294,7 +294,7 @@ const routes = [
         name: 'Proposals',
         component: () => import('../pages/proposals/ProposalsPage.vue'),
         meta: {
-          access: ['organizer', 'admin', 'subAdmin'],
+          access: ['organizer', 'admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -304,7 +304,7 @@ const routes = [
         name: 'New Proposal',
         component: () => import('../pages/proposals/NewProposal.vue'),
         meta: {
-          access: ['organizer', 'admin', 'subAdmin'],
+          access: ['organizer', 'admin'],
           requiresAuth: true,
           groupName: 'Main',
         },
@@ -314,7 +314,7 @@ const routes = [
         name: 'Edit Proposal',
         component: () => import('../pages/proposals/EditProposal.vue'),
         meta: {
-          access: ['organizer', 'admin', 'subAdmin'],
+          access: ['organizer', 'admin'],
           requiresAuth: true,
           groupName: 'Main',
         },

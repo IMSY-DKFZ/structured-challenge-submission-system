@@ -13,6 +13,7 @@
       <button
         v-if="showActionBtn"
         type="submit"
+        :disabled="disabled"
         class="btn btn-primary mt-4"
         :class="classListBtn">
         {{ actionBtn }}
@@ -65,6 +66,10 @@ export default {
     },
     showMissingInputTop: {
       typ: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
       default: false,
     },
   },

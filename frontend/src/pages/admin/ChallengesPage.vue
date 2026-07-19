@@ -118,6 +118,7 @@
               <VueForm
                 action-btn="Change Status"
                 name="status"
+                :disabled="mutationPending"
                 :action-btn-fullwidth="false"
                 @submit-event="setStatus">
                 <VueInput
@@ -137,6 +138,7 @@
               <VueForm
                 action-btn="Apply"
                 name="allowModification"
+                :disabled="mutationPending"
                 :action-btn-fullwidth="false"
                 @submit-event="setAllowModification">
                 <VueInput
@@ -171,7 +173,7 @@
                   v-model="current_password"></VueInput>
                 <button
                   type="button"
-                  :disabled="!current_password"
+                  :disabled="!current_password || mutationPending"
                   class="mt-3 btn btn-danger"
                   @click="deleteChallenge">
                   <i class="be bi-trash2-fill" />
@@ -198,7 +200,7 @@
       <div class="admin-list-shell">
         <div class="card mb-3">
           <div
-            class="card-header bg-light cursor-pointer"
+            class="card-header bg-body-tertiary cursor-pointer"
             @click="showSearchPanel = !showSearchPanel">
             <div class="d-flex justify-content-between align-items-center">
               <h6 class="mb-0">
@@ -216,7 +218,8 @@
           <div
             v-show="showSearchPanel"
             class="card-body">
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Challenge ID</label>
                 <input
@@ -257,7 +260,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Challenge Year</label>
                 <select
@@ -290,7 +294,8 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mb-2 p-2 text-bg-light border border-secondary-subtle rounded">
+            <div
+              class="d-flex gap-2 mb-2 p-2 bg-body-tertiary border border-secondary-subtle rounded">
               <div class="w-100">
                 <label class="form-label small fw-bold text-nowrap">Submission Time</label>
                 <select
@@ -323,7 +328,7 @@
             </div>
 
             <div class="d-flex gap-2">
-              <div class="w-100 p-2 text-bg-light border border-secondary-subtle rounded">
+              <div class="w-100 p-2 bg-body-tertiary border border-secondary-subtle rounded">
                 <label class="form-label small fw-bold text-nowrap">Lighthouse</label>
                 <select
                   v-model="searchFilters.challenge_is_lighthouse_challenge"
@@ -458,10 +463,17 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
+              v-for="page in visiblePages"
               :key="page">
-              <a
+              <span
+                v-if="page === 'ellipsis-left' || page === 'ellipsis-right'"
                 class="page-link"
+                >…</span
+              >
+              <a
+                v-else
+                class="page-link"
+                :class="{ active: currentPage === page }"
                 @click="changePage(page)"
                 href="#"
                 >{{ page }}</a
@@ -582,10 +594,17 @@
             </li>
             <li
               class="page-item"
-              v-for="page in Math.ceil(totalItems / itemsPerPage)"
+              v-for="page in visiblePages"
               :key="page">
-              <a
+              <span
+                v-if="page === 'ellipsis-left' || page === 'ellipsis-right'"
                 class="page-link"
+                >…</span
+              >
+              <a
+                v-else
+                class="page-link"
+                :class="{ active: currentPage === page }"
                 @click="changePage(page)"
                 href="#"
                 >{{ page }}</a
@@ -654,7 +673,7 @@
             <button
               type="button"
               class="btn btn-warning"
-              :disabled="!bulkStatusSelected"
+              :disabled="!bulkStatusSelected || mutationPending"
               @click="bulkChangeStatus">
               <i class="bi bi-check-circle me-2"></i>Apply Status Change
             </button>
@@ -710,7 +729,7 @@
             <button
               type="button"
               class="btn btn-info"
-              :disabled="!bulkAllowModificationSelected"
+              :disabled="!bulkAllowModificationSelected || mutationPending"
               @click="bulkAllowModifications">
               <i class="bi bi-check-circle me-2"></i>Apply Permission
             </button>
@@ -767,7 +786,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              :disabled="!bulkCurrentPassword"
+              :disabled="!bulkCurrentPassword || mutationPending"
               @click="bulkPruneChallenges">
               <i class="bi bi-exclamation-triangle me-2"></i>Prune Forever
             </button>
@@ -789,10 +808,9 @@ import VueInput from '@/components/essentials/VueInput.vue'
 import VueForm from '@/components/essentials/VueForm.vue'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
-import { apiDelete, apiGetDownload, apiPut, apiPost } from '@/api/api'
+import { apiDelete, apiGet, apiGetDownload, apiPut, apiPost } from '@/api/api'
 import ConfirmDialogue from '@/components/ConfirmDialogue.vue'
 import LoadingCircle from '@/components/LoadingCircle.vue'
-import loadingCircle from '@/components/LoadingCircle.vue'
 import { useToastAlertStore } from '@/stores/toastAlert'
 import StringToPrettyDate from '../../helper/format'
 
@@ -837,61 +855,59 @@ export default {
     docsURL() {
       return new URL('/api/docs', api.defaults.baseURL).href
     },
-    loadingCircle() {
-      return loadingCircle
-    },
     dataSelected() {
       return this.data.data
-    },
-    tableHeaders() {
-      return this.tableHeaders
     },
     btnTitle() {
       let defaultText = 'Download proposal'
       return this.LoadingCircleStateDownload ? null : defaultText
     },
     list() {
-      // If advanced search is active, return API results directly (already filtered server-side)
-      if (this.activeSearchFilters !== null) {
-        return this.challengesList
-      }
-
-      // Otherwise, apply client-side quick search filter
+      const query = this.searchString.toLowerCase().trim()
       const filteredList =
-        this.searchString === ''
+        query === ''
           ? this.challengesList
           : this.challengesList.filter(
               (item) =>
-                item.id.toString() === this.searchString ||
-                (item.challenge_year &&
-                  typeof item.challenge_year == 'string' &&
-                  item.challenge_year
-                    .toLowerCase()
-                    .includes(this.searchString.toLowerCase().trim())) ||
-                (item.challenge_progress &&
-                  typeof item.challenge_progress == 'string' &&
-                  item.challenge_progress
-                    .toLowerCase()
-                    .includes(this.searchString.toLowerCase().trim())) ||
-                (item.challenge_name &&
-                  typeof item.challenge_name == 'string' &&
-                  item.challenge_name
-                    .toLowerCase()
-                    .includes(this.searchString.toLowerCase().trim())) ||
-                (item.challenge_author_emails &&
-                  typeof item.challenge_author_emails == 'string' &&
-                  item.challenge_author_emails
-                    .toLowerCase()
-                    .includes(this.searchString.toLowerCase().trim())) ||
+                String(item.id) === query ||
+                String(item.challenge_year ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                String(item.challenge_progress ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                String(item.challenge_name ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
+                String(item.challenge_author_emails ?? '')
+                  .toLowerCase()
+                  .includes(query) ||
                 this.getConferenceShortName(item.challenge_conference_id)
                   .toLowerCase()
-                  .includes(this.searchString.toLowerCase().trim()) ||
-                item.challenge_status.toLowerCase().includes(this.searchString.toLowerCase().trim())
+                  .includes(query) ||
+                String(item.challenge_status ?? '')
+                  .toLowerCase()
+                  .includes(query)
             )
       return filteredList
     },
     hasActiveFilters() {
       return this.activeSearchFilters !== null
+    },
+    totalPages() {
+      return Math.ceil(this.totalItems / this.itemsPerPage)
+    },
+    visiblePages() {
+      const total = this.totalPages
+      if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1)
+      const pages = [1]
+      const start = Math.max(2, this.currentPage - 1)
+      const end = Math.min(total - 1, this.currentPage + 1)
+      if (start > 2) pages.push('ellipsis-left')
+      for (let page = start; page <= end; page += 1) pages.push(page)
+      if (end < total - 1) pages.push('ellipsis-right')
+      pages.push(total)
+      return pages
     },
   },
   data() {
@@ -973,20 +989,52 @@ export default {
         submission_time_date2: '',
       },
       activeSearchFilters: null,
-    }
-  },
-  mounted() {
-    if (this.$route.params.id && !this.dataSelected) {
-      this.$router.push({ name: 'Challenges' })
+      mutationPending: false,
+      listRequestId: 0,
+      detailRequestId: 0,
     }
   },
   async created() {
     await Promise.all([this.getAndSetChallengeAll(), this.getAndSetConferenceShortNames()])
-    // await this.getAndSetUserAll()
+    await this.loadChallengeFromRoute()
   },
   methods: {
     StringToPrettyDate,
     useAuthStore,
+    clearSelection() {
+      this.selectedRows = []
+      this.selectAll = false
+    },
+    applyChallengeSelection(challenge) {
+      this.data = {
+        data: challenge,
+        index: this.challengesList.findIndex((item) => item.id === challenge.id),
+      }
+      this.status = this.setStatusText()
+      this.allowModification = challenge.is_allowed_for_further_editing
+        ? this.allowModificationList[0]
+        : this.allowModificationList[1]
+    },
+    async loadChallengeFromRoute() {
+      const requestId = ++this.detailRequestId
+      const id = Number(this.$route.params.id)
+      if (!Number.isInteger(id) || id < 1) {
+        if (this.$route.params.id) {
+          useToastAlertStore().showAlert('Invalid challenge ID', 'danger', 4000)
+          await this.$router.replace({ name: 'Challenges' })
+        }
+        return
+      }
+      try {
+        const challenge = await apiGet(`/admin/challenge/${id}`)
+        if (requestId !== this.detailRequestId || Number(this.$route.params.id) !== id) return
+        this.applyChallengeSelection(challenge)
+      } catch (error) {
+        if (requestId !== this.detailRequestId) return
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+        await this.$router.replace({ name: 'Challenges' })
+      }
+    },
     async getAndSetConferenceShortNames() {
       const payload = {
         output_filters: ['id', 'short_name'],
@@ -1007,9 +1055,13 @@ export default {
       if (!conferenceId) return '-'
       return this.conferenceShortNames[conferenceId] || `#${conferenceId}`
     },
-    async getAndSetChallengeAll() {
+    async getAndSetChallengeAll(preserveSelection = false) {
+      const requestId = ++this.listRequestId
+      this.LoadingCircleState = true
+      if (!preserveSelection) this.clearSelection()
       const offset = (this.currentPage - 1) * this.itemsPerPage
-      const apiEndpoint = `/admin/challenge/all?limit=${this.itemsPerPage}&offset=${offset}`
+      const sortBy = this.tableHeaderColumnNames[this.tableHeader.indexOf(this.sortColumn)] || 'id'
+      const apiEndpoint = `/admin/challenge/all?limit=${this.itemsPerPage}&offset=${offset}&sort_by=${encodeURIComponent(sortBy)}&sort_desc=${this.sortDirection === 'desc'}`
       const output_filters = [
         'id',
         'challenge_name',
@@ -1024,6 +1076,7 @@ export default {
         'challenge_modified_time',
         'challenge_submission_time',
         'challenge_file',
+        'is_allowed_for_further_editing',
       ]
       let payload = {
         output_filters,
@@ -1031,11 +1084,20 @@ export default {
       }
       await apiPost(apiEndpoint, payload)
         .then((resp) => {
+          if (requestId !== this.listRequestId) return
           this.challengesList = resp['content']
           this.totalItems = resp['total_records']
+          if (
+            this.totalItems > 0 &&
+            this.currentPage > Math.ceil(this.totalItems / this.itemsPerPage)
+          ) {
+            this.currentPage = Math.ceil(this.totalItems / this.itemsPerPage)
+            return
+          }
           this.LoadingCircleState = false
         })
         .catch((e) => {
+          if (requestId !== this.listRequestId) return
           this.LoadingCircleState = false
           if (e.message.includes('No Challenge found') || e.message.includes('not found')) {
             this.challengesList = []
@@ -1106,7 +1168,9 @@ export default {
           this.searchFilters.submission_time_operator === 'between' &&
           this.searchFilters.submission_time_date2
         ) {
-          const date2 = new Date(this.searchFilters.submission_time_date2).toISOString()
+          const endDate = new Date(this.searchFilters.submission_time_date2)
+          endDate.setHours(23, 59, 59, 999)
+          const date2 = endDate.toISOString()
           filters.challenge_submission_time__between = [date1, date2]
         }
       }
@@ -1114,9 +1178,24 @@ export default {
       return Object.keys(filters).length > 0 ? filters : null
     },
     applySearch() {
+      if (
+        this.searchFilters.submission_time_operator === 'between' &&
+        (!this.searchFilters.submission_time_date2 ||
+          this.searchFilters.submission_time_date1 > this.searchFilters.submission_time_date2)
+      ) {
+        useToastAlertStore().showAlert('Choose a valid submission date range', 'warning', 4000)
+        return
+      }
+      if (
+        this.searchFilters.year_operator === 'between' &&
+        (!this.searchFilters.challenge_year2 ||
+          Number(this.searchFilters.challenge_year) > Number(this.searchFilters.challenge_year2))
+      ) {
+        useToastAlertStore().showAlert('Choose a valid challenge year range', 'warning', 4000)
+        return
+      }
       this.activeSearchFilters = this.buildSearchFilters()
-      this.currentPage = 1 // Reset to first page when applying search
-      this.getAndSetChallengeAll()
+      this.reloadFromFirstPage()
 
       if (this.activeSearchFilters) {
         useToastAlertStore().showAlert('Search filters applied', 'success', 3000)
@@ -1140,8 +1219,7 @@ export default {
         submission_time_date2: '',
       }
       this.activeSearchFilters = null
-      this.currentPage = 1
-      this.getAndSetChallengeAll()
+      this.reloadFromFirstPage()
       useToastAlertStore().showAlert('Search filters cleared', 'success', 3000)
     },
     // async getAndSetUserAll() {
@@ -1151,19 +1229,19 @@ export default {
     //   })
     // },
     selectData(item, idx) {
-      this.data = {
-        data: item,
-        index: idx,
-      }
-      this.status = this.setStatusText()
+      this.applyChallengeSelection(item)
       // this.creator = this.dataSelected?.challenge_author_names[0] !== null ? this.dataSelected.challenge_author_names[0] : "No author name";
       // this.creator = this.dataSelected?.challenge_author_names !== null ? this.dataSelected.challenge_author_names : "No author name";
       this.$router.push({ name: 'Challenges Overview', params: { id: item.id } })
     },
     unselectData() {
+      this.detailRequestId += 1
       this.data = {}
       this.searchString = ''
       this.failMessageCreator = null
+      this.status = ''
+      this.allowModification = ''
+      this.current_password = null
     },
     async downloadChallenge(id) {
       if (Number.isInteger(id)) {
@@ -1205,35 +1283,36 @@ export default {
     },
 
     async setAllowModification() {
-      let is_allowed_for_further_editing = false
-      if (this.allowModification === this.allowModificationList[0]) {
-        is_allowed_for_further_editing = true
-      }
-      // let challenge_locked = this.setLocked(challenge_status)
-      let data = {
-        is_allowed_for_further_editing: is_allowed_for_further_editing,
-      }
-      await apiPut(`admin/challenge/${this.dataSelected?.id}/update`, data)
-        .then(() => {
-          useToastAlertStore().showAlert('Challenge updated', 'success')
+      if (!this.allowModification || this.mutationPending) return
+      this.mutationPending = true
+      try {
+        const response = await apiPut(`admin/challenge/${this.dataSelected?.id}/update`, {
+          is_allowed_for_further_editing: this.allowModification === this.allowModificationList[0],
         })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e, 'danger', 6000)
-        })
+        this.applyChallengeSelection(response.data)
+        useToastAlertStore().showAlert('Challenge updated', 'success')
+        await this.getAndSetChallengeAll()
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
+      }
     },
     async setStatus() {
-      let challenge_status = this.setStatusCamelCase()
-      // let challenge_locked = this.setLocked(challenge_status)
-      let newStatus = {
-        challenge_status: challenge_status,
+      if (!this.status || this.mutationPending) return
+      this.mutationPending = true
+      try {
+        const response = await apiPut(`admin/challenge/${this.dataSelected?.id}/status`, {
+          challenge_status: this.setStatusCamelCase(),
+        })
+        this.applyChallengeSelection(response.data)
+        useToastAlertStore().showAlert('The status was changed', 'success')
+        await this.getAndSetChallengeAll()
+      } catch (error) {
+        useToastAlertStore().showAlert(error.message, 'danger', 6000)
+      } finally {
+        this.mutationPending = false
       }
-      await apiPut(`admin/challenge/${this.dataSelected?.id}/status`, newStatus)
-        .then(() => {
-          useToastAlertStore().showAlert('The status was changed', 'success')
-        })
-        .catch((e) => {
-          useToastAlertStore().showAlert(e, 'danger', 6000)
-        })
     },
     setStatusCamelCase() {
       switch (this.status) {
@@ -1372,6 +1451,7 @@ export default {
     //   })
     // },
     async deleteChallenge() {
+      if (this.mutationPending) return
       const ok = await this.$refs.confirmDialogue.show({
         title: 'Prune challenge proposal',
         message: 'Are you sure you want to prune this challenge? It cannot be undone.',
@@ -1379,20 +1459,20 @@ export default {
         okButtonTheme: 'btn-danger',
       })
       if (ok) {
-        await apiDelete(
-          `admin/challenge/${this.dataSelected?.id}/prune?active_user_password=${encodeURIComponent(
-            this.current_password
-          )}`
-        )
-          .then(() => {
-            useToastAlertStore().showAlert('The challenge was finally deleted', 'success')
-            setTimeout(1000)
-            location.reload()
-          })
-          .catch((e) => {
-            useToastAlertStore().showAlert(e, 'danger', 6000)
-          })
-      } else {
+        this.mutationPending = true
+        try {
+          await apiDelete(
+            `admin/challenge/${this.dataSelected?.id}/prune?active_user_password=${encodeURIComponent(this.current_password)}`
+          )
+          useToastAlertStore().showAlert('The challenge was permanently deleted', 'success')
+          this.current_password = null
+          await this.$router.push({ name: 'Challenges' })
+          await this.getAndSetChallengeAll()
+        } catch (error) {
+          useToastAlertStore().showAlert(error.message, 'danger', 6000)
+        } finally {
+          this.mutationPending = false
+        }
       }
     },
     changePage(page) {
@@ -1402,8 +1482,11 @@ export default {
     },
     changeItemsPerPage(option) {
       this.itemsPerPage = option
-      this.currentPage = 1 // Reset to the first page when items per page changes
-      this.getAndSetChallengeAll()
+      this.reloadFromFirstPage()
+    },
+    reloadFromFirstPage() {
+      if (this.currentPage === 1) this.getAndSetChallengeAll()
+      else this.currentPage = 1
     },
     sortTable(column) {
       // Toggle sort direction if the same column is clicked again
@@ -1415,45 +1498,37 @@ export default {
       }
 
       this.sortColumn = column
-      let idx = this.tableHeader.indexOf(column)
-
-      // Perform sorting based on the selected column and direction
-      this.list.sort((a, b) => {
-        const valueA =
-          column === 'Conference'
-            ? this.getSortableValue(this.getConferenceShortName(a.challenge_conference_id))
-            : this.getSortableValue(a[this.tableHeaderColumnNames[idx]])
-        const valueB =
-          column === 'Conference'
-            ? this.getSortableValue(this.getConferenceShortName(b.challenge_conference_id))
-            : this.getSortableValue(b[this.tableHeaderColumnNames[idx]])
-
-        if (valueA < valueB) {
-          return this.sortDirection === 'asc' ? -1 : 1
-        }
-        if (valueA > valueB) {
-          return this.sortDirection === 'asc' ? 1 : -1
-        }
-        return 0
-      })
-    },
-    getSortableValue(value) {
-      // Convert values to a common type for proper sorting
-      if (typeof value === 'string') {
-        return value.toLowerCase()
-      } else if (value instanceof Date) {
-        return value.getTime()
-      } else {
-        return value
-      }
+      this.reloadFromFirstPage()
     },
     selectAllRows() {
       // Toggle the selection of all rows
       if (this.selectAll) {
-        this.selectedRows = this.challengesList.map((item) => item.id)
+        this.selectedRows = this.list.map((item) => item.id)
       } else {
         this.selectedRows = []
       }
+    },
+    finishBulkOperation(result, operationLabel) {
+      const successful = Array.isArray(result?.successful) ? result.successful : []
+      const failed = Array.isArray(result?.failed) ? result.failed : []
+      const failedIds = failed
+        .map((item) => Number(item?.id ?? item?.entity_id ?? item?.data?.id))
+        .filter(Number.isInteger)
+      this.selectedRows = failedIds
+      this.selectAll = failedIds.length > 0 && failedIds.length === this.list.length
+      if (failed.length > 0) {
+        useToastAlertStore().showAlert(
+          `${operationLabel}: ${successful.length} succeeded, ${failed.length} failed. Failed rows remain selected.`,
+          successful.length ? 'warning' : 'danger',
+          6000
+        )
+      } else {
+        useToastAlertStore().showAlert(
+          result?.detail || `${operationLabel}: ${successful.length} succeeded`,
+          'success'
+        )
+      }
+      return failed.length === 0
     },
     async bulkDownloadChallenges() {
       if (this.selectedRows.length === 0) {
@@ -1525,30 +1600,28 @@ export default {
       }
 
       // Execute the bulk status change directly
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
-        await api
-          .put('/admin/challenge/bulk-status', {
-            ids: this.selectedRows,
-            challenge_status_object: {
-              challenge_status: this.bulkStatusSelected,
-            },
-          })
-          .then((response) => {
-            useToastAlertStore().showAlert(
-              response.data.detail || `Status changed for ${this.selectedRows.length} challenge(s)`,
-              'success'
-            )
-            this.selectedRows = []
-            this.selectAll = false
-            this.bulkStatusSelected = ''
-            this.showBulkStatusPanel = false
-            this.getAndSetChallengeAll()
-          })
-          .catch((e) => {
-            useToastAlertStore().showAlert(e?.response?.data?.detail || e.message, 'danger', 6000)
-          })
-      } catch (e) {
-        useToastAlertStore().showAlert(e, 'danger', 6000)
+        const response = await api.put('/admin/challenge/bulk-status', {
+          ids: this.selectedRows,
+          challenge_status_object: {
+            challenge_status: this.bulkStatusSelected,
+          },
+        })
+        if (this.finishBulkOperation(response.data, 'Status update')) {
+          this.bulkStatusSelected = ''
+          this.showBulkStatusPanel = false
+        }
+        await this.getAndSetChallengeAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(
+          error?.response?.data?.detail || error.message,
+          'danger',
+          6000
+        )
+      } finally {
+        this.mutationPending = false
       }
     },
     async bulkAllowModifications() {
@@ -1575,31 +1648,28 @@ export default {
         this.bulkAllowModificationSelected === this.allowModificationList[0]
 
       // Execute the bulk permission change directly
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
         const updates = this.selectedRows.map((id) => ({
           id: id,
           is_allowed_for_further_editing: is_allowed_for_further_editing,
         }))
 
-        await api
-          .put('/admin/challenge/bulk-update', updates)
-          .then((response) => {
-            useToastAlertStore().showAlert(
-              response.data.detail ||
-                `Modification settings updated for ${this.selectedRows.length} challenge(s)`,
-              'success'
-            )
-            this.selectedRows = []
-            this.selectAll = false
-            this.bulkAllowModificationSelected = ''
-            this.showBulkAllowModPanel = false
-            this.getAndSetChallengeAll()
-          })
-          .catch((e) => {
-            useToastAlertStore().showAlert(e?.response?.data?.detail || e.message, 'danger', 6000)
-          })
-      } catch (e) {
-        useToastAlertStore().showAlert(e, 'danger', 6000)
+        const response = await api.put('/admin/challenge/bulk-update', updates)
+        if (this.finishBulkOperation(response.data, 'Modification update')) {
+          this.bulkAllowModificationSelected = ''
+          this.showBulkAllowModPanel = false
+        }
+        await this.getAndSetChallengeAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(
+          error?.response?.data?.detail || error.message,
+          'danger',
+          6000
+        )
+      } finally {
+        this.mutationPending = false
       }
     },
     async bulkPruneChallenges() {
@@ -1623,44 +1693,48 @@ export default {
       }
 
       // Execute the bulk prune directly
+      if (this.mutationPending) return
+      this.mutationPending = true
       try {
-        await api
-          .delete(
-            `/admin/challenge/bulk-prune?active_user_password=${encodeURIComponent(
-              this.bulkCurrentPassword
-            )}`,
-            {
-              data: this.selectedRows,
-            }
-          )
-          .then((response) => {
-            useToastAlertStore().showAlert(
-              response.data.detail ||
-                `${this.selectedRows.length} challenge(s) pruned successfully`,
-              'success'
-            )
-            this.selectedRows = []
-            this.selectAll = false
-            this.bulkCurrentPassword = ''
-            this.showBulkPrunePanel = false
-            this.getAndSetChallengeAll()
-          })
-          .catch((e) => {
-            useToastAlertStore().showAlert(e?.response?.data?.detail || e.message, 'danger', 6000)
-          })
-      } catch (e) {
-        useToastAlertStore().showAlert(e, 'danger', 6000)
+        const response = await api.delete(
+          `/admin/challenge/bulk-prune?active_user_password=${encodeURIComponent(this.bulkCurrentPassword)}`,
+          { data: this.selectedRows }
+        )
+        if (this.finishBulkOperation(response.data, 'Prune')) {
+          this.bulkCurrentPassword = ''
+          this.showBulkPrunePanel = false
+        }
+        await this.getAndSetChallengeAll(true)
+      } catch (error) {
+        useToastAlertStore().showAlert(
+          error?.response?.data?.detail || error.message,
+          'danger',
+          6000
+        )
+      } finally {
+        this.mutationPending = false
       }
     },
   },
   watch: {
-    $route(val) {
+    async $route(val) {
       if (val.name === 'Challenges') {
-        this.data = {}
-        this.searchString = ''
+        this.unselectData()
+      } else if (val.name === 'Challenges Overview') {
+        await this.loadChallengeFromRoute()
       }
     },
     currentPage: 'getAndSetChallengeAll',
+    searchString() {
+      this.clearSelection()
+    },
+    selectedRows(value) {
+      const visibleIds = this.list.map((item) => item.id)
+      this.selectAll = visibleIds.length > 0 && visibleIds.every((id) => value.includes(id))
+    },
+    showBulkPrunePanel(value) {
+      if (!value) this.bulkCurrentPassword = ''
+    },
   },
 }
 </script>

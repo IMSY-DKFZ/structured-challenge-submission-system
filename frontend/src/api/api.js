@@ -2,6 +2,20 @@ import api, { setToken } from '@/api/axios'
 import { useToastAlertStore } from '@/stores/toastAlert'
 import { useAuthStore } from '@/stores/auth'
 
+function apiErrorMessage(error) {
+  const detail = error?.response?.data?.detail
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => item?.msg || item?.message || JSON.stringify(item))
+      .filter(Boolean)
+      .join('; ')
+  }
+  if (detail && typeof detail === 'object') {
+    return detail.msg || detail.message || JSON.stringify(detail)
+  }
+  return detail || error?.message || 'Request failed'
+}
+
 async function apiPost(path, payload, headers, skipConnectionError) {
   let data
   // let errorText
@@ -13,7 +27,7 @@ async function apiPost(path, payload, headers, skipConnectionError) {
       })
       .catch((error) => {
         data = error
-        if (!skipConnectionError) throw new Error(error?.response.data.detail || error?.message)
+        if (!skipConnectionError) throw new Error(apiErrorMessage(error))
       })
     return data.data
   } else {
@@ -29,17 +43,7 @@ async function apiPost(path, payload, headers, skipConnectionError) {
         }
       })
       .catch((error) => {
-        if (
-          error?.response?.data?.detail[0].msg !== undefined &&
-          error?.response?.data?.detail[0].msg.toString().includes('password')
-        ) {
-          throw new Error(error?.response?.data?.detail[0].msg || error?.message)
-        }
-        if (skipConnectionError) {
-          throw new Error(error?.response.data.detail || error?.message)
-        } else {
-          throw new Error(error?.response.data.detail || error?.message)
-        }
+        throw new Error(apiErrorMessage(error))
       })
     return data.data
   }
@@ -54,7 +58,7 @@ async function apiPut(path, payload, headers) {
       })
       .catch((error) => {
         data = error
-        throw new Error(error?.response?.data.detail || error?.message)
+        throw new Error(apiErrorMessage(error))
       })
     return data
   } else {
@@ -67,7 +71,7 @@ async function apiPut(path, payload, headers) {
       })
       .catch((error) => {
         data = error
-        throw new Error(error?.response?.data.detail || error?.message)
+        throw new Error(apiErrorMessage(error))
       })
     return data.data
   }
@@ -81,11 +85,7 @@ async function apiDelete(path, payload) {
     })
     .catch((error) => {
       data = error
-      throw new Error(
-        typeof error?.response.data.detail == 'string'
-          ? error?.response.data.detail
-          : error?.message
-      )
+      throw new Error(apiErrorMessage(error))
     })
   return data.data
 }
@@ -102,9 +102,7 @@ async function apiGet(path, headers) {
       })
       .catch((error) => {
         data = error.response !== undefined ? connectionError(error) : error
-        let errorMessage =
-          error.response !== undefined ? error?.response.data.detail : error?.message
-        throw new Error(errorMessage)
+        throw new Error(apiErrorMessage(error))
       })
   } else {
     await api
@@ -114,9 +112,7 @@ async function apiGet(path, headers) {
       })
       .catch((error) => {
         data = error.response !== undefined ? connectionError(error) : error
-        let errorMessage =
-          error.response !== undefined ? error?.response.data.detail : error?.message
-        throw new Error(errorMessage)
+        throw new Error(apiErrorMessage(error))
       })
   }
   return data

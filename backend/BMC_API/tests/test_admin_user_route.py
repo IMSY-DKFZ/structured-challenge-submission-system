@@ -19,6 +19,74 @@ pytest_plugins = [
 class TestAdminUserRoutes:
     """Tests for the admin user routes"""
 
+    @staticmethod
+    async def _admin_id(dbsession, email: str) -> int:
+        result = await dbsession.execute(select(UserModel.id).where(UserModel.email == email))
+        return result.scalar_one()
+
+    @pytest.mark.anyio
+    async def test_admin_cannot_remove_all_roles(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, test_user: UserCreateAdminDTO
+    ):
+        create_response = await client.post(
+            fastapi_app.url_path_for("create_user_route_admin"),
+            json=test_user.model_dump(),
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        response = await client.put(
+            fastapi_app.url_path_for("update_user_route_admin", id=create_response.json()["id"]),
+            json={"roles": []},
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "at least one role" in response.json()["detail"]
+
+    @pytest.mark.anyio
+    @pytest.mark.parametrize("update", [{"disabled": True}, {"roles": ["Organizer"]}])
+    async def test_admin_cannot_lock_out_own_account(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, test_admin, dbsession, update
+    ):
+        admin_id = await self._admin_id(dbsession, test_admin.email)
+        response = await client.put(
+            fastapi_app.url_path_for("update_user_route_admin", id=admin_id),
+            json=update,
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.anyio
+    async def test_admin_cannot_lock_out_own_account_in_bulk(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, test_admin, dbsession
+    ):
+        admin_id = await self._admin_id(dbsession, test_admin.email)
+        response = await client.put(
+            fastapi_app.url_path_for("bulk_update_users_route_admin"),
+            json=[{"id": admin_id, "disabled": True}],
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @pytest.mark.anyio
+    @pytest.mark.parametrize("bulk", [False, True])
+    async def test_admin_cannot_delete_own_account(
+        self, client: AsyncClient, fastapi_app: FastAPI, admin_token, test_admin, dbsession, bulk
+    ):
+        admin_id = await self._admin_id(dbsession, test_admin.email)
+        route_name = "bulk_delete_users_route_admin" if bulk else "delete_user_route_admin"
+        route = fastapi_app.url_path_for(route_name) if bulk else fastapi_app.url_path_for(route_name, id=admin_id)
+        with patch(
+            "BMC_API.src.application.interfaces.authentication.auth.authenticate_user",
+            return_value=True,
+        ):
+            response = await client.request(
+                "DELETE",
+                route,
+                params={"active_user_password": test_admin.password},
+                json=[admin_id] if bulk else None,
+                headers={"Authorization": f"Bearer {admin_token}"},
+            )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     @pytest.mark.anyio
     async def test_get_user_admin_success(
         self, client: AsyncClient, fastapi_app: FastAPI, test_user_confirmed: UserCreateAdminDTO, admin_token
